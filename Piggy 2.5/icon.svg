@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe79a"/>
+      <stop offset="100%" stop-color="#ffd95e"/>
+    </linearGradient>
+    <linearGradient id="pigGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffb8cc"/>
+      <stop offset="100%" stop-color="#f48fb1"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#b8860b" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background with rounded squircles -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  
+  <!-- Outer circle border accent -->
+  <rect x="12" y="12" width="488" height="488" rx="116" fill="none" stroke="#e0b83e" stroke-width="4"/>
+
+  <!-- Piggy Graphic -->
+  <g filter="url(#shadow)">
+    <!-- Ears -->
+    <path d="M190 170 C160 110, 200 90, 230 145 Z" fill="#f06292"/>
+    <path d="M330 160 C360 100, 320 80, 290 135 Z" fill="#e91e63" opacity="0.7"/>
+
+    <!-- Tail -->
+    <path d="M130 290 C100 280, 90 310, 110 325 C120 330, 110 345, 100 340" fill="none" stroke="#f06292" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Feet -->
+    <rect x="190" y="360" width="34" height="42" rx="14" fill="#f06292"/>
+    <rect x="300" y="360" width="34" height="42" rx="14" fill="#f06292"/>
+
+    <!-- Body -->
+    <ellipse cx="260" cy="280" rx="140" ry="110" fill="url(#pigGrad)"/>
+
+    <!-- Coin Slot -->
+    <rect x="230" y="165" width="60" height="10" rx="5" fill="#c2185b" opacity="0.6"/>
+    
+    <!-- Coin Going In -->
+    <circle cx="260" cy="140" r="28" fill="#ffd700" stroke="#d4af37" stroke-width="3"/>
+    <text x="260" y="148" font-family="-apple-system, sans-serif" font-size="22" font-weight="bold" fill="#b8860b" text-anchor="middle">Kč</text>
+
+    <!-- Eye -->
+    <ellipse cx="325" cy="245" rx="9" ry="12" fill="#2b2b2b"/>
+    <circle cx="328" cy="242" r="3" fill="#ffffff"/>
+
+    <!-- Snout -->
+    <ellipse cx="380" cy="285" rx="35" ry="26" fill="#f06292"/>
+    <ellipse cx="372" cy="285" rx="5" ry="9" fill="#c2185b"/>
+    <ellipse cx="388" cy="285" rx="5" ry="9" fill="#c2185b"/>
+
+    <!-- Cheeks -->
+    <circle cx="330" cy="285" r="14" fill="#ff4081" opacity="0.3"/>
+  </g>
+</svg>

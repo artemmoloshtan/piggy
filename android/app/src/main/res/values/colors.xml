@@ -1,0 +1,8 @@
+<resources>
+    <color name="gold_primary">#FFD95E</color>
+    <color name="gold_dark">#E0B83E</color>
+    <color name="gold_light">#FFE79A</color>
+    <color name="background">#F4F2EC</color>
+    <color name="ink">#2B2B2B</color>
+    <color name="pink_pig">#F48FB1</color>
+</resources>
