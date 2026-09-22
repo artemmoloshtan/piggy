@@ -5,9 +5,10 @@ A fast, zero-dependency, single-file financial web application that computes cap
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Client--Side-blue.svg)](#)
-[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Android%20%7C%20PWA-orange.svg)](#)
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(v2.5)-047857?logo=android&logoColor=white)](Piggy.apk)
 
-> **🚀 Live Demo**: [https://artemmoloshtan.github.io/piggy](https://artemmoloshtan.github.io/piggy)
+> **🚀 Live Demo**: [https://artemmoloshtan.github.io/piggy](https://artemmoloshtan.github.io/piggy)  
+> **📱 Android Build**: [**Download Piggy.apk (v2.5.0)**](Piggy.apk) (5.4 MB)
 
 ---
 
@@ -43,6 +44,7 @@ index.html   <-- Complete, zero-dependency, self-contained application
 ## 📱 Android App & PWA
 
 In addition to the standalone HTML web file, Piggy includes:
+- **Direct APK Download**: You can download and install [**`Piggy.apk`**](Piggy.apk) (5.4 MB) directly onto any Android device.
 - **Native Android Project** (`android/`): Modern Kotlin + Android WebView wrapper utilizing `WebViewAssetLoader`, Android system file picker (`onShowFileChooser`), and public storage export via `MediaStore.Downloads`.
 - **Installable PWA**: Includes `manifest.webmanifest` and Service Worker (`sw.js`) for adding directly to mobile home screens.
 
