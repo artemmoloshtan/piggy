@@ -584,6 +584,88 @@
     text-decoration: underline;
   }
 
+  /* Mobile Responsive & Touch Optimizations */
+  @media (max-width: 768px) {
+    header { padding: max(14px, env(safe-area-inset-top, 14px)) 16px 12px; }
+    .brand .pig-logo { font-size: 32px; }
+    header h1 { font-size: 20px; }
+    header p { font-size: 12px; }
+    .header-badges { width: 100%; justify-content: flex-start; margin-top: 4px; }
+    main { padding: 14px 12px max(60px, env(safe-area-inset-bottom, 60px)); }
+    .drop-card { padding: 14px; margin-bottom: 16px; border-radius: 8px; }
+    .dropzone { padding: 22px 14px; }
+    .dropzone .big { font-size: 14.5px; }
+    .dropzone .small { font-size: 12px; }
+    .toolbar { gap: 6px; }
+    .btn { min-height: 42px; font-size: 12.5px; padding: 7px 13px; }
+
+    /* 2x2 grid for mobile KPIs */
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .kpi-card { padding: 12px 14px; border-radius: 8px; }
+    .kpi-val { font-size: 19px; }
+    .kpi-title { font-size: 11px; }
+    .kpi-sub { font-size: 11px; }
+
+    .chart-card { padding: 14px; margin-bottom: 16px; border-radius: 8px; }
+
+    /* Sticky Tab Bar for easy navigation */
+    nav.tabs {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--bg);
+      padding: 6px 0 0;
+      margin: 12px 0 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav.tabs button {
+      padding: 9px 14px;
+      font-size: 13px;
+    }
+    .tabs-actions {
+      width: 100%;
+      margin-left: 0;
+      padding-top: 8px;
+      padding-bottom: 4px;
+      display: flex;
+      gap: 6px;
+    }
+    .tabs-actions .btn { flex: 1; justify-content: center; }
+
+    .panel {
+      padding: 14px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+
+    /* Sticky First Column in Data Tables on Mobile */
+    table th:first-child, table td:first-child {
+      position: sticky;
+      left: 0;
+      background: #ffffff;
+      z-index: 2;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.06);
+    }
+    table th:first-child {
+      background: #f7f5ee;
+      z-index: 3;
+    }
+    .total-row td:first-child {
+      background: #f7f4ea;
+    }
+    tr.hl td:first-child {
+      background: #fff6cc !important;
+    }
+
+    footer { padding: 18px 14px max(32px, env(safe-area-inset-bottom, 32px)); }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .toolbar .btn { flex: 1 1 calc(50% - 6px); justify-content: center; text-align: center; }
+  }
+
   /* Print Stylesheet for Tax Filing */
   @media print {
     header { background: none; border-bottom: 2px solid #000; padding: 10px 0; }
@@ -635,7 +717,8 @@
 
     <div class="toolbar">
       <button class="btn btn-demo" id="btnDemo">✨ Load Demo Portfolio</button>
-      <button class="btn" id="btnTemplate">📋 Paste Template</button>
+      <button class="btn" id="btnPasteClipboard">📋 Paste from Clipboard</button>
+      <button class="btn" id="btnTemplate">📑 Load Template</button>
       <button class="btn" id="btnDownloadTemplate">⬇️ Download Template (.csv)</button>
       <button class="btn btn-clear" id="btnClear">✕ Clear</button>
     </div>
@@ -1485,6 +1568,23 @@ document.addEventListener('click', e=>{
   const t = e.target;
   if (t.closest('#btnDemo')){ clearAll(); loadText(DEMOS.demo, 'Demo portfolio'); return; }
   if (t.closest('#btnTemplate')){ clearAll(); loadText(DEMOS.Template, 'Template portfolio'); return; }
+  if (t.closest('#btnPasteClipboard')){
+    if (navigator.clipboard && navigator.clipboard.readText){
+      navigator.clipboard.readText().then(text => {
+        if (text && text.trim()){
+          clearAll();
+          loadText(text, 'Pasted from clipboard');
+        } else {
+          showError('Clipboard is empty or does not contain text.');
+        }
+      }).catch(err => {
+        showError('Clipboard permission was not granted. You can paste using Ctrl+V or Cmd+V directly onto the page.');
+      });
+    } else {
+      showError('Clipboard API is not available in this browser. Please use Ctrl+V or Cmd+V.');
+    }
+    return;
+  }
   if (t.closest('#btnDownloadTemplate')){ download('piggy-template.csv', DEMOS.Template); return; }
   if (t.closest('#btnClear')){ clearAll(); return; }
   if (t.closest('#btnExport')){ exportReport(); return; }
