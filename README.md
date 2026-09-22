@@ -5,10 +5,10 @@ A fast, zero-dependency, single-file financial web application that computes cap
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Client--Side-blue.svg)](#)
-[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(v2.5)-047857?logo=android&logoColor=white)](Piggy.apk)
+[![Download APK](https://img.shields.io/badge/Download-Android%20APK%20(v1.0.0)-047857?logo=android&logoColor=white)](Piggy.apk)
 
 > **🚀 Live Demo**: [https://artemmoloshtan.github.io/piggy](https://artemmoloshtan.github.io/piggy)  
-> **📱 Android Build**: [**Download Piggy.apk (v2.5.0)**](Piggy.apk) (5.4 MB)
+> **📱 Android Build**: [**Download Piggy.apk (v1.0.0)**](Piggy.apk) (5.4 MB)
 
 ---
 

@@ -85,7 +85,7 @@ class WebAppInterface(private val activity: Activity) {
 
     @JavascriptInterface
     fun getAppVersion(): String {
-        return "2.5.0"
+        return "1.0.0"
     }
 
     private fun saveFileToDownloads(context: Context, filename: String, content: String): Uri? {
