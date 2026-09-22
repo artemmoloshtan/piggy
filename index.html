@@ -4,51 +4,72 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffd95e">
-<meta name="description" content="Piggy – Single-file client-side tax calculator for stock and security trading profits under Czech tax law (FIFO, 3-year holding test, GFŘ exchange rates).">
+<meta name="description" content="Piggy v1.1.0 – Liquid Glass &amp; Material You tax calculator for stock and security trading profits under Czech income tax law (FIFO, časový test, GFŘ exchange rates).">
 <title>Piggy – Czech Securities Tax &amp; FIFO Engine</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
   :root {
-    --bg: #f8f7f3;
-    --card: #ffffff;
-    --ink: #1a1a1a;
-    --ink-sub: #5f5a4e;
-    --border: #e2dcd0;
-    --border-light: #eeebe3;
-    --gold: #ffd95e;
-    --gold-dark: #d9ab24;
-    --gold-light: #fff5d1;
-    --green: #15803d;
+    --bg-mesh: radial-gradient(at 0% 0%, rgba(255, 237, 180, 0.45) 0px, transparent 55%),
+               radial-gradient(at 100% 0%, rgba(254, 215, 102, 0.35) 0px, transparent 55%),
+               radial-gradient(at 50% 100%, rgba(254, 240, 199, 0.5) 0px, transparent 60%),
+               #f8f7f2;
+    --glass-card: rgba(255, 255, 255, 0.74);
+    --glass-card-hover: rgba(255, 255, 255, 0.88);
+    --glass-border: rgba(255, 255, 255, 0.85);
+    --glass-border-subtle: rgba(220, 214, 200, 0.55);
+    --glass-shadow: 0 10px 30px -4px rgba(45, 38, 20, 0.05), 0 2px 8px -2px rgba(45, 38, 20, 0.03);
+    --glass-shadow-lg: 0 18px 40px -6px rgba(45, 38, 20, 0.09), 0 4px 14px -3px rgba(45, 38, 20, 0.05);
+
+    --ink: #1c1c1e;
+    --ink-sub: #635f54;
+    --gold: #f59e0b;
+    --gold-dark: #d97706;
+    --gold-surface: rgba(245, 158, 11, 0.12);
+    --green: #059669;
     --green-bg: #ecfdf5;
     --green-border: #a7f3d0;
-    --red: #b91c1c;
+    --red: #dc2626;
     --red-bg: #fef2f2;
     --red-border: #fecaca;
-    --purple: #7e22ce;
+    --purple: #7c3aed;
     --purple-bg: #faf5ff;
-    --blue: #1d4ed8;
+    --blue: #2563eb;
     --blue-bg: #eff6ff;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
-    --radius: 10px;
+    --teal: #0d9488;
+    --teal-bg: #f0fdfa;
+
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+    --radius-pill: 9999px;
   }
-  * { box-sizing: border-box; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--ink);
-    background: var(--bg);
+    background: var(--bg-mesh);
+    min-height: 100vh;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Header */
+  /* Header with Liquid Glass Blur */
   header {
-    background: linear-gradient(180deg, #fff7d6 0%, #ffd95e 100%);
-    border-bottom: 2px solid var(--gold-dark);
-    padding: max(18px, env(safe-area-inset-top, 18px)) 20px 18px;
+    background: rgba(255, 245, 204, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--glass-border);
+    padding: max(16px, env(safe-area-inset-top, 16px)) 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   }
   header .wrap {
-    max-width: 1200px;
+    max-width: 1220px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -62,22 +83,26 @@
     gap: 14px;
   }
   .pig-logo {
-    font-size: 40px;
+    font-size: 38px;
     line-height: 1;
-    filter: drop-shadow(0 2px 4px rgba(184,134,11,0.25));
+    filter: drop-shadow(0 4px 8px rgba(217, 119, 6, 0.25));
     user-select: none;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .pig-logo:hover {
+    transform: scale(1.12) rotate(-5deg);
   }
   header h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: #2b2204;
+    color: #261d05;
   }
   header p {
-    margin: 3px 0 0;
-    color: #6b5514;
-    font-size: 13.5px;
+    margin: 2px 0 0;
+    color: #6d581a;
+    font-size: 13px;
     font-weight: 500;
   }
   .header-badges {
@@ -90,82 +115,80 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
     font-size: 12px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.15s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .badge-privacy {
-    background: rgba(255,255,255,0.7);
-    color: #554411;
-    border: 1px solid rgba(180,140,20,0.25);
+    background: rgba(255, 255, 255, 0.7);
+    color: #5d460d;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
   }
   .badge-github {
-    background: #1e2022;
-    color: #fff;
-    border: 1px solid #1e2022;
+    background: #18181b;
+    color: #fafafa;
+    border: 1px solid #27272a;
   }
   .badge-github:hover {
-    background: #333639;
-    color: #fff;
+    background: #27272a;
+    transform: translateY(-1px);
   }
   .badge-github svg {
     fill: currentColor;
     width: 14px;
     height: 14px;
   }
-  .badge-apk {
-    background: #065f46;
-    color: #fff;
-    border: 1px solid #047857;
-  }
-  .badge-apk:hover {
-    background: #047857;
-    color: #fff;
-  }
-  .badge-apk svg {
-    fill: currentColor;
-    width: 13px;
-    height: 13px;
-  }
 
   /* Main Container */
   main {
-    max-width: 1200px;
+    max-width: 1220px;
     margin: 0 auto;
-    padding: 24px 18px 48px;
+    padding: 24px 20px 48px;
   }
 
-  /* Dropzone Card */
-  .drop-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
+  /* Liquid Glass Card Containers */
+  .glass-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--glass-shadow);
     margin-bottom: 24px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
+  .glass-card:hover {
+    box-shadow: var(--glass-shadow-lg);
+  }
+
+  /* Dropzone */
   .dropzone {
-    border: 2px dashed #cfc7b4;
-    background: #faf9f5;
-    border-radius: 8px;
-    padding: 30px 20px;
+    border: 2px dashed rgba(200, 192, 175, 0.75);
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: var(--radius-md);
+    padding: 28px 20px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .dropzone:hover, .dropzone.drag {
-    background: #fff9e6;
+    background: rgba(255, 247, 214, 0.75);
     border-color: var(--gold-dark);
+    transform: scale(0.995);
   }
   .dropzone-icon {
     font-size: 32px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .dropzone .big {
-    font-size: 16px;
+    font-size: 15.5px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -175,7 +198,7 @@
     margin-top: 4px;
   }
 
-  /* Actions Toolbar */
+  /* Material You Pill Action Buttons */
   .toolbar {
     margin-top: 16px;
     display: flex;
@@ -188,50 +211,60 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 9px 18px;
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    background: #ffffff;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--glass-border-subtle);
+    background: rgba(255, 255, 255, 0.85);
     color: var(--ink);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     touch-action: manipulation;
+    user-select: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
   }
   .btn:hover {
-    background: #f5f3eb;
-    border-color: #c9c2b0;
+    background: #ffffff;
+    border-color: #c4bcb0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  .btn:active {
+    transform: scale(0.98);
   }
   .btn.primary {
-    background: var(--gold);
-    border-color: var(--gold-dark);
-    color: #3b2c04;
+    background: linear-gradient(180deg, #ffdf70 0%, #ffd043 100%);
+    border-color: #d4a317;
+    color: #2b1f02;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
   }
   .btn.primary:hover {
-    background: #f7ce47;
+    background: linear-gradient(180deg, #ffe48a 0%, #ffd659 100%);
   }
   .btn-demo {
-    background: #f0fdf4;
-    border-color: #86efac;
-    color: #166534;
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+    color: #065f46;
   }
   .btn-demo:hover {
-    background: #dcfce7;
+    background: #d1fae5;
   }
   .btn-clear {
-    color: #842029;
-    border-color: #f5c2c7;
-    background: #fff;
+    color: #991b1b;
+    border-color: #fca5a5;
+    background: #ffffff;
   }
   .btn-clear:hover {
-    background: #f8d7da;
+    background: #fee2e2;
   }
 
-  /* File Chips */
+  /* Chips */
   #loaded {
-    margin-top: 12px;
+    margin-top: 14px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -241,10 +274,10 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #f2efe6;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 3px 10px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
     font-size: 12px;
     font-weight: 500;
   }
@@ -261,13 +294,13 @@
     color: var(--red);
   }
 
-  /* Messages & Alerts */
+  /* Alerts */
   .err {
     background: var(--red-bg);
     border: 1px solid var(--red-border);
     color: var(--red);
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
     margin-top: 14px;
     font-size: 13.5px;
     font-weight: 500;
@@ -276,8 +309,8 @@
     background: #fffbeb;
     border: 1px solid #fde68a;
     color: #92400e;
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
     margin-top: 14px;
     font-size: 13.5px;
   }
@@ -286,85 +319,39 @@
     font-size: 13px;
   }
 
-  /* Executive KPI Cards Dashboard */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .kpi-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-  }
-  .kpi-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--border);
-  }
-  .kpi-card.kpi-profit::before { background: var(--green); }
-  .kpi-card.kpi-tax::before { background: var(--gold-dark); }
-  .kpi-card.kpi-exempt::before { background: var(--blue); }
-  .kpi-card.kpi-fee::before { background: var(--purple); }
-  .kpi-title {
-    font-size: 12.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--ink-sub);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .kpi-val {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .kpi-sub {
-    font-size: 12px;
-    color: var(--ink-sub);
-    margin-top: 4px;
-  }
-
-  /* Chart Card */
+  /* Elevated Performance Chart Card */
   .chart-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
+    background: var(--glass-card);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--glass-shadow);
     margin-bottom: 24px;
   }
   .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
   }
   .chart-title {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .chart-legend {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     font-size: 12px;
     font-weight: 600;
+    flex-wrap: wrap;
   }
   .legend-item {
     display: flex;
@@ -374,65 +361,69 @@
   .legend-dot {
     width: 10px;
     height: 10px;
-    border-radius: 2px;
+    border-radius: 3px;
   }
-  .dot-inc { background: #34d399; }
-  .dot-out { background: #f87171; }
-  .dot-net { background: #fbbf24; }
+  .dot-inc { background: #10b981; }
+  .dot-out { background: #ef4444; }
+  .dot-net { background: #f59e0b; }
 
-  /* Tabs */
+  /* Material You Pill Navigation Tabs */
   nav.tabs {
-    margin: 20px 0 0;
+    margin: 22px 0 0;
     display: flex;
-    gap: 6px;
+    gap: 8px;
     overflow-x: auto;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0;
+    padding: 6px 4px 10px;
+    border-bottom: 1px solid var(--glass-border-subtle);
   }
   nav.tabs button {
-    padding: 10px 18px;
+    padding: 9px 18px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
-    background: transparent;
-    border: 1px solid transparent;
-    border-bottom: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-pill);
     color: var(--ink-sub);
     white-space: nowrap;
-    border-radius: 6px 6px 0 0;
-    transition: all 0.15s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   nav.tabs button:hover {
     color: var(--ink);
-    background: #f1ede2;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
   }
   nav.tabs button.active {
-    background: var(--card);
-    border-color: var(--border);
-    border-bottom: 2px solid var(--gold-dark);
-    color: var(--ink);
+    background: #1e1e1e;
+    color: #ffffff;
+    border-color: #1e1e1e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
   .tabs-actions {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-left: auto;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
   }
 
   /* Panels */
   .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 var(--radius) var(--radius);
-    padding: 20px;
+    background: var(--glass-card);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
     display: none;
     overflow-x: auto;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--glass-shadow);
+    margin-top: 14px;
   }
   .panel.active {
     display: block;
@@ -440,15 +431,15 @@
   h2.section {
     margin: 0 0 16px;
     font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
   h3.group {
-    margin: 24px 0 8px;
-    font-size: 15px;
+    margin: 24px 0 10px;
+    font-size: 14.5px;
     font-weight: 700;
-    border-bottom: 1px solid var(--border-light);
-    padding-bottom: 4px;
+    border-bottom: 1px solid var(--glass-border-subtle);
+    padding-bottom: 6px;
     color: var(--ink-sub);
   }
 
@@ -458,21 +449,25 @@
     width: 100%;
     font-size: 13px;
     min-width: 680px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-md);
+    overflow: hidden;
   }
   th {
-    background: #f7f5ee;
-    border: 1px solid var(--border);
-    padding: 7px 10px;
+    background: rgba(247, 245, 238, 0.9);
+    border: 1px solid var(--glass-border-subtle);
+    padding: 8px 12px;
     text-align: left;
     white-space: nowrap;
-    font-weight: 600;
-    color: #494539;
+    font-weight: 700;
+    color: #443e32;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   td {
-    border: 1px solid var(--border);
-    padding: 6px 10px;
-    vertical-align: top;
+    border: 1px solid var(--glass-border-subtle);
+    padding: 7px 12px;
+    vertical-align: middle;
   }
   td.num, th.num {
     text-align: right;
@@ -480,11 +475,11 @@
     font-variant-numeric: tabular-nums;
   }
   tr:hover td {
-    background: #faf9f6;
+    background: rgba(255, 255, 255, 0.85);
   }
   tr.dim td {
     color: #8c826e;
-    background: #fdfdfc;
+    background: rgba(253, 253, 252, 0.6);
   }
   s { color: #9c927f; }
   .look {
@@ -493,7 +488,7 @@
     border: none;
     cursor: pointer;
     font: inherit;
-    font-weight: 600;
+    font-weight: 700;
     padding: 0 4px;
     font-size: 12px;
   }
@@ -502,7 +497,7 @@
   }
   .sym {
     cursor: pointer;
-    color: #1e40af;
+    color: #1d4ed8;
     font-weight: 700;
     text-decoration: underline dotted;
   }
@@ -510,15 +505,15 @@
     color: var(--gold-dark);
   }
   tr.hl td {
-    background: #fff6cc !important;
+    background: rgba(255, 246, 204, 0.8) !important;
   }
 
   /* Badges */
   .type {
     display: inline-block;
     font-size: 11px;
-    padding: 2px 7px;
-    border-radius: 12px;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
     font-weight: 700;
     white-space: nowrap;
     letter-spacing: 0.02em;
@@ -527,58 +522,77 @@
   .t-sell { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
   .t-short { background: var(--purple-bg); color: var(--purple); }
   .t-cov { background: var(--blue-bg); color: var(--blue); }
+  .t-stable { background: var(--teal-bg); color: var(--teal); border: 1px solid #99f6e4; font-weight: 700; }
+
   .total-row td {
     font-weight: 700;
-    background: #f7f4ea;
-    border-top: 2px solid var(--border);
-  }
-  .t-stable {
-    background: #e6fffa;
-    color: #0f766e;
-    border: 1px solid #99f6e4;
-    font-weight: 700;
+    background: rgba(247, 244, 234, 0.95);
+    border-top: 2px solid var(--glass-border-subtle);
   }
 
-  /* Open Positions Dashboard & Pie Chart */
+  /* Current Price Editable Input */
+  .price-input {
+    width: 90px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border-subtle);
+    background: rgba(255, 255, 255, 0.92);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.15s;
+  }
+  .price-input:focus {
+    outline: none;
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    background: #ffffff;
+  }
+
+  /* Open Positions Dashboard & Allocation Pie Chart */
   .openpos-kpi-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 12px;
     margin-bottom: 20px;
   }
   .openpos-kpi {
-    background: #faf9f6;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
   }
   .openpos-kpi .label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--ink-sub);
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
   }
   .openpos-kpi .val {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--ink);
-    margin-top: 2px;
+    margin-top: 3px;
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
   .openpos-kpi.highlight-stable {
-    border-color: #0d9488;
-    background: #f0fdfa;
+    border-color: #2dd4bf;
+    background: rgba(240, 253, 250, 0.85);
   }
   .openpos-kpi.highlight-stable .val {
     color: #0f766e;
   }
 
   .pie-card {
-    background: #faf9f6;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
     margin-bottom: 20px;
   }
   .pie-card-title {
@@ -593,9 +607,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 28px;
+    gap: 32px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 14px;
   }
   .pie-chart-wrap {
     width: 240px;
@@ -604,7 +618,7 @@
   }
   .pie-legend-list {
     flex: 1;
-    min-width: 260px;
+    min-width: 270px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -613,12 +627,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 10px;
     font-size: 13px;
-    padding: 6px 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-sm);
+    transition: transform 0.15s;
+  }
+  .pie-legend-row:hover {
+    transform: translateX(2px);
     background: #ffffff;
-    border: 1px solid var(--border-light);
-    border-radius: 6px;
   }
   .pie-legend-left {
     display: flex;
@@ -638,20 +657,20 @@
     font-weight: 700;
     font-size: 12px;
     color: var(--ink-sub);
-    min-width: 46px;
+    min-width: 48px;
     text-align: right;
   }
   .pie-legend-val {
-    font-weight: 600;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
     text-align: right;
   }
 
   .stablecoin-input-bar {
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -671,16 +690,16 @@
     padding: 6px 10px;
     font-size: 13px;
     font-family: inherit;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-sm);
     background: #fff;
   }
   .stablecoin-input-bar select {
     padding: 6px 8px;
     font-size: 13px;
     font-family: inherit;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-sm);
     background: #fff;
   }
 
@@ -696,11 +715,11 @@
     user-select: none;
   }
   details.faq {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 16px;
-    box-shadow: var(--shadow-sm);
+    background: var(--glass-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 10px 18px;
+    box-shadow: var(--glass-shadow);
   }
   details.faq summary {
     font-size: 14.5px;
@@ -714,7 +733,7 @@
     margin: 4px 0 12px;
   }
   details.faq code {
-    background: #f3efe6;
+    background: rgba(243, 239, 230, 0.8);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 12px;
@@ -731,12 +750,12 @@
 
   /* Footer */
   footer {
-    max-width: 1200px;
+    max-width: 1220px;
     margin: 0 auto;
-    padding: 24px 18px 40px;
+    padding: 24px 20px 48px;
     color: var(--ink-sub);
     font-size: 13px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--glass-border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -757,34 +776,32 @@
     header p { font-size: 12px; }
     .header-badges { width: 100%; justify-content: flex-start; margin-top: 4px; }
     main { padding: 14px 12px max(60px, env(safe-area-inset-bottom, 60px)); }
-    .drop-card { padding: 14px; margin-bottom: 16px; border-radius: 8px; }
+    .glass-card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
     .dropzone { padding: 22px 14px; }
     .dropzone .big { font-size: 14.5px; }
     .dropzone .small { font-size: 12px; }
     .toolbar { gap: 6px; }
-    .btn { min-height: 42px; font-size: 12.5px; padding: 7px 13px; }
+    .btn { min-height: 42px; font-size: 12.5px; padding: 7px 14px; }
 
-    /* 2x2 grid for mobile KPIs */
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-    .kpi-card { padding: 12px 14px; border-radius: 8px; }
-    .kpi-val { font-size: 19px; }
-    .kpi-title { font-size: 11px; }
-    .kpi-sub { font-size: 11px; }
+    .openpos-kpi-row { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .openpos-kpi { padding: 12px 14px; }
+    .openpos-kpi .val { font-size: 18px; }
 
-    .chart-card { padding: 14px; margin-bottom: 16px; border-radius: 8px; }
+    .chart-card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
 
-    /* Sticky Tab Bar for easy navigation */
+    /* Sticky Tab Bar for easy mobile navigation */
     nav.tabs {
       position: sticky;
-      top: 0;
+      top: 65px;
       z-index: 30;
-      background: var(--bg);
-      padding: 6px 0 0;
+      background: rgba(248, 247, 242, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 6px 0 8px;
       margin: 12px 0 0;
-      border-bottom: 1px solid var(--border);
     }
     nav.tabs button {
-      padding: 9px 14px;
+      padding: 8px 14px;
       font-size: 13px;
     }
     .tabs-actions {
@@ -798,10 +815,9 @@
     .tabs-actions .btn { flex: 1; justify-content: center; }
 
     .panel {
-      padding: 14px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      border-top: none;
+      padding: 16px 12px;
+      border-radius: var(--radius-md);
+      margin-top: 10px;
     }
 
     /* Sticky First Column in Data Tables on Mobile */
@@ -827,22 +843,19 @@
   }
 
   @media (max-width: 480px) {
-    .kpi-grid { grid-template-columns: 1fr; }
+    .openpos-kpi-row { grid-template-columns: 1fr; }
     .toolbar .btn { flex: 1 1 calc(50% - 6px); justify-content: center; text-align: center; }
   }
 
   /* Print Stylesheet for Tax Filing */
   @media print {
     header { background: none; border-bottom: 2px solid #000; padding: 10px 0; }
-    .drop-card, .toolbar, nav.tabs, .tabs-actions, footer, .badge-github { display: none !important; }
-    .panel { display: block !important; border: none; box-shadow: none; padding: 0; }
+    .glass-card, .toolbar, nav.tabs, .tabs-actions, footer, .badge-github, .chart-card, .stablecoin-input-bar { display: none !important; }
+    .panel { display: block !important; border: none; box-shadow: none; padding: 0; background: none; }
     body { background: #fff; color: #000; font-size: 11px; }
-    table { min-width: 100%; font-size: 10px; page-break-inside: auto; }
+    table { min-width: 100%; font-size: 10px; page-break-inside: auto; background: #fff; }
     tr { page-break-inside: avoid; page-break-after: auto; }
     th, td { border: 1px solid #999; padding: 4px 6px; }
-    .kpi-grid { grid-template-columns: repeat(4, 1fr); margin-bottom: 16px; }
-    .kpi-card { border: 1px solid #ccc; box-shadow: none; padding: 8px 12px; }
-    .kpi-val { font-size: 16px; }
   }
 </style>
 </head>
@@ -872,16 +885,16 @@
 
 <main>
   <!-- Input Section -->
-  <section class="drop-card" id="input">
+  <section class="glass-card" id="input">
     <div class="dropzone" id="drop">
       <div class="dropzone-icon">📄</div>
       <div class="big">Drag &amp; drop your broker trade export (.CSV / .TSV) here</div>
-      <div class="small">Or click anywhere in this box to browse, or paste copied cells directly with <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
+      <div class="small">Or click anywhere to browse, or paste copied cells directly with <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
       <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
     </div>
 
     <div class="toolbar">
-      <button class="btn btn-demo" id="btnDemo">✨ Load Demo Portfolio</button>
+      <button class="btn btn-demo" id="btnDemo">✨ Load Demo Portfolio (2022–2025)</button>
       <button class="btn" id="btnPasteClipboard">📋 Paste from Clipboard</button>
       <button class="btn" id="btnTemplate">📑 Load Template</button>
       <button class="btn" id="btnDownloadTemplate">⬇️ Download Template (.csv)</button>
@@ -893,41 +906,20 @@
 
   <!-- Results Section -->
   <section id="results" hidden>
-    <!-- Executive KPI Dashboard -->
-    <div class="kpi-grid">
-      <div class="kpi-card kpi-profit">
-        <div class="kpi-title">Gross Realized Profit <span>📈</span></div>
-        <div class="kpi-val" id="kpi-profit">0 Kč</div>
-        <div class="kpi-sub">Total economic profit across all trades</div>
-      </div>
-      <div class="kpi-card kpi-tax">
-        <div class="kpi-title">Tax Base (§ 10 ZDP) <span>🏛️</span></div>
-        <div class="kpi-val" id="kpi-tax">0 Kč</div>
-        <div class="kpi-sub" id="kpi-tax-sub">Taxable Income − Expenses (CZK)</div>
-      </div>
-      <div class="kpi-card kpi-exempt">
-        <div class="kpi-title">Exempt Income <span>🛡️</span></div>
-        <div class="kpi-val" id="kpi-exempt">0 Kč</div>
-        <div class="kpi-sub">Met 3-year holding period (Časový test)</div>
-      </div>
-      <div class="kpi-card kpi-fee">
-        <div class="kpi-title">Total Broker Fees <span>💸</span></div>
-        <div class="kpi-val" id="kpi-fees">0 Kč</div>
-        <div class="kpi-sub">Included in tax expense deductions</div>
-      </div>
-    </div>
-
-    <!-- Interactive SVG Chart -->
+    <!-- Elevated Yearly Taxable Performance Chart (Front & Center) -->
     <div class="chart-card">
       <div class="chart-header">
-        <div class="chart-title">Yearly Taxable Performance (CZK)</div>
+        <div class="chart-title">
+          <span>📊</span>
+          <span>Yearly Taxable Performance (Přehled daňových příjmů a výdajů v CZK)</span>
+        </div>
         <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot dot-inc"></div> Taxable Income</div>
-          <div class="legend-item"><div class="legend-dot dot-out"></div> Taxable Expenses</div>
-          <div class="legend-item"><div class="legend-dot dot-net"></div> Net Tax Base</div>
+          <div class="legend-item"><div class="legend-dot dot-inc"></div> Taxable Income (Příjmy)</div>
+          <div class="legend-item"><div class="legend-dot dot-out"></div> Taxable Expenses (Výdaje)</div>
+          <div class="legend-item"><div class="legend-dot dot-net"></div> Net Tax Base (Základ daně)</div>
         </div>
       </div>
-      <div id="chart-container" style="width: 100%; height: 180px;"></div>
+      <div id="chart-container" style="width: 100%; height: 200px;"></div>
     </div>
 
     <!-- Navigation Tabs -->
@@ -937,8 +929,8 @@
       <button data-tab="akcie">By Symbol (Podle tickeru)</button>
       <button data-tab="pozice">Open Positions (Otevřené)</button>
       <div class="tabs-actions">
-        <button class="btn" id="btnPrint" style="padding:5px 12px">🖨️ Print / PDF</button>
-        <button class="btn primary" id="btnExport" style="padding:5px 12px">📥 Download Report (.csv)</button>
+        <button class="btn" id="btnPrint" style="padding:6px 14px">🖨️ Print / PDF</button>
+        <button class="btn primary" id="btnExport" style="padding:6px 14px">📥 Download Report (.csv)</button>
       </div>
     </nav>
 
@@ -957,7 +949,7 @@
       <div id="out-akcie"></div>
     </div>
     <div class="panel" id="panel-pozice">
-      <h2 class="section">Open Positions &amp; Unrealized Holdings</h2>
+      <h2 class="section">Open Positions &amp; Portfolio Asset Allocation</h2>
       <div id="out-pozice"></div>
     </div>
   </section>
@@ -1002,14 +994,14 @@
     <table class="faq-cols">
       <thead><tr><th>Column</th><th>Meaning</th><th>Example</th></tr></thead>
       <tbody>
-        <tr><td><code>Datum obchodu</code></td><td>Trade timestamp (dd.mm.yyyy hh:mm)</td><td>15.04.2024 14:30</td></tr>
+        <tr><td><code>Datum obchodu</code></td><td>Trade timestamp (dd.mm.yyyy hh:mm)</td><td>15.03.2023 14:30</td></tr>
         <tr><td><code>Směr</code></td><td>Trade direction: Nákup (Buy) or Prodej (Sell)</td><td>Nákup</td></tr>
-        <tr><td><code>Symbol</code></td><td>Security ticker / symbol</td><td>AAPL</td></tr>
-        <tr><td><code>Cena</code></td><td>Execution price per share</td><td>185.50</td></tr>
-        <tr><td><code>Počet</code></td><td>Volume / Quantity of shares traded</td><td>10</td></tr>
+        <tr><td><code>Symbol</code></td><td>Security ticker / symbol</td><td>FIFO</td></tr>
+        <tr><td><code>Cena</code></td><td>Execution price per share</td><td>120$</td></tr>
+        <tr><td><code>Počet</code></td><td>Volume / Quantity of shares traded</td><td>30</td></tr>
         <tr><td><code>Měna</code></td><td>Currency (CZK, USD, EUR)</td><td>USD</td></tr>
-        <tr><td><code>Objem</code></td><td>Total transaction value before fees</td><td>-1855.00</td></tr>
-        <tr><td><code>Poplatky</code></td><td>Broker commission / transaction fees</td><td>1.50</td></tr>
+        <tr><td><code>Objem</code></td><td>Total transaction value before fees</td><td>-3 600$</td></tr>
+        <tr><td><code>Poplatky</code></td><td>Broker commission / transaction fees</td><td>15$</td></tr>
       </tbody>
     </table>
   </details>
@@ -1017,7 +1009,7 @@
 
 <footer>
   <div>
-    <strong>Piggy v1.0.0</strong> • Created with Vanilla JavaScript • 100% Client-Side
+    <strong>Piggy v1.1.0</strong> • Liquid Glass &amp; Material You • 100% Client-Side
   </div>
   <div>
     <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer">github.com/artemmoloshtan/piggy</a>
@@ -1369,7 +1361,7 @@ function processSymbol(sym, ts){
 
 <script>
 // ---------------------------------------------------------------------------
-// PIGGY UI & PRESENTATION LAYER
+// PIGGY UI & PRESENTATION LAYER (v1.1.0)
 // ---------------------------------------------------------------------------
 "use strict";
 
@@ -1379,33 +1371,46 @@ let loadedFiles = [];
 let highlight = { set: new Set() };
 let customStablecoin = { amount: 0, currency: 'USD' };
 
+// User-defined / live market price overrides for open positions
+let marketPrices = {};
+
 const STABLECOIN_SYMBOLS = new Set(['USDT', 'USDC', 'DAI', 'FDUSD', 'BUSD', 'TUSD', 'USDD', 'EURC', 'PYUSD', 'USDP', 'USDG']);
 function isStablecoin(sym){
   if (!sym) return false;
   return STABLECOIN_SYMBOLS.has(String(sym).trim().toUpperCase());
 }
 
+// Updated Demo Portfolio spanning 2022, 2023, 2024, and 2025 featuring HOLDING-3Y, FIFO, SHORT, and USDT
 const DEMOS = {
   demo:
 "Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky\n" +
-"1.8.2021 10:00;Nákup;HOLDING-3Y;900;200;CZK;-180 050,00;50,00\n" +
-"2.5.2021 8:45;Nákup;FIFO;100;10;USD;-1 012,00;12,00\n" +
-"2.8.2021 13:10;Nákup;FIFO;110;10;USD;-1 114,00;14,00\n" +
-"4.11.2022 15:25;Prodej;FIFO;125;12;USD;1 488,00;12,00\n" +
-"3.1.2023 10:00;Prodej;SHORT;55;30;EUR;1 648,00;2,00\n" +
-"17.6.2023 12:30;Nákup;SHORT;49;30;EUR;-1 478,00;8,00\n" +
-"10.4.2024 11:05;Nákup;MINERAL;30;50;EUR;-1 517,50;17,50\n" +
-"5.6.2024 9:10;Prodej;FIFO;150;8;USD;1 190,00;10,00\n" +
-"1.8.2024 10:00;Prodej;HOLDING-3Y;1200;90;CZK;107 955,00;45,00\n" +
-"2.8.2024 10:00;Prodej;HOLDING-3Y;1200;90;CZK;107 955,00;45,00\n" +
-"12.9.2024 14:20;Prodej;MINERAL;42;50;EUR;2 082,50;17,50\n" +
-"20.12.2024 9:00;Nákup;AKCIE-25;500;20;CZK;-10 012,50;12,50\n" +
-"15.1.2025 10:00;Nákup;USDT;1;1500;USD;-1 501,00;1,00\n",
+"12.1.2022 10:15;Nákup;HOLDING-3Y;850;150;CZK;-127 540,00;40,00\n" +
+"15.3.2022 14:30;Nákup;FIFO;90;25;USD;-2 260,00;10,00\n" +
+"20.8.2022 11:00;Nákup;FIFO;110;20;USD;-2 212,00;12,00\n" +
+"10.11.2022 15:45;Prodej;FIFO;130;15;USD;1 940,00;10,00\n" +
+"14.2.2023 9:30;Prodej;SHORT;65;40;EUR;2 592,00;8,00\n" +
+"18.5.2023 13:20;Nákup;FIFO;120;30;USD;-3 615,00;15,00\n" +
+"22.9.2023 11:10;Nákup;SHORT;52;40;EUR;-2 088,00;8,00\n" +
+"15.11.2023 16:00;Prodej;FIFO;145;20;USD;2 890,00;10,00\n" +
+"20.1.2024 10:00;Prodej;SHORT;70;25;EUR;1 745,00;5,00\n" +
+"10.4.2024 14:00;Nákup;FIFO;135;20;USD;-2 712,00;12,00\n" +
+"15.6.2024 15:30;Prodej;FIFO;160;25;USD;3 988,00;12,00\n" +
+"15.8.2024 11:00;Nákup;SHORT;58;25;EUR;-1 456,00;6,00\n" +
+"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 002,00;2,00\n" +
+"15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00\n" +
+"20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00\n",
   Template:
 "Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky\n" +
-"1.1.2025 0:00;Nákup;AKCIE-1;100,00;20;CZK;-2 010,00;10,00\n" +
-"30.6.2025 0:00;Prodej;AKCIE-1;150,00;20;CZK;2 982,25;17,75\n"
+"1.1.2025 0:00;Nákup;FIFO;100,00;20;USD;-2 010,00;10,00\n" +
+"30.6.2025 0:00;Prodej;FIFO;150,00;20;USD;2 982,25;17,75\n"
 };
+
+// ---- Formatting with Direct Currency Symbols ------------------------------
+function currSign(currency){
+  if (currency === 'USD') return '$';
+  if (currency === 'EUR') return '€';
+  return ' Kč';
+}
 
 function fmt(n, dec){
   if (n == null || isNaN(n)) return '0,00';
@@ -1416,6 +1421,13 @@ function fmt(n, dec){
   let int = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   return (neg ? '−' : '') + int + (p[1] !== undefined ? ',' + p[1] : '');
 }
+
+function fmtMoney(n, currency, dec){
+  const sign = currSign(currency);
+  const formatted = fmt(n, dec);
+  return formatted + sign;
+}
+
 function fmtDate(d){ return d.getDate()+'.'+ (d.getMonth()+1) + '.' + d.getFullYear(); }
 function fmtDateTime(d){
   let s = fmtDate(d);
@@ -1479,6 +1491,7 @@ function renderLoaded(){
 function clearAll(){
   loadedFiles = [];
   state = null;
+  marketPrices = {};
   $('results').hidden = true;
   $('messages').innerHTML = '';
   renderLoaded();
@@ -1498,9 +1511,8 @@ function runAll(){
   renderAll(state);
 }
 
-// ---- Render Views & Dashboard ---------------------------------------------
+// ---- Render Views & Elevated Performance Chart ----------------------------
 function renderAll(st){
-  renderKPIs(st);
   renderChart(st);
   renderWarnings(st.warnings);
   renderSouhrn(st);
@@ -1509,71 +1521,44 @@ function renderAll(st){
   renderPozice(st);
 }
 
-function renderKPIs(st){
-  let totalProfit = 0;
-  let totalTaxInc = 0;
-  let totalTaxOut = 0;
-  let totalExempt = 0;
-  let totalFees = 0;
-
-  for (const g of st.groups){
-    totalProfit += g.profit * rateFor(g.currency, g.year);
-    totalTaxInc += g.taxInc;
-    totalTaxOut += g.taxOut;
-    totalExempt += g.exemptC;
-  }
-  for (const f of st.flow){
-    totalFees += f.trade.fee * rateFor(f.trade.currency, f.trade.year);
-  }
-
-  const netTaxBase = totalTaxInc - totalTaxOut;
-  $('kpi-profit').textContent = fmt(totalProfit) + ' Kč';
-  $('kpi-profit').style.color = totalProfit >= 0 ? 'var(--green)' : 'var(--red)';
-
-  $('kpi-tax').textContent = fmt(netTaxBase) + ' Kč';
-  $('kpi-tax-sub').textContent = 'Income ' + fmt(totalTaxInc) + ' Kč − Expenses ' + fmt(totalTaxOut) + ' Kč';
-
-  $('kpi-exempt').textContent = fmt(totalExempt) + ' Kč';
-  $('kpi-fees').textContent = fmt(totalFees) + ' Kč';
-}
-
-// Native pure SVG bar chart
+// Elevated native pure SVG bar chart with direct currency formatting
 function renderChart(st){
   const el = $('chart-container');
   const years = st.byYear.filter(y=>y.totals.incC > 0 || y.totals.outC > 0);
   if (!years.length){
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-sub);font-size:13px">No realized taxable sales to display.</div>';
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-sub);font-size:13.5px;font-weight:500">No realized taxable sales to display.</div>';
     return;
   }
 
-  const maxVal = Math.max(...years.map(y=>Math.max(y.totals.incC, y.totals.outC, y.totals.incC - y.totals.outC)), 1000);
-  const w = el.clientWidth || 900;
-  const h = 170;
-  const padBottom = 26;
-  const padTop = 10;
+  const maxVal = Math.max(...years.map(y=>Math.max(y.totals.incC, y.totals.outC, Math.abs(y.totals.incC - y.totals.outC))), 1000);
+  const w = el.clientWidth || 920;
+  const h = 190;
+  const padBottom = 28;
+  const padTop = 14;
   const chartH = h - padBottom - padTop;
   const barGroupWidth = w / years.length;
-  const barWidth = Math.max(8, Math.min(22, barGroupWidth / 4));
+  const barWidth = Math.max(10, Math.min(26, barGroupWidth / 4.2));
 
   let svg = '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">';
-  svg += '<line x1="0" y1="'+(h-padBottom)+'" x2="'+w+'" y2="'+(h-padBottom)+'" stroke="var(--border)" stroke-width="1" />';
+  svg += '<line x1="0" y1="'+(h-padBottom)+'" x2="'+w+'" y2="'+(h-padBottom)+'" stroke="rgba(210, 204, 190, 0.7)" stroke-width="1.5" />';
 
   years.forEach((yr, idx) => {
     const cx = (idx + 0.5) * barGroupWidth;
-    const incH = (yr.totals.incC / maxVal) * chartH;
-    const outH = (yr.totals.outC / maxVal) * chartH;
-    const net = Math.max(0, yr.totals.incC - yr.totals.outC);
-    const netH = (net / maxVal) * chartH;
+    const incH = Math.max(3, (yr.totals.incC / maxVal) * chartH);
+    const outH = Math.max(3, (yr.totals.outC / maxVal) * chartH);
+    const net = yr.totals.incC - yr.totals.outC;
+    const netH = Math.max(3, (Math.abs(net) / maxVal) * chartH);
+    const netColor = net >= 0 ? '#f59e0b' : '#ef4444';
 
-    // Income bar
-    svg += '<rect x="'+(cx - barWidth*1.6)+'" y="'+(h - padBottom - incH)+'" width="'+barWidth+'" height="'+incH+'" rx="3" fill="#34d399" title="Taxable Income: '+fmt(yr.totals.incC)+' Kč" />';
-    // Expense bar
-    svg += '<rect x="'+(cx - barWidth*0.5)+'" y="'+(h - padBottom - outH)+'" width="'+barWidth+'" height="'+outH+'" rx="3" fill="#f87171" title="Taxable Expenses: '+fmt(yr.totals.outC)+' Kč" />';
-    // Net bar
-    svg += '<rect x="'+(cx + barWidth*0.6)+'" y="'+(h - padBottom - netH)+'" width="'+barWidth+'" height="'+netH+'" rx="3" fill="#fbbf24" title="Net Tax Base: '+fmt(net)+' Kč" />';
+    // Income bar (green)
+    svg += '<rect x="'+(cx - barWidth*1.65)+'" y="'+(h - padBottom - incH)+'" width="'+barWidth+'" height="'+incH+'" rx="4" fill="#10b981" title="Taxable Income: '+fmtMoney(yr.totals.incC, 'CZK')+'" />';
+    // Expense bar (red)
+    svg += '<rect x="'+(cx - barWidth*0.5)+'" y="'+(h - padBottom - outH)+'" width="'+barWidth+'" height="'+outH+'" rx="4" fill="#ef4444" title="Taxable Expenses: '+fmtMoney(yr.totals.outC, 'CZK')+'" />';
+    // Net Base bar (amber or red if negative)
+    svg += '<rect x="'+(cx + barWidth*0.65)+'" y="'+(h - padBottom - netH)+'" width="'+barWidth+'" height="'+netH+'" rx="4" fill="'+netColor+'" title="Net Tax Base: '+fmtMoney(net, 'CZK')+'" />';
 
     // Year label
-    svg += '<text x="'+cx+'" y="'+(h - 6)+'" font-size="12" font-weight="600" fill="var(--ink)" text-anchor="middle">'+yr.year+'</text>';
+    svg += '<text x="'+cx+'" y="'+(h - 8)+'" font-size="12.5" font-weight="700" fill="var(--ink)" text-anchor="middle">'+yr.year+'</text>';
   });
 
   svg += '</svg>';
@@ -1590,30 +1575,30 @@ function renderSouhrn(st){
   const el = $('out-souhrn');
   if (!st.byYear.length){ el.innerHTML='<p class="info">No realized sales in loaded history.</p>'; return; }
   let h = '<table><thead><tr><th>Year</th><th>Currency</th>' +
-    '<th class="num">Tax Income<br><span style="font-weight:400;font-size:11px">(orig. currency)</span></th>' +
-    '<th class="num">Tax Expenses<br><span style="font-weight:400;font-size:11px">(orig. currency)</span></th>' +
-    '<th class="num">Tax Income<br><span style="font-weight:400;font-size:11px">(CZK)</span></th>' +
-    '<th class="num">Tax Expenses<br><span style="font-weight:400;font-size:11px">(CZK)</span></th>' +
-    '<th class="num">Tax Base<br><span style="font-weight:700;font-size:11px">(CZK)</span></th><th></th></tr></thead><tbody>';
+    '<th class="num">Tax Income</th>' +
+    '<th class="num">Tax Expenses</th>' +
+    '<th class="num">Tax Income (CZK)</th>' +
+    '<th class="num">Tax Expenses (CZK)</th>' +
+    '<th class="num">Tax Base (CZK)</th><th></th></tr></thead><tbody>';
 
   for (const yr of st.byYear){
     for (const r of yr.rows){
       const zakl = r.incC - r.outC;
       h += '<tr><td>'+(r===yr.rows[0]?'<strong>'+yr.year+'</strong>':'')+'</td><td>'+esc(r.currency)+'</td>' +
-        '<td class="num">'+fmt(r.incN)+'</td><td class="num">'+fmt(-r.outN)+'</td>' +
-        '<td class="num">'+fmt(r.incC)+'</td><td class="num">'+fmt(-r.outC)+'</td>' +
-        '<td class="num" style="font-weight:700;color:'+(zakl>=0?'var(--green)':'var(--red)')+'">'+fmt(zakl)+'</td>' +
+        '<td class="num">'+fmtMoney(r.incN, r.currency)+'</td><td class="num">'+fmtMoney(-r.outN, r.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(r.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-r.outC, 'CZK')+'</td>' +
+        '<td class="num" style="font-weight:700;color:'+(zakl>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(zakl, 'CZK')+'</td>' +
         '<td>'+(r===yr.rows[0]?'<button class="look" data-goto="rok-'+yr.year+'">View trades →</button>':'')+'</td></tr>';
     }
     const tot = yr.totals;
     const totNet = tot.incC - tot.outC;
     h += '<tr class="total-row"><td>'+yr.year+' Total</td><td></td><td class="num"></td><td class="num"></td>' +
-      '<td class="num">'+fmt(tot.incC)+'</td><td class="num">'+fmt(-tot.outC)+'</td>' +
-      '<td class="num" style="font-weight:800;color:'+(totNet>=0?'var(--green)':'var(--red)')+'">'+fmt(totNet)+'</td><td></td></tr>';
+      '<td class="num">'+fmtMoney(tot.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-tot.outC, 'CZK')+'</td>' +
+      '<td class="num" style="font-weight:800;color:'+(totNet>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(totNet, 'CZK')+'</td><td></td></tr>';
 
     if (tot.incC > 0 && tot.incC <= 100000){
       h += '<tr class="dim"><td colspan="8">' +
-        '💡 <em>Total gross income in '+yr.year+' did not exceed 100,000 CZK — sales may qualify for exemption under § 4(1)(w) ZDP. Check with your accountant.</em>' +
+        '💡 <em>Total gross income in '+yr.year+' did not exceed 100 000 Kč — sales may qualify for exemption under § 4(1)(w) ZDP. Check with your accountant.</em>' +
         '</td></tr>';
     }
   }
@@ -1634,7 +1619,7 @@ function renderRoky(st){
     h += '<h3 class="group" id="rok-'+year+'">Year '+year+' ('+list.length+' trades)</h3>';
     h += '<table><thead><tr><th>Date &amp; Time</th><th>Direction</th><th>Symbol</th>' +
       '<th class="num">Quantity</th><th class="num">Price</th><th class="num">Fees</th><th class="num">Volume</th>' +
-      '<th class="num">Profit</th><th class="num">Tax Income (CZK)</th><th class="num">Tax Expenses (CZK)</th></tr></thead><tbody>';
+      '<th class="num">Profit</th><th class="num">Tax Income</th><th class="num">Tax Expenses</th></tr></thead><tbody>';
     for (const f of list){
       const t = f.trade;
       const isSale = t.dir === 'S';
@@ -1646,12 +1631,12 @@ function renderRoky(st){
         '<td><span class="type '+tl.cls+'">'+tl.text+'</span></td>' +
         '<td><span class="sym" data-symbol2="'+esc(t.symbol)+'">'+esc(t.symbol)+'</span></td>' +
         '<td class="num">'+fmt(t.qty, 4)+'</td>' +
-        '<td class="num">'+fmt(t.price)+' <span class="dim">'+esc(t.currency)+'</span></td>' +
-        '<td class="num">'+fmt(t.fee)+'</td>' +
-        '<td class="num">'+fmt(objemOf(t))+'</td>' +
-        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmt(g.profit) : '—')+'</td>' +
-        '<td class="num">'+(g ? fmt(g.taxInc) : '—')+'</td>' +
-        '<td class="num">'+(g ? fmt(-g.taxOut) : '—')+'</td></tr>';
+        '<td class="num">'+fmtMoney(t.price, t.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(t.fee, t.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(objemOf(t), t.currency)+'</td>' +
+        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, t.currency) : '—')+'</td>' +
+        '<td class="num">'+(g ? fmtMoney(g.taxInc, 'CZK') : '—')+'</td>' +
+        '<td class="num">'+(g ? fmtMoney(-g.taxOut, 'CZK') : '—')+'</td></tr>';
     }
     h += '</tbody></table>';
   }
@@ -1663,10 +1648,11 @@ function renderAkcie(st){
   if (!st.bySymbol.length){ el.innerHTML='<p class="info">No symbol data.</p>'; return; }
   let h = '';
   for (const s of st.bySymbol){
-    h += '<h3 class="group" id="sym-'+esc(s.symbol)+'">'+esc(s.symbol)+' • Net Holding: '+fmt(s.trades[s.trades.length-1].net, 4)+' shares</h3>';
+    const lastTrade = s.trades[s.trades.length-1];
+    h += '<h3 class="group" id="sym-'+esc(s.symbol)+'">'+esc(s.symbol)+' • Net Holding: '+fmt(lastTrade.net, 4)+' shares</h3>';
     h += '<table><thead><tr><th>Date &amp; Time</th><th>Direction</th>' +
       '<th class="num">Qty</th><th class="num">Price</th><th class="num">Fees</th><th class="num">Volume</th>' +
-      '<th class="num">Profit</th><th class="num">Tax Inc (CZK)</th><th class="num">Tax Exp (CZK)</th><th class="num">Net Position</th></tr></thead><tbody>';
+      '<th class="num">Profit</th><th class="num">Tax Inc</th><th class="num">Tax Exp</th><th class="num">Net Position</th></tr></thead><tbody>';
     for (const f of s.trades){
       const t = f.trade;
       const isSale = t.dir === 'S';
@@ -1676,12 +1662,12 @@ function renderAkcie(st){
         '<td>'+esc(fmtDateTime(t.tradeDate))+'</td>' +
         '<td><span class="type '+tl.cls+'">'+tl.text+'</span></td>' +
         '<td class="num">'+fmt(t.qty, 4)+'</td>' +
-        '<td class="num">'+fmt(t.price)+' <span class="dim">'+esc(t.currency)+'</span></td>' +
-        '<td class="num">'+fmt(t.fee)+'</td>' +
-        '<td class="num">'+fmt(objemOf(t))+'</td>' +
-        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmt(g.profit) : '—')+'</td>' +
-        '<td class="num">'+(g ? fmt(g.taxInc) : '—')+'</td>' +
-        '<td class="num">'+(g ? fmt(-g.taxOut) : '—')+'</td>' +
+        '<td class="num">'+fmtMoney(t.price, t.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(t.fee, t.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(objemOf(t), t.currency)+'</td>' +
+        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, t.currency) : '—')+'</td>' +
+        '<td class="num">'+(g ? fmtMoney(g.taxInc, 'CZK') : '—')+'</td>' +
+        '<td class="num">'+(g ? fmtMoney(-g.taxOut, 'CZK') : '—')+'</td>' +
         '<td class="num" style="font-weight:700">'+fmt(f.net, 4)+'</td></tr>';
     }
     h += '</tbody></table>';
@@ -1689,50 +1675,66 @@ function renderAkcie(st){
   el.innerHTML = h;
 }
 
+// ---- Open Positions with Real-Time Current Market Price & P/L --------------
 function renderPozice(st){
   const el = $('out-pozice');
   const currYear = new Date().getFullYear();
 
-  // Aggregate positions by symbol
+  // Aggregate open positions by symbol
   const bySymbol = new Map();
   for (const pos of st.openPos){
     const sym = pos.trade.symbol;
     const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
-    const czkVal = Math.abs(pos.objem) * rate;
+    const bookCostCZK = Math.abs(pos.objem) * rate;
+
+    // Set initial default market price from entry price if not set
+    if (marketPrices[sym] == null){
+      marketPrices[sym] = pos.trade.price;
+    }
+    const currentPrice = marketPrices[sym];
+    const marketValueNative = currentPrice * pos.qty;
+    const marketValueCZK = marketValueNative * rate;
+
     if (!bySymbol.has(sym)){
       bySymbol.set(sym, {
         symbol: sym,
         qty: 0,
-        czkVal: 0,
+        bookCostCZK: 0,
+        marketValueCZK: 0,
         currency: pos.trade.currency,
         isStable: isStablecoin(sym),
-        kind: pos.kind,
+        currentPrice: currentPrice,
         items: []
       });
     }
     const rec = bySymbol.get(sym);
     rec.qty += pos.qty;
-    rec.czkVal += czkVal;
+    rec.bookCostCZK += bookCostCZK;
+    rec.marketValueCZK += marketValueCZK;
     rec.items.push(pos);
   }
 
-  // Calculate custom stablecoin value if any
+  // Calculate custom uninvested stablecoin value
   const customRate = rateFor(customStablecoin.currency, currYear);
   const customCZK = (customStablecoin.amount || 0) * customRate;
 
-  // Calculate totals
-  let totalSecuritiesCZK = 0;
+  // Compute portfolio valuation totals
+  let totalSecuritiesMarketCZK = 0;
+  let totalSecuritiesBookCZK = 0;
   let totalStablecoinsCZK = customCZK;
 
   for (const [sym, item] of bySymbol.entries()){
     if (item.isStable){
-      totalStablecoinsCZK += item.czkVal;
+      totalStablecoinsCZK += item.marketValueCZK;
     } else {
-      totalSecuritiesCZK += item.czkVal;
+      totalSecuritiesMarketCZK += item.marketValueCZK;
+      totalSecuritiesBookCZK += item.bookCostCZK;
     }
   }
 
-  const totalPortfolioCZK = totalSecuritiesCZK + totalStablecoinsCZK;
+  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
+  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
+  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
   const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
 
   if (!st.openPos.length && customCZK <= 0){
@@ -1742,12 +1744,14 @@ function renderPozice(st){
 
   let h = '';
 
-  // 1. Metric cards for Open Positions
+  // 1. Open Positions Dashboard Metrics Cards
   h += '<div class="openpos-kpi-row">';
-  h += '<div class="openpos-kpi"><div class="label">Total Open Portfolio</div><div class="val">' + fmt(totalPortfolioCZK) + ' Kč</div></div>';
-  h += '<div class="openpos-kpi"><div class="label">Securities / Equities</div><div class="val">' + fmt(totalSecuritiesCZK) + ' Kč</div></div>';
-  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val">' + fmt(totalStablecoinsCZK) + ' Kč</div></div>';
-  h += '<div class="openpos-kpi"><div class="label">Stablecoins Share</div><div class="val">' + stablePct.toFixed(1) + ' %</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">Total Portfolio Value</div><div class="val">' + fmtMoney(totalPortfolioCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">Securities Valuation</div><div class="val">' + fmtMoney(totalSecuritiesMarketCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi" style="border-color:'+(unrealizedProfitCZK>=0?'#6ee7b7':'#fca5a5')+';background:'+(unrealizedProfitCZK>=0?'#ecfdf5':'#fef2f2')+'">' +
+    '<div class="label">Unrealized P/L</div>' +
+    '<div class="val" style="color:'+(unrealizedProfitCZK>=0?'var(--green)':'var(--red)')+'">' + (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span></div></div>';
+  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val">' + fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span></div></div>';
   h += '</div>';
 
   // 2. Custom Stablecoin / Cash Adjuster Input
@@ -1755,17 +1759,17 @@ function renderPozice(st){
   h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
   h += '<input type="number" id="inp-stable-amt" placeholder="e.g. 1000" min="0" step="any" value="' + (customStablecoin.amount > 0 ? customStablecoin.amount : '') + '">';
   h += '<select id="inp-stable-curr">';
-  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC</option>';
-  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC</option>';
-  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK</option>';
+  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC ($)</option>';
+  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC (€)</option>';
+  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK (Kč)</option>';
   h += '</select>';
   h += '<button class="btn primary" id="btnApplyStable">Update Allocation</button>';
   if (customStablecoin.amount > 0){
-    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 10px">Reset Cash</button>';
+    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 12px">Reset Cash</button>';
   }
   h += '</div>';
 
-  // 3. Asset Allocation Pie / Donut Chart
+  // 3. Asset Allocation Donut / Pie Chart
   const slices = [];
   const palette = [
     '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
@@ -1774,10 +1778,10 @@ function renderPozice(st){
   let pIdx = 0;
 
   for (const [sym, item] of bySymbol.entries()){
-    if (item.czkVal > 0){
+    if (item.marketValueCZK > 0){
       slices.push({
         label: sym,
-        czk: item.czkVal,
+        czk: item.marketValueCZK,
         color: item.isStable ? '#10b981' : palette[pIdx++ % palette.length],
         isStable: item.isStable,
         qty: item.qty
@@ -1797,7 +1801,7 @@ function renderPozice(st){
   slices.sort((a,b)=>b.czk - a.czk);
 
   h += '<div class="pie-card">';
-  h += '<div class="pie-card-title"><span>Portfolio Allocation Breakdown</span><span style="font-size:12px;font-weight:600;color:var(--ink-sub)">Total: ' + fmt(totalPortfolioCZK) + ' Kč</span></div>';
+  h += '<div class="pie-card-title"><span>Portfolio Allocation Breakdown (Market Value)</span><span style="font-size:12.5px;font-weight:700;color:var(--ink-sub)">Total: ' + fmtMoney(totalPortfolioCZK, 'CZK') + '</span></div>';
   h += '<div class="pie-flex">';
   
   // Render SVG Donut Chart
@@ -1818,7 +1822,7 @@ function renderPozice(st){
     }
     h += '</div>';
     h += '<div style="display:flex;align-items:center;gap:12px">';
-    h += '<span class="pie-legend-val">' + fmt(s.czk) + ' Kč</span>';
+    h += '<span class="pie-legend-val">' + fmtMoney(s.czk, 'CZK') + '</span>';
     h += '<span class="pie-legend-pct">' + pct.toFixed(1) + '%</span>';
     h += '</div>';
     h += '</div>';
@@ -1827,27 +1831,45 @@ function renderPozice(st){
   h += '</div>'; // end pie-flex
   h += '</div>'; // end pie-card
 
-  // 4. Open Positions Detailed Table
-  h += '<h3 class="group" style="margin-top:24px">Individual Open Position Lots</h3>';
+  // 4. Open Positions Detailed Table with Interactive Current Price & P/L
+  h += '<h3 class="group" style="margin-top:24px">Individual Open Positions &amp; Live Price Inputs</h3>';
   h += '<table><thead><tr><th>Symbol</th><th>Type</th><th>Purchase Date</th>' +
-    '<th class="num">Open Quantity</th><th class="num">Entry Price</th><th class="num">Allocated Fees</th>' +
-    '<th class="num">Book Cost (orig)</th><th class="num">Value (CZK)</th><th class="num">Weight</th></tr></thead><tbody>';
+    '<th class="num">Open Qty</th>' +
+    '<th class="num">Entry Price</th>' +
+    '<th class="num">Current Price</th>' +
+    '<th class="num">Book Cost</th>' +
+    '<th class="num">Current Value</th>' +
+    '<th class="num">Unrealized P/L</th>' +
+    '<th class="num">Weight</th></tr></thead><tbody>';
 
   for (const pos of st.openPos){
+    const sym = pos.trade.symbol;
     const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
-    const czkVal = Math.abs(pos.objem) * rate;
-    const weight = totalPortfolioCZK > 0 ? (czkVal / totalPortfolioCZK) * 100 : 0;
-    const stable = isStablecoin(pos.trade.symbol);
+    const bookCostNative = Math.abs(pos.objem);
+    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : pos.trade.price;
+    const curValueNative = curPrice * pos.qty;
+    const curValueCZK = curValueNative * rate;
+    const posProfitNative = curValueNative - bookCostNative;
+    const posRoiPct = bookCostNative > 0 ? (posProfitNative / bookCostNative) * 100 : 0;
+    const weight = totalPortfolioCZK > 0 ? (curValueCZK / totalPortfolioCZK) * 100 : 0;
+    const stable = isStablecoin(sym);
 
-    h += '<tr><td><strong>' + esc(pos.trade.symbol) + '</strong></td>' +
+    h += '<tr><td><strong>' + esc(sym) + '</strong></td>' +
       '<td>' + (stable ? '<span class="type t-stable">Stablecoin</span>' : '<span class="type ' + (pos.kind==='B'?'t-buy':'t-short') + '">' + (pos.kind==='B'?'Long':'Short') + '</span>') + '</td>' +
       '<td>' + esc(fmtDateTime(pos.trade.tradeDate)) + '</td>' +
       '<td class="num">' + fmt(pos.qty, 4) + '</td>' +
-      '<td class="num">' + fmt(pos.trade.price) + ' ' + esc(pos.trade.currency) + '</td>' +
-      '<td class="num">' + fmt(pos.fee) + ' ' + esc(pos.trade.currency) + '</td>' +
-      '<td class="num">' + fmt(Math.abs(pos.objem)) + ' ' + esc(pos.trade.currency) + '</td>' +
-      '<td class="num" style="font-weight:700">' + fmt(czkVal) + ' Kč</td>' +
-      '<td class="num" style="font-size:12px;color:var(--ink-sub)">' + weight.toFixed(1) + ' %</td></tr>';
+      '<td class="num">' + fmtMoney(pos.trade.price, pos.trade.currency) + '</td>' +
+      '<td class="num">' +
+        '<input type="number" class="price-input" data-sym="' + esc(sym) + '" value="' + curPrice + '" step="any" min="0">' +
+        ' <span class="dim">' + currSign(pos.trade.currency).trim() + '</span>' +
+      '</td>' +
+      '<td class="num">' + fmtMoney(bookCostNative, pos.trade.currency) + '</td>' +
+      '<td class="num" style="font-weight:700">' + fmtMoney(curValueNative, pos.trade.currency) + '</td>' +
+      '<td class="num" style="font-weight:700;color:'+(posProfitNative>=0?'var(--green)':'var(--red)')+'">' +
+        (posProfitNative>=0?'+':'') + fmtMoney(posProfitNative, pos.trade.currency) +
+        '<br><span style="font-size:11px;font-weight:600">(' + (posRoiPct>=0?'+':'') + posRoiPct.toFixed(1) + '%)</span>' +
+      '</td>' +
+      '<td class="num" style="font-size:12px;color:var(--ink-sub)">' + weight.toFixed(1) + '%</td></tr>';
   }
   h += '</tbody></table>';
   el.innerHTML = h;
@@ -1855,16 +1877,16 @@ function renderPozice(st){
 
 function renderDonutSvg(slices, total){
   if (total <= 0 || !slices.length){
-    return '<svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="75" fill="none" stroke="var(--border)" stroke-width="36"/><text x="120" y="125" text-anchor="middle" font-size="12" fill="var(--ink-sub)">No data</text></svg>';
+    return '<svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="75" fill="none" stroke="var(--glass-border-subtle)" stroke-width="36"/><text x="120" y="125" text-anchor="middle" font-size="12" fill="var(--ink-sub)">No data</text></svg>';
   }
 
-  const cx = 120, cy = 120, R = 95, r = 55;
+  const cx = 120, cy = 120, R = 96, r = 58;
   let svg = '<svg width="240" height="240" viewBox="0 0 240 240">';
 
   if (slices.length === 1){
-    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="75" fill="none" stroke="' + slices[0].color + '" stroke-width="40"/>';
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="77" fill="none" stroke="' + slices[0].color + '" stroke-width="38"/>';
   } else {
-    let curAng = -Math.PI / 2; // start at 12 o'clock
+    let curAng = -Math.PI / 2;
     for (const s of slices){
       const sliceAng = (s.czk / total) * 2 * Math.PI;
       const endAng = curAng + sliceAng;
@@ -1884,15 +1906,15 @@ function renderDonutSvg(slices, total){
         ' L ' + x3.toFixed(2) + ' ' + y3.toFixed(2) +
         ' A ' + r + ' ' + r + ' 0 ' + largeArc + ' 0 ' + x4.toFixed(2) + ' ' + y4.toFixed(2) + ' Z';
 
-      svg += '<path d="' + d + '" fill="' + s.color + '" stroke="#fff" stroke-width="1.5"><title>' + esc(s.label) + ': ' + fmt(s.czk) + ' Kč (' + ((s.czk/total)*100).toFixed(1) + '%)</title></path>';
+      svg += '<path d="' + d + '" fill="' + s.color + '" stroke="#ffffff" stroke-width="1.5"><title>' + esc(s.label) + ': ' + fmtMoney(s.czk, 'CZK') + ' (' + ((s.czk/total)*100).toFixed(1) + '%)</title></path>';
       curAng = endAng;
     }
   }
 
   // Center hole text
-  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 1) + '" fill="#ffffff"/>';
-  svg += '<text x="' + cx + '" y="114" text-anchor="middle" font-size="14" font-weight="800" fill="var(--ink)">' + fmt(total, 0) + ' Kč</text>';
-  svg += '<text x="' + cx + '" y="132" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink-sub)">Total Open</text>';
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 1) + '" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.04))"/>';
+  svg += '<text x="' + cx + '" y="114" text-anchor="middle" font-size="14.5" font-weight="800" fill="var(--ink)">' + fmtMoney(total, 'CZK', 0) + '</text>';
+  svg += '<text x="' + cx + '" y="132" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink-sub)">Total Value</text>';
   svg += '</svg>';
   return svg;
 }
@@ -1929,7 +1951,7 @@ function applyRowHl(){
 // Event Listeners
 document.addEventListener('click', e=>{
   const t = e.target;
-  if (t.closest('#btnDemo')){ clearAll(); loadText(DEMOS.demo, 'Demo portfolio'); return; }
+  if (t.closest('#btnDemo')){ clearAll(); loadText(DEMOS.demo, 'Demo portfolio (2022–2025)'); return; }
   if (t.closest('#btnTemplate')){ clearAll(); loadText(DEMOS.Template, 'Template portfolio'); return; }
   if (t.closest('#btnPasteClipboard')){
     if (navigator.clipboard && navigator.clipboard.readText){
@@ -1991,6 +2013,18 @@ document.addEventListener('click', e=>{
   }
 });
 
+// Interactive Current Price input changes in Open Positions
+document.addEventListener('input', e=>{
+  if (e.target && e.target.classList.contains('price-input')){
+    const sym = e.target.dataset.sym;
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val) && val >= 0){
+      marketPrices[sym] = val;
+      if (state) renderPozice(state);
+    }
+  }
+});
+
 document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
   b.addEventListener('click', ()=>tab(b.dataset.tab));
 });
@@ -2039,7 +2073,7 @@ function exportReport(){
   L.push('Rok;Měna;Daňové příjmy (pův. měna);Daňové výdaje (pův. měna);Daňové příjmy (CZK);Daňové výdaje (CZK);Daňový základ (CZK);Osvobozené příjmy (CZK)');
   for (const yr of state.byYear){
     for (const r of yr.rows){
-      L.push([yr.year, r.currency, fmt(r.incN), fmt(-r.outN), fmt(r.incC), fmt(-r.outC), fmt(r.incC - r.outC), fmt(r.exemptC)].join(';'));
+      L.push([yr.year, r.currency, fmtMoney(r.incN, r.currency), fmtMoney(-r.outN, r.currency), fmtMoney(r.incC, 'CZK'), fmtMoney(-r.outC, 'CZK'), fmtMoney(r.incC - r.outC, 'CZK'), fmtMoney(r.exemptC, 'CZK')].join(';'));
     }
   }
   L.push(''); L.push('PODLE ROKŮ'); 
@@ -2049,7 +2083,7 @@ function exportReport(){
     for (const r of yr.rows){
       for (const g of r.list){
         L.push([fmtDateTime(g.trade.tradeDate), g.symbol, fmt(g.trade.qty, 4),
-          fmt(g.trade.price), fmt(g.trade.fee), fmt(g.trade.qty*g.trade.price - g.trade.fee), fmt(g.profit), fmt(g.taxInc), fmt(-g.taxOut)].join(';'));
+          fmtMoney(g.trade.price, g.trade.currency), fmtMoney(g.trade.fee, g.trade.currency), fmtMoney(g.trade.qty*g.trade.price - g.trade.fee, g.trade.currency), fmtMoney(g.profit, g.trade.currency), fmtMoney(g.taxInc, 'CZK'), fmtMoney(-g.taxOut, 'CZK')].join(';'));
       }
     }
   }
