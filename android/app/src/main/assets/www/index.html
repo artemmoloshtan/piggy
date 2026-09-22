@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffd95e">
-<meta name="description" content="Piggy v1.1.0 – Liquid Glass &amp; Material You tax calculator for stock and security trading profits under Czech income tax law (FIFO, časový test, GFŘ exchange rates).">
+<meta name="description" content="Piggy – Client-side tax calculator for stock and security trading profits under Czech income tax law (FIFO, časový test, GFŘ exchange rates).">
 <title>Piggy – Czech Securities Tax &amp; FIFO Engine</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
@@ -83,14 +83,24 @@
     gap: 14px;
   }
   .pig-logo {
-    font-size: 38px;
-    line-height: 1;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
     filter: drop-shadow(0 4px 8px rgba(217, 119, 6, 0.25));
     user-select: none;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pig-logo img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
   }
   .pig-logo:hover {
-    transform: scale(1.12) rotate(-5deg);
+    transform: scale(1.1) rotate(-4deg);
   }
   header h1 {
     margin: 0;
@@ -168,39 +178,156 @@
     box-shadow: var(--glass-shadow-lg);
   }
 
-  /* Dropzone */
+  /* Dual Input Containers: Dropzone + Clipboard Panel */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
   .dropzone {
-    border: 2px dashed rgba(200, 192, 175, 0.75);
-    background: rgba(255, 255, 255, 0.45);
+    border: 2px dashed rgba(200, 192, 175, 0.85);
+    background: rgba(255, 255, 255, 0.55);
     border-radius: var(--radius-md);
-    padding: 28px 20px;
+    padding: 24px 18px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   .dropzone:hover, .dropzone.drag {
-    background: rgba(255, 247, 214, 0.75);
+    background: rgba(255, 247, 214, 0.85);
     border-color: var(--gold-dark);
-    transform: scale(0.995);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(217, 119, 6, 0.08);
   }
   .dropzone-icon {
     font-size: 32px;
     margin-bottom: 6px;
   }
   .dropzone .big {
-    font-size: 15.5px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--ink);
   }
   .dropzone .small {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--ink-sub);
     margin-top: 4px;
   }
 
+  /* Dedicated Clipboard Paste Zone */
+  .paste-zone {
+    border: 2px dashed rgba(186, 212, 245, 0.9);
+    background: rgba(240, 247, 255, 0.6);
+    border-radius: var(--radius-md);
+    padding: 24px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .paste-zone:hover {
+    background: rgba(224, 242, 254, 0.85);
+    border-color: #0284c7;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.1);
+  }
+  .paste-icon {
+    font-size: 32px;
+    margin-bottom: 6px;
+  }
+  .paste-zone .big {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0369a1;
+  }
+  .paste-zone .small {
+    font-size: 12.5px;
+    color: #0c4a6e;
+    margin-top: 4px;
+  }
+
+  /* Well-Defined Loaded Files Staging Area */
+  .loaded-files-box {
+    margin: 16px 0 6px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1.5px solid rgba(220, 214, 200, 0.8);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(45, 38, 20, 0.04);
+  }
+  .loaded-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(230, 224, 210, 0.7);
+  }
+  .loaded-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .loaded-title .badge-count {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+  }
+  #loaded-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid var(--glass-border-subtle);
+    border-radius: var(--radius-pill);
+    padding: 5px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .file-chip button {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .file-chip button:hover {
+    background: #dc2626;
+    color: #ffffff;
+  }
+
   /* Material You Pill Action Buttons */
   .toolbar {
-    margin-top: 16px;
+    margin-top: 14px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -261,28 +388,6 @@
   .btn-clear:hover {
     background: #fee2e2;
   }
-
-  /* Chips */
-  #loaded {
-    margin-top: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-  .file-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: var(--radius-pill);
-    padding: 4px 12px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .file-chip button {
-    background: none;
     border: none;
     cursor: pointer;
     font-size: 14px;
@@ -777,9 +882,13 @@
     .header-badges { width: 100%; justify-content: flex-start; margin-top: 4px; }
     main { padding: 14px 12px max(60px, env(safe-area-inset-bottom, 60px)); }
     .glass-card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
-    .dropzone { padding: 22px 14px; }
+    .input-grid { grid-template-columns: 1fr; gap: 10px; }
+    .dropzone { padding: 18px 14px; }
     .dropzone .big { font-size: 14.5px; }
     .dropzone .small { font-size: 12px; }
+    .paste-zone { padding: 18px 14px; }
+    .paste-zone .big { font-size: 14.5px; }
+    .paste-zone .small { font-size: 12px; }
     .toolbar { gap: 6px; }
     .btn { min-height: 42px; font-size: 12.5px; padding: 7px 14px; }
 
@@ -864,7 +973,7 @@
 <header>
   <div class="wrap">
     <div class="brand">
-      <div class="pig-logo">🐷</div>
+      <div class="pig-logo"><img src="icon.svg" alt="Piggy Logo" width="44" height="44"></div>
       <div>
         <h1>Piggy</h1>
         <p>Czech Securities Tax &amp; FIFO Engine • Časový test • GFŘ jednotné kurzy</p>
@@ -886,21 +995,38 @@
 <main>
   <!-- Input Section -->
   <section class="glass-card" id="input">
-    <div class="dropzone" id="drop">
-      <div class="dropzone-icon">📄</div>
-      <div class="big">Drag &amp; drop your broker trade export (.CSV / .TSV) here</div>
-      <div class="small">Or click anywhere to browse, or paste copied cells directly with <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
-      <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
+    <div class="input-grid">
+      <div class="dropzone" id="drop">
+        <div class="dropzone-icon">📁</div>
+        <div class="big">Drag &amp; drop broker export (.CSV / .TSV)</div>
+        <div class="small">Or click here to browse files on your device</div>
+        <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
+      </div>
+
+      <div class="paste-zone" id="btnPasteClipboard">
+        <div class="paste-icon">📋</div>
+        <div class="big">Paste from Clipboard</div>
+        <div class="small">Click to import copied trade cells, or use <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
+      </div>
+    </div>
+
+    <!-- Defined Holding Area for Loaded Files -->
+    <div class="loaded-files-box" id="loaded-box" hidden>
+      <div class="loaded-header">
+        <div class="loaded-title">
+          <span>📦 Loaded Files &amp; Datasets</span>
+          <span class="badge-count" id="loaded-count">0</span>
+        </div>
+        <button class="btn btn-clear" id="btnClear" style="padding:4px 12px;font-size:12px;min-height:auto;">✕ Clear All</button>
+      </div>
+      <div id="loaded-chips"></div>
     </div>
 
     <div class="toolbar">
-      <button class="btn btn-demo" id="btnDemo">✨ Load Demo Portfolio (2022–2025)</button>
-      <button class="btn" id="btnPasteClipboard">📋 Paste from Clipboard</button>
+      <button class="btn btn-demo" id="btnDemo">Load Demo Portfolio</button>
       <button class="btn" id="btnTemplate">📑 Load Template</button>
       <button class="btn" id="btnDownloadTemplate">⬇️ Download Template (.csv)</button>
-      <button class="btn btn-clear" id="btnClear">✕ Clear</button>
     </div>
-    <div id="loaded"></div>
     <div id="messages"></div>
   </section>
 
@@ -1009,7 +1135,7 @@
 
 <footer>
   <div>
-    <strong>Piggy v1.1.0</strong> • Liquid Glass &amp; Material You • 100% Client-Side
+    <strong>Piggy v1.1.0</strong> • 100% Client-Side Privacy
   </div>
   <div>
     <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer">github.com/artemmoloshtan/piggy</a>
@@ -1481,11 +1607,21 @@ function readFile(file){
 }
 
 function renderLoaded(){
-  const el = $('loaded');
-  if (!loadedFiles.length){ el.innerHTML = ''; return; }
-  el.innerHTML = loadedFiles.map((f,i)=>
-    '<span class="file-chip">📁 '+esc(f.name)+' ('+f.trades.length+' trades) <button data-rm="'+i+'" title="Remove file">✕</button></span>'
-  ).join('');
+  const box = $('loaded-box');
+  const countEl = $('loaded-count');
+  const chipsEl = $('loaded-chips');
+  if (!loadedFiles.length){
+    if (box) box.hidden = true;
+    if (chipsEl) chipsEl.innerHTML = '';
+    return;
+  }
+  if (box) box.hidden = false;
+  if (countEl) countEl.textContent = loadedFiles.length + (loadedFiles.length === 1 ? ' item' : ' items');
+  if (chipsEl){
+    chipsEl.innerHTML = loadedFiles.map((f,i)=>
+      '<span class="file-chip"><span>📄 '+esc(f.name)+' ('+f.trades.length+' trades)</span><button data-rm="'+i+'" title="Remove file">✕</button></span>'
+    ).join('');
+  }
 }
 
 function clearAll(){
@@ -1951,7 +2087,7 @@ function applyRowHl(){
 // Event Listeners
 document.addEventListener('click', e=>{
   const t = e.target;
-  if (t.closest('#btnDemo')){ clearAll(); loadText(DEMOS.demo, 'Demo portfolio (2022–2025)'); return; }
+  if (t.closest('#btnDemo')){ clearAll(); loadText(DEMOS.demo, 'Demo portfolio'); return; }
   if (t.closest('#btnTemplate')){ clearAll(); loadText(DEMOS.Template, 'Template portfolio'); return; }
   if (t.closest('#btnPasteClipboard')){
     if (navigator.clipboard && navigator.clipboard.readText){
