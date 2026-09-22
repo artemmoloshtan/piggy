@@ -67,6 +67,11 @@
     top: 0;
     z-index: 50;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  }
+  header.header-collapsed {
+    transform: translateY(-100%);
+    box-shadow: none;
   }
   header .wrap {
     max-width: 1220px;
@@ -908,6 +913,10 @@
       -webkit-backdrop-filter: blur(16px);
       padding: 6px 0 8px;
       margin: 12px 0 0;
+      transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.header-is-collapsed nav.tabs {
+      top: 0;
     }
     nav.tabs button {
       padding: 8px 14px;
@@ -2233,6 +2242,33 @@ function exportReport(){
     tr.innerHTML = '<td><strong>'+y+'</strong></td><td class="num">'+RATES[y].usd.toFixed(2).replace('.',',')+' Kč</td><td class="num">'+RATES[y].eur.toFixed(2).replace('.',',')+' Kč</td>';
     body.appendChild(tr);
   }
+})();
+
+// Mobile Header Auto-Collapse on Scroll Down / Reveal on Scroll Up
+(function(){
+  let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+  const header = document.querySelector('header');
+  if (!header) return;
+
+  window.addEventListener('scroll', ()=>{
+    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    // Only apply on mobile/tablet viewports
+    if (window.innerWidth <= 768){
+      if (currentScrollY > 70 && currentScrollY > lastScrollY + 6){
+        // Scrolling down
+        header.classList.add('header-collapsed');
+        document.body.classList.add('header-is-collapsed');
+      } else if (currentScrollY < lastScrollY - 8 || currentScrollY <= 20){
+        // Scrolling up or at the very top
+        header.classList.remove('header-collapsed');
+        document.body.classList.remove('header-is-collapsed');
+      }
+    } else {
+      header.classList.remove('header-collapsed');
+      document.body.classList.remove('header-is-collapsed');
+    }
+    lastScrollY = Math.max(0, currentScrollY);
+  }, { passive: true });
 })();
 </script>
 </body>
