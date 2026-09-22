@@ -6,6 +6,7 @@
 build/
 **/build/
 *.apk
+!Piggy.apk
 *.aab
 local.properties
 .jdk/
