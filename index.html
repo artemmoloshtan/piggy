@@ -532,6 +532,157 @@
     background: #f7f4ea;
     border-top: 2px solid var(--border);
   }
+  .t-stable {
+    background: #e6fffa;
+    color: #0f766e;
+    border: 1px solid #99f6e4;
+    font-weight: 700;
+  }
+
+  /* Open Positions Dashboard & Pie Chart */
+  .openpos-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .openpos-kpi {
+    background: #faf9f6;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .openpos-kpi .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink-sub);
+    letter-spacing: 0.03em;
+  }
+  .openpos-kpi .val {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .openpos-kpi.highlight-stable {
+    border-color: #0d9488;
+    background: #f0fdfa;
+  }
+  .openpos-kpi.highlight-stable .val {
+    color: #0f766e;
+  }
+
+  .pie-card {
+    background: #faf9f6;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .pie-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pie-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .pie-chart-wrap {
+    width: 240px;
+    height: 240px;
+    flex-shrink: 0;
+  }
+  .pie-legend-list {
+    flex: 1;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pie-legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+  }
+  .pie-legend-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pie-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .pie-legend-sym {
+    font-weight: 700;
+  }
+  .pie-legend-pct {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink-sub);
+    min-width: 46px;
+    text-align: right;
+  }
+  .pie-legend-val {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .stablecoin-input-bar {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .stablecoin-input-bar label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stablecoin-input-bar input {
+    width: 130px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  .stablecoin-input-bar select {
+    padding: 6px 8px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
 
   /* Collapsible / FAQ */
   details {
@@ -1226,6 +1377,13 @@ const $ = (id)=>document.getElementById(id);
 let state = null;
 let loadedFiles = [];
 let highlight = { set: new Set() };
+let customStablecoin = { amount: 0, currency: 'USD' };
+
+const STABLECOIN_SYMBOLS = new Set(['USDT', 'USDC', 'DAI', 'FDUSD', 'BUSD', 'TUSD', 'USDD', 'EURC', 'PYUSD', 'USDP', 'USDG']);
+function isStablecoin(sym){
+  if (!sym) return false;
+  return STABLECOIN_SYMBOLS.has(String(sym).trim().toUpperCase());
+}
 
 const DEMOS = {
   demo:
@@ -1241,7 +1399,8 @@ const DEMOS = {
 "1.8.2024 10:00;Prodej;HOLDING-3Y;1200;90;CZK;107 955,00;45,00\n" +
 "2.8.2024 10:00;Prodej;HOLDING-3Y;1200;90;CZK;107 955,00;45,00\n" +
 "12.9.2024 14:20;Prodej;MINERAL;42;50;EUR;2 082,50;17,50\n" +
-"20.12.2024 9:00;Nákup;AKCIE-25;500;20;CZK;-10 012,50;12,50\n",
+"20.12.2024 9:00;Nákup;AKCIE-25;500;20;CZK;-10 012,50;12,50\n" +
+"15.1.2025 10:00;Nákup;USDT;1;1500;USD;-1 501,00;1,00\n",
   Template:
 "Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky\n" +
 "1.1.2025 0:00;Nákup;AKCIE-1;100,00;20;CZK;-2 010,00;10,00\n" +
@@ -1532,20 +1691,210 @@ function renderAkcie(st){
 
 function renderPozice(st){
   const el = $('out-pozice');
-  if (!st.openPos.length){ el.innerHTML='<p class="info">No open positions remaining. All positions are closed.</p>'; return; }
-  let h = '<table><thead><tr><th>Symbol</th><th>Direction</th><th>Purchase Date</th>' +
-    '<th class="num">Open Quantity</th><th class="num">Entry Price</th><th class="num">Allocated Fees</th><th class="num">Current Book Cost</th></tr></thead><tbody>';
+  const currYear = new Date().getFullYear();
+
+  // Aggregate positions by symbol
+  const bySymbol = new Map();
   for (const pos of st.openPos){
-    h += '<tr><td><strong>'+esc(pos.trade.symbol)+'</strong></td>' +
-      '<td><span class="type '+(pos.kind==='B'?'t-buy':'t-short')+'">'+(pos.kind==='B'?'Long':'Short')+'</span></td>' +
-      '<td>'+esc(fmtDateTime(pos.trade.tradeDate))+'</td>' +
-      '<td class="num">'+fmt(pos.qty, 4)+'</td>' +
-      '<td class="num">'+fmt(pos.trade.price)+' '+esc(pos.trade.currency)+'</td>' +
-      '<td class="num">'+fmt(pos.fee)+' '+esc(pos.trade.currency)+'</td>' +
-      '<td class="num">'+fmt(Math.abs(pos.objem))+' '+esc(pos.trade.currency)+'</td></tr>';
+    const sym = pos.trade.symbol;
+    const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
+    const czkVal = Math.abs(pos.objem) * rate;
+    if (!bySymbol.has(sym)){
+      bySymbol.set(sym, {
+        symbol: sym,
+        qty: 0,
+        czkVal: 0,
+        currency: pos.trade.currency,
+        isStable: isStablecoin(sym),
+        kind: pos.kind,
+        items: []
+      });
+    }
+    const rec = bySymbol.get(sym);
+    rec.qty += pos.qty;
+    rec.czkVal += czkVal;
+    rec.items.push(pos);
+  }
+
+  // Calculate custom stablecoin value if any
+  const customRate = rateFor(customStablecoin.currency, currYear);
+  const customCZK = (customStablecoin.amount || 0) * customRate;
+
+  // Calculate totals
+  let totalSecuritiesCZK = 0;
+  let totalStablecoinsCZK = customCZK;
+
+  for (const [sym, item] of bySymbol.entries()){
+    if (item.isStable){
+      totalStablecoinsCZK += item.czkVal;
+    } else {
+      totalSecuritiesCZK += item.czkVal;
+    }
+  }
+
+  const totalPortfolioCZK = totalSecuritiesCZK + totalStablecoinsCZK;
+  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
+
+  if (!st.openPos.length && customCZK <= 0){
+    el.innerHTML = '<p class="info">No open positions remaining. All positions are closed.</p>';
+    return;
+  }
+
+  let h = '';
+
+  // 1. Metric cards for Open Positions
+  h += '<div class="openpos-kpi-row">';
+  h += '<div class="openpos-kpi"><div class="label">Total Open Portfolio</div><div class="val">' + fmt(totalPortfolioCZK) + ' Kč</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">Securities / Equities</div><div class="val">' + fmt(totalSecuritiesCZK) + ' Kč</div></div>';
+  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val">' + fmt(totalStablecoinsCZK) + ' Kč</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">Stablecoins Share</div><div class="val">' + stablePct.toFixed(1) + ' %</div></div>';
+  h += '</div>';
+
+  // 2. Custom Stablecoin / Cash Adjuster Input
+  h += '<div class="stablecoin-input-bar">';
+  h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
+  h += '<input type="number" id="inp-stable-amt" placeholder="e.g. 1000" min="0" step="any" value="' + (customStablecoin.amount > 0 ? customStablecoin.amount : '') + '">';
+  h += '<select id="inp-stable-curr">';
+  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC</option>';
+  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC</option>';
+  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK</option>';
+  h += '</select>';
+  h += '<button class="btn primary" id="btnApplyStable">Update Allocation</button>';
+  if (customStablecoin.amount > 0){
+    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 10px">Reset Cash</button>';
+  }
+  h += '</div>';
+
+  // 3. Asset Allocation Pie / Donut Chart
+  const slices = [];
+  const palette = [
+    '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
+    '#06b6d4', '#f97316', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'
+  ];
+  let pIdx = 0;
+
+  for (const [sym, item] of bySymbol.entries()){
+    if (item.czkVal > 0){
+      slices.push({
+        label: sym,
+        czk: item.czkVal,
+        color: item.isStable ? '#10b981' : palette[pIdx++ % palette.length],
+        isStable: item.isStable,
+        qty: item.qty
+      });
+    }
+  }
+  if (customCZK > 0){
+    slices.push({
+      label: 'Cash Reserve (' + customStablecoin.currency + ')',
+      czk: customCZK,
+      color: '#059669',
+      isStable: true,
+      qty: customStablecoin.amount
+    });
+  }
+
+  slices.sort((a,b)=>b.czk - a.czk);
+
+  h += '<div class="pie-card">';
+  h += '<div class="pie-card-title"><span>Portfolio Allocation Breakdown</span><span style="font-size:12px;font-weight:600;color:var(--ink-sub)">Total: ' + fmt(totalPortfolioCZK) + ' Kč</span></div>';
+  h += '<div class="pie-flex">';
+  
+  // Render SVG Donut Chart
+  h += '<div class="pie-chart-wrap">';
+  h += renderDonutSvg(slices, totalPortfolioCZK);
+  h += '</div>';
+
+  // Render Legend
+  h += '<div class="pie-legend-list">';
+  for (const s of slices){
+    const pct = totalPortfolioCZK > 0 ? (s.czk / totalPortfolioCZK) * 100 : 0;
+    h += '<div class="pie-legend-row">';
+    h += '<div class="pie-legend-left">';
+    h += '<div class="pie-legend-color" style="background:' + s.color + '"></div>';
+    h += '<span class="pie-legend-sym">' + esc(s.label) + '</span>';
+    if (s.isStable){
+      h += '<span class="type t-stable">Stablecoin</span>';
+    }
+    h += '</div>';
+    h += '<div style="display:flex;align-items:center;gap:12px">';
+    h += '<span class="pie-legend-val">' + fmt(s.czk) + ' Kč</span>';
+    h += '<span class="pie-legend-pct">' + pct.toFixed(1) + '%</span>';
+    h += '</div>';
+    h += '</div>';
+  }
+  h += '</div>'; // end pie-legend-list
+  h += '</div>'; // end pie-flex
+  h += '</div>'; // end pie-card
+
+  // 4. Open Positions Detailed Table
+  h += '<h3 class="group" style="margin-top:24px">Individual Open Position Lots</h3>';
+  h += '<table><thead><tr><th>Symbol</th><th>Type</th><th>Purchase Date</th>' +
+    '<th class="num">Open Quantity</th><th class="num">Entry Price</th><th class="num">Allocated Fees</th>' +
+    '<th class="num">Book Cost (orig)</th><th class="num">Value (CZK)</th><th class="num">Weight</th></tr></thead><tbody>';
+
+  for (const pos of st.openPos){
+    const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
+    const czkVal = Math.abs(pos.objem) * rate;
+    const weight = totalPortfolioCZK > 0 ? (czkVal / totalPortfolioCZK) * 100 : 0;
+    const stable = isStablecoin(pos.trade.symbol);
+
+    h += '<tr><td><strong>' + esc(pos.trade.symbol) + '</strong></td>' +
+      '<td>' + (stable ? '<span class="type t-stable">Stablecoin</span>' : '<span class="type ' + (pos.kind==='B'?'t-buy':'t-short') + '">' + (pos.kind==='B'?'Long':'Short') + '</span>') + '</td>' +
+      '<td>' + esc(fmtDateTime(pos.trade.tradeDate)) + '</td>' +
+      '<td class="num">' + fmt(pos.qty, 4) + '</td>' +
+      '<td class="num">' + fmt(pos.trade.price) + ' ' + esc(pos.trade.currency) + '</td>' +
+      '<td class="num">' + fmt(pos.fee) + ' ' + esc(pos.trade.currency) + '</td>' +
+      '<td class="num">' + fmt(Math.abs(pos.objem)) + ' ' + esc(pos.trade.currency) + '</td>' +
+      '<td class="num" style="font-weight:700">' + fmt(czkVal) + ' Kč</td>' +
+      '<td class="num" style="font-size:12px;color:var(--ink-sub)">' + weight.toFixed(1) + ' %</td></tr>';
   }
   h += '</tbody></table>';
   el.innerHTML = h;
+}
+
+function renderDonutSvg(slices, total){
+  if (total <= 0 || !slices.length){
+    return '<svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="75" fill="none" stroke="var(--border)" stroke-width="36"/><text x="120" y="125" text-anchor="middle" font-size="12" fill="var(--ink-sub)">No data</text></svg>';
+  }
+
+  const cx = 120, cy = 120, R = 95, r = 55;
+  let svg = '<svg width="240" height="240" viewBox="0 0 240 240">';
+
+  if (slices.length === 1){
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="75" fill="none" stroke="' + slices[0].color + '" stroke-width="40"/>';
+  } else {
+    let curAng = -Math.PI / 2; // start at 12 o'clock
+    for (const s of slices){
+      const sliceAng = (s.czk / total) * 2 * Math.PI;
+      const endAng = curAng + sliceAng;
+      const largeArc = sliceAng > Math.PI ? 1 : 0;
+
+      const x1 = cx + R * Math.cos(curAng);
+      const y1 = cy + R * Math.sin(curAng);
+      const x2 = cx + R * Math.cos(endAng);
+      const y2 = cy + R * Math.sin(endAng);
+      const x3 = cx + r * Math.cos(endAng);
+      const y3 = cy + r * Math.sin(endAng);
+      const x4 = cx + r * Math.cos(curAng);
+      const y4 = cy + r * Math.sin(curAng);
+
+      const d = 'M ' + x1.toFixed(2) + ' ' + y1.toFixed(2) +
+        ' A ' + R + ' ' + R + ' 0 ' + largeArc + ' 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2) +
+        ' L ' + x3.toFixed(2) + ' ' + y3.toFixed(2) +
+        ' A ' + r + ' ' + r + ' 0 ' + largeArc + ' 0 ' + x4.toFixed(2) + ' ' + y4.toFixed(2) + ' Z';
+
+      svg += '<path d="' + d + '" fill="' + s.color + '" stroke="#fff" stroke-width="1.5"><title>' + esc(s.label) + ': ' + fmt(s.czk) + ' Kč (' + ((s.czk/total)*100).toFixed(1) + '%)</title></path>';
+      curAng = endAng;
+    }
+  }
+
+  // Center hole text
+  svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 1) + '" fill="#ffffff"/>';
+  svg += '<text x="' + cx + '" y="114" text-anchor="middle" font-size="14" font-weight="800" fill="var(--ink)">' + fmt(total, 0) + ' Kč</text>';
+  svg += '<text x="' + cx + '" y="132" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink-sub)">Total Open</text>';
+  svg += '</svg>';
+  return svg;
 }
 
 // Navigation & Tab Switching
@@ -1597,6 +1946,18 @@ document.addEventListener('click', e=>{
     } else {
       showError('Clipboard API is not available in this browser. Please use Ctrl+V or Cmd+V.');
     }
+    return;
+  }
+  if (t.closest('#btnApplyStable')){
+    const amt = parseFloat($('inp-stable-amt')?.value) || 0;
+    const curr = $('inp-stable-curr')?.value || 'USD';
+    customStablecoin = { amount: Math.max(0, amt), currency: curr };
+    if (state) renderPozice(state);
+    return;
+  }
+  if (t.closest('#btnResetStable')){
+    customStablecoin = { amount: 0, currency: 'USD' };
+    if (state) renderPozice(state);
     return;
   }
   if (t.closest('#btnDownloadTemplate')){ download('piggy-template.csv', DEMOS.Template); return; }
