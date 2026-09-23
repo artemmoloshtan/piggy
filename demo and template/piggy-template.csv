@@ -1,3 +1,3 @@
-Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky
-1.1.2025 0:00;Nákup;AKCIE-1;100,00;20;CZK;-2 010,00;10,00
-30.6.2025 0:00;Prodej;AKCIE-1;150,00;20;CZK;2 982,25;17,75
+Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva
+1.1.2025 0:00;Nákup;AKCIE-1;100,00;20;CZK;-2 010,00;10,00;Akcie
+30.6.2025 0:00;Prodej;AKCIE-1;150,00;20;CZK;2 982,25;17,75;Akcie

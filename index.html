@@ -651,6 +651,8 @@
   .t-short { background: var(--purple-bg); color: var(--purple); }
   .t-cov { background: var(--blue-bg); color: var(--blue); }
   .t-stable { background: var(--teal-bg); color: var(--teal); border: 1px solid #99f6e4; font-weight: 700; }
+  .tag-crypto { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-size: 10.5px; padding: 2px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-block; white-space: nowrap; }
+  .tag-sec { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; font-size: 10.5px; padding: 2px 7px; border-radius: var(--radius-pill); font-weight: 700; display: inline-block; white-space: nowrap; }
 
   .total-row td {
     font-weight: 700;
@@ -1121,8 +1123,34 @@ function addMonthsCZ(d, months){
   return new Date(y, m, Math.min(day, lastDay));
 }
 
+function normalizeAssetType(val){
+  if (!val) return 'security';
+  const v = String(val).trim().toLowerCase();
+  if (/^(kryptoaktivum|kryptoaktiva|virtu[aá]ln[ií]\s*aktivum|virtu[aá]ln[ií]\s*aktiva|kryptom[eě]na|kryptom[eě]ny|crypto|cryptocurrency|crypto-?asset|virtual\s*asset)$/i.test(v)){
+    return 'crypto';
+  }
+  return 'security';
+}
+
+function sanitizeCSVCell(val){
+  if (val == null) return '';
+  const s = String(val);
+  if (/^[=+\-@\t\r]/.test(s)){
+    return "'" + s;
+  }
+  return s;
+}
+
 function pairTaxable(sell, buy){
   if (buy.tradeDate > sell.tradeDate) return true; // short cover is always taxable
+  if (sell.assetType === 'crypto' || buy.assetType === 'crypto'){
+    // Under Czech law, crypto transfers in 2024 or earlier NEVER qualify for 3-year holding exemption
+    if (sell.year <= 2024) return true;
+    // Effective 2025, 3-year holding exemption applies to crypto
+    const end = addMonthsCZ(buy.settleDate, 36);
+    return sell.settleDate <= end;
+  }
+  // Securities
   const months = buy.settleDate <= new Date(2013,11,31) ? 6 : 36;
   const end = addMonthsCZ(buy.settleDate, months);
   return sell.settleDate <= end;
@@ -1165,6 +1193,37 @@ function parseDateTime(s){
   return null;
 }
 
+function mapHeaders(headerCells){
+  const map = {
+    date: -1, dir: -1, symbol: -1, price: -1, qty: -1,
+    currency: -1, volume: -1, fee: -1, assetType: -1
+  };
+  const norm = s => String(s || '').trim().toLowerCase().replace(/^["']|["']$/g, '');
+  headerCells.forEach((c, idx) => {
+    const h = norm(c);
+    if (map.date === -1 && ['datum obchodu', 'datum', 'date', 'trade date', 'timestamp', 'čas', 'cas', 'time', 'datum a čas', 'datetime'].includes(h)) map.date = idx;
+    else if (map.dir === -1 && ['směr', 'smer', 'typ', 'direction', 'type', 'action', 'side', 'k/p', 'b/s'].includes(h)) map.dir = idx;
+    else if (map.symbol === -1 && ['symbol', 'ticker', 'akcie', 'asset', 'instrument', 'cenný papír', 'cenny papir'].includes(h)) map.symbol = idx;
+    else if (map.price === -1 && ['cena', 'price', 'realizační cena', 'realizacni cena', 'kurz', 'rate', 'unit price'].includes(h)) map.price = idx;
+    else if (map.qty === -1 && ['počet', 'pocet', 'množství', 'mnozstvi', 'quantity', 'qty', 'shares', 'units', 'objem ks', 'ks'].includes(h)) map.qty = idx;
+    else if (map.currency === -1 && ['měna', 'mena', 'currency', 'curr', 'ccy'].includes(h)) map.currency = idx;
+    else if (map.volume === -1 && ['objem', 'celkem', 'volume', 'total', 'amount', 'hodnota', 'celková částka', 'celkova castka'].includes(h)) map.volume = idx;
+    else if (map.fee === -1 && ['poplatky', 'poplatek', 'fees', 'fee', 'commission', 'provize', 'popl.'].includes(h)) map.fee = idx;
+    else if (map.assetType === -1 && ['typ aktiva', 'druh aktiva', 'kategorie', 'typ nástroje', 'typ nastroje', 'asset type', 'category', 'instrument type', 'security type'].includes(h)) map.assetType = idx;
+  });
+
+  // Fallback to standard positional index if header didn't have recognized names
+  if (map.date === -1) map.date = 0;
+  if (map.dir === -1) map.dir = 1;
+  if (map.symbol === -1) map.symbol = 2;
+  if (map.price === -1) map.price = 3;
+  if (map.qty === -1) map.qty = 4;
+  if (map.currency === -1) map.currency = 5;
+  if (map.volume === -1) map.volume = 6;
+  if (map.fee === -1) map.fee = 7;
+  return map;
+}
+
 function parseCsv(text){
   const result = { header:null, rows:[], delimiter:null, error:null };
   if (!text || !text.trim()) { result.error = 'The file is empty.'; return result; }
@@ -1175,18 +1234,30 @@ function parseCsv(text){
   for (const delim of [';', '\t', ',']){
     for (let i=0;i<Math.min(lines0.length,40);i++){
       const cells = splitLine(lines0[i], delim);
-      if (cells.length){
-        const firstCol = String(cells[0]).trim().toLowerCase().replace(/^["']|["']$/g, '');
-        if (['datum obchodu', 'datum', 'date', 'trade date', 'timestamp'].includes(firstCol)){
-          if (cells.length < 8){
-            result.error = 'Invalid format – table header has '+cells.length+' columns; 8 expected (Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky or Date;Direction;Symbol;Price;Quantity;Currency;Volume;Fees).';
-            return result;
-          }
+      if (cells.length >= 3){
+        const normLine = cells.map(c => String(c).trim().toLowerCase().replace(/^["']|["']$/g, ''));
+        const hasDate = normLine.some(h => ['datum obchodu', 'datum', 'date', 'trade date', 'timestamp', 'čas', 'time', 'datum a čas'].includes(h));
+        const hasDirOrSym = normLine.some(h => ['směr', 'smer', 'typ', 'direction', 'type', 'action', 'symbol', 'ticker', 'akcie', 'asset'].includes(h));
+        if (hasDate && hasDirOrSym){
           delimiter = delim; headerIdx = i; header = cells; break;
         }
       }
     }
     if (delimiter) break;
+  }
+  if (!delimiter){
+    for (const delim of [';', '\t', ',']){
+      for (let i=0;i<Math.min(lines0.length,40);i++){
+        const cells = splitLine(lines0[i], delim);
+        if (cells.length >= 8){
+          const firstCol = String(cells[0]).trim().toLowerCase().replace(/^["']|["']$/g, '');
+          if (['datum obchodu', 'datum', 'date', 'trade date', 'timestamp'].includes(firstCol)){
+            delimiter = delim; headerIdx = i; header = cells; break;
+          }
+        }
+      }
+      if (delimiter) break;
+    }
   }
   if (!delimiter){ result.error = 'Invalid file – header row (Datum obchodu;Směr;… or Date;Direction;…) was not found.'; return result; }
   result.header = header; result.delimiter = delimiter;
@@ -1194,7 +1265,6 @@ function parseCsv(text){
     const line = lines0[i];
     if (!line.trim()) continue;
     const cells = splitLine(line, delimiter);
-    if (cells.length < 8){ const p = cells.slice(); while(p.length<8) p.push(''); result.rows.push(p); continue; }
     result.rows.push(cells);
   }
   return result;
@@ -1220,34 +1290,44 @@ function splitLine(line, delim){
 
 let ID = 0;
 function normalizeCurrency(s){
-  const v = String(s||'').trim().toUpperCase();
+  if (s == null) return null;
+  const v = String(s).trim().toUpperCase();
   if (v === 'KČ' || v === 'KC' || v === 'CZK' || v === 'KORUNA' || v==='') return 'CZK';
   if (v === 'USD' || v === 'US$' || v === '$') return 'USD';
   if (v === 'EUR' || v === '€' || v === 'EURO') return 'EUR';
-  return 'CZK';
+  return null;
 }
 
 function normalizeRows(csvResult){
   const trades = [];
   let discarded = 0;
+  const unsupportedCurrs = new Set();
+  const colMap = mapHeaders(csvResult.header || []);
+
   for (const r of csvResult.rows){
-    if (r.length < 8) continue;
-    const dirRaw = String(r[1]||'').trim().toLowerCase();
+    const dirRaw = String(r[colMap.dir]||'').trim().toLowerCase();
     const dir = (dirRaw === 'nákup' || dirRaw === 'nakup' || dirRaw === 'buy' || dirRaw === 'b') ? 'B'
               : (dirRaw === 'prodej' || dirRaw === 'sell' || dirRaw === 's') ? 'S' : null;
     if (!dir){ discarded++; continue; }
 
-    const tradeDate = parseDateTime(r[0]);
+    const tradeDate = parseDateTime(r[colMap.date]);
     if (!tradeDate){ discarded++; continue; }
     const settleDate = new Date(tradeDate.getFullYear(), tradeDate.getMonth(), tradeDate.getDate());
-    const symbol = String(r[2]||'').trim() || null;
+    const symbol = String(r[colMap.symbol]||'').trim() || null;
     if (!symbol){ discarded++; continue; }
 
-    const currency = normalizeCurrency(r[5]);
-    const price = parseNumber(r[3]);
-    let qty = Math.abs(parseNumber(r[4]));
-    const fee = Math.abs(parseNumber(r[7]));
-    let objem = parseNumber(r[6]);
+    const rawCurr = String(r[colMap.currency] || '').trim();
+    const currency = normalizeCurrency(rawCurr);
+    if (!currency){
+      discarded++;
+      unsupportedCurrs.add(rawCurr || 'UNKNOWN');
+      continue;
+    }
+
+    const price = parseNumber(r[colMap.price]);
+    let qty = Math.abs(parseNumber(r[colMap.qty]));
+    const fee = colMap.fee >= 0 ? Math.abs(parseNumber(r[colMap.fee])) : 0;
+    let objem = colMap.volume >= 0 ? parseNumber(r[colMap.volume]) : 0;
     if (!objem && price && qty){
       objem = (dir === 'B' ? -1 : 1) * (price * qty);
     }
@@ -1258,14 +1338,18 @@ function normalizeRows(csvResult){
       else if (fallback) { qty = fallback; }
     }
 
+    const assetTypeRaw = colMap.assetType >= 0 ? r[colMap.assetType] : null;
+    const assetType = normalizeAssetType(assetTypeRaw);
+
     trades.push({
       id: ID++,
       tradeDate, settleDate, dir, symbol, price, qty, currency, fee, objem,
+      assetType,
       year: settleDate.getFullYear(),
       related: new Set()
     });
   }
-  return { trades, discarded };
+  return { trades, discarded, unsupportedCurrencies: [...unsupportedCurrs] };
 }
 
 function computeAll(trades){
@@ -1311,6 +1395,34 @@ function computeAll(trades){
     const yearTot = rows.reduce((acc,r)=>({
       incN:acc.incN+r.incN,outN:acc.outN+r.outN,incC:acc.incC+r.incC,outC:acc.outC+r.outC,exemptC:acc.exemptC+r.exemptC
     }),{incN:0,outN:0,incC:0,outC:0,exemptC:0});
+
+    let grossSecuritiesCZK = 0;
+    let grossCryptoCZK = 0;
+    let exemptSecuritiesCZK = 0;
+    let exemptCryptoCZK = 0;
+    for (const r of rows){
+      for (const g of r.list){
+        const isCrypto = g.trade.assetType === 'crypto';
+        const grossCZK = g.taxInc + g.exemptC;
+        if (isCrypto){
+          grossCryptoCZK += grossCZK;
+          exemptCryptoCZK += g.exemptC;
+        } else {
+          grossSecuritiesCZK += grossCZK;
+          exemptSecuritiesCZK += g.exemptC;
+        }
+      }
+    }
+    yearTot.grossSecuritiesCZK = grossSecuritiesCZK;
+    yearTot.grossCryptoCZK = grossCryptoCZK;
+    yearTot.exemptSecuritiesCZK = exemptSecuritiesCZK;
+    yearTot.exemptCryptoCZK = exemptCryptoCZK;
+    yearTot.totalGrossCZK = grossSecuritiesCZK + grossCryptoCZK;
+
+    if (year >= 2026 && !warnings.some(w => w.includes(String(year)))){
+      warnings.push(t('warnProvisionalRate', { year }));
+    }
+
     byYearList.push({ year, rows, count: rows.reduce((a,r)=>a+r.count,0), totals: yearTot });
   }
 
@@ -1506,6 +1618,10 @@ const I18N = {
     colTaxIncCZK: "Daňové příjmy (CZK)",
     colTaxOutCZK: "Daňové výdaje (CZK)",
     colTaxBaseCZK: "Základ daně (CZK)",
+    colExemptCZK: "Osvobozené příjmy (CZK)",
+    colAssetType: "Typ aktiva",
+    tagCrypto: "Kryptoaktivum",
+    tagSecurity: "Cenný papír",
     colViewTrades: "Zobrazit obchody →",
     colDateTime: "Datum a čas",
     colDirection: "Směr",
@@ -1533,7 +1649,11 @@ const I18N = {
     shares: "ks",
     lots: "dávek",
     lot: "Dávka",
-    alert100k: "💡 Celkové hrubé příjmy v roce {year} nepřesáhly 100 000 Kč — prodeje mohou být osvobozeny od daně podle § 4 odst. 1 písm. w) ZDP. Ověřte u svého daňového poradce.",
+    alert100k: "💡 Celkové hrubé příjmy z prodeje cenných papírů v roce {year} ({val}) nepřesáhly 100 000 Kč — veškeré příjmy z prodeje cenných papírů jsou osvobozeny od daně podle § 4 odst. 1 písm. w) ZDP.",
+    alert40M2025: "⚠️ V roce 2025 přesáhly osvobozené příjmy z cenných papírů zákonný limit 40 000 000 Kč ({val}). Částka nad 40 mil. Kč podléhá zdanění podle konsolidačního balíčku.",
+    alert5M: "📢 Osvobozené příjmy v roce {year} přesáhly 5 000 000 Kč ({val}). Nezapomeňte podat finančnímu úřadu 'Oznámení o osvobozených příjmech' podle § 38v ZDP!",
+    warnUnsupportedCurrs: "Některé řádky byly přeskočeny kvůli nepodporované měně: {currs}. Piggy podporuje CZK, USD a EUR s oficiálními jednotnými kurzy GFŘ.",
+    warnProvisionalRate: "Pro rok {year} ještě GFŘ nevyhlásilo oficiální jednotné kurzy měn. Výpočty pro rok {year} jsou orientační s použitím kurzu roku 2025.",
     taxBaseNote: "Základ daně = Daňové příjmy − Daňové výdaje. Upozornění: Ztrátu z prodeje cenných papírů nelze v ČR kompenzovat proti příjmům ze zaměstnání ani přenášet do dalších let.",
     itemsCount: "{n} položek",
     itemCount: "1 položka",
@@ -1545,11 +1665,11 @@ const I18N = {
     exportByYear: "PODLE ROKŮ",
     faqSectionTitle: "Daňový průvodce ČR & dokumentace k importu",
     faq1Summary: "🇨🇿 Základy daňového práva ČR & použití § 10 ZDP",
-    faq1Body: "<p>Piggy je navržen speciálně pro daňové rezidenty v <strong>České republice</strong> obchodující s cennými papíry (akcie, ETF, podílové fondy, dluhopisy) a kryptoměnami podle Zákona o daních z příjmů (<em>č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Ostatní příjmy – Kapitálové zisky)</strong>: Příjmy z úplatného převodu cenných papírů u fyzických osob podléhají dani jako ostatní příjmy. Základ daně = Zdanitelné příjmy − (Výdaje na pořízení + Poplatky související s pořízením a prodejem).</li><li style=\"margin-bottom:8px\"><strong>Párování metodou FIFO</strong>: V souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019 se při postupném nákupu a prodeji stejného cenného papíru používá metoda <strong>First-In, First-Out (FIFO)</strong>. Piggy automaticky chronologicky páruje nákupní a prodejní dávky a eviduje zbývající zůstatky.</li><li style=\"margin-bottom:8px\"><strong>3letý časový test (§ 4 odst. 1 písm. w) ZDP)</strong>: Příjmy z prodeje cenných papírů držených déle než <strong>36 měsíců (3 roky)</strong> jsou zcela osvobozeny od daně z příjmů. (U CP pořízených do 31. 12. 2013 platí historický 6měsíční test). Piggy automaticky detekuje osvobozené obchody, odděluje jejich výdaje a osvobozené příjmy vykazuje zvlášť.</li><li style=\"margin-bottom:8px\"><strong>Roční limit příjmů 100 000 Kč (§ 4 odst. 1 písm. w) ZDP)</strong>: Pokud celkové hrubé příjmy z neosvobozených prodejů cenných papírů nepřesáhnou v kalendářním roce 100 000 Kč, jsou tyto příjmy ze zákona osvobozeny a neuvádějí se v daňovém přiznání. Piggy vás na splnění limitu automaticky upozorní.</li><li style=\"margin-bottom:8px\"><strong>Jednotné kurzy GFŘ</strong>: Obchody v cizích měnách (USD, EUR) jsou přepočítávány oficiálními jednotnými kurzy vyhlašovanými každoročně Generálním finančním ředitelstvím (GFŘ). Nákupy se přepočítávají kurzem roku pořízení, prodeje kurzem roku prodeje.</li><li><strong>Zákaz kompenzace ztrát</strong>: Ztrátu z obchodování s cennými papíry nelze v ČR kompenzovat proti příjmům ze zaměstnání (§ 6) ani podnikání (§ 7) a nelze ji přenášet do dalších zdaňovacích období.</li></ul>",
+    faq1Body: "<p>Piggy je navržen speciálně pro daňové rezidenty v <strong>České republice</strong> obchodující s cennými papíry (akcie, ETF, podílové fondy, dluhopisy) a kryptoaktivy podle Zákona o daních z příjmů (<em>č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Ostatní příjmy – Kapitálové zisky)</strong>: Příjmy z úplatného převodu cenných papírů u fyzických osob podléhají dani jako ostatní příjmy. Základ daně = Zdanitelné příjmy − (Výdaje na pořízení + Poplatky související s pořízením a prodejem).</li><li style=\"margin-bottom:8px\"><strong>Párování metodou FIFO</strong>: V souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019 se při postupném nákupu a prodeji stejného cenného papíru používá metoda <strong>First-In, First-Out (FIFO)</strong>. Piggy automaticky chronologicky páruje nákupní a prodejní dávky a eviduje zbývající zůstatky.</li><li style=\"margin-bottom:8px\"><strong>3letý časový test (§ 4 odst. 1 písm. w) ZDP)</strong>: Příjmy z prodeje cenných papírů držených déle než <strong>36 měsíců (3 roky)</strong> jsou zcela osvobozeny od daně z příjmů. (U CP pořízených do 31. 12. 2013 platí historický 6měsíční test). Piggy automaticky detekuje osvobozené obchody, odděluje jejich výdaje a osvobozené příjmy vykazuje zvlášť.</li><li style=\"margin-bottom:8px\"><strong>Roční limit příjmů 100 000 Kč (§ 4 odst. 1 písm. w) ZDP)</strong>: Pokud celkové hrubé příjmy ze všech převodů cenných papírů nepřesáhnou v kalendářním roce 100 000 Kč, jsou tyto příjmy ze zákona osvobozeny. Pokud limit přesáhnou, nelze tuto výjimku uplatnit a osvobozeny jsou pouze obchody splňující 3letý časový test.</li><li style=\"margin-bottom:8px\"><strong>Kryptoaktiva (§ 10 odst. 1 písm. q) ZDP / Úprava 2025)</strong>: Pro zdaňovací období do roku 2024 jsou kryptoaktiva (kryptoměny / virtuální aktiva podle MiCA a AML zákonů) posuzována jako ostatní movitý majetek bez 3letého časového testu či 100k limitu (veškeré prodeje jsou zdanitelné). Od roku 2025 se na kryptoaktiva vztahuje 3letý časový test podle schválené novely.</li><li style=\"margin-bottom:8px\"><strong>Limit 40 mil. Kč pro rok 2025 &amp; Hlášení nad 5 mil. Kč (§ 38v ZDP)</strong>: Pro rok 2025 platí limit osvobozených příjmů z prodeje CP 40 000 000 Kč. Pokud osvobozený příjem poplatníka v kalendářním roce přesáhne 5 000 000 Kč, je nutné podat finančnímu úřadu 'Oznámení o osvobozených příjmech'.</li><li style=\"margin-bottom:8px\"><strong>Jednotné kurzy GFŘ</strong>: Obchody v cizích měnách (USD, EUR) jsou přepočítávány oficiálními jednotnými kurzy vyhlašovanými každoročně Generálním finančním ředitelstvím (GFŘ). Nákupy se přepočítávají kurzem roku pořízení, prodeje kurzem roku prodeje.</li><li><strong>Zákaz kompenzace ztrát</strong>: Ztrátu z obchodování s cennými papíry nelze v ČR kompenzovat proti příjmům ze zaměstnání (§ 6) ani podnikání (§ 7) a nelze ji přenášet do dalších zdaňovacích období.</li></ul>",
     faq2Summary: "📂 Podporované formáty importu, oddělovače a brokeři",
-    faq2Body: "<p>Piggy podporuje import přetažením souboru (drag &amp; drop), výběrem ze zařízení i přímým vložením ze schránky (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>Typy souborů</strong>: <code>.csv</code>, <code>.tsv</code> a <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Oddělovače</strong>: Automatická detekce středníku (<code>;</code>), čárky (<code>,</code>) i tabulátoru (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Číselné formáty</strong>: Podpora české desetinné čárky (<code>120,50</code>) i tečky (<code>120.50</code>), mezer mezi tisíci (<code>1 250,00</code>) a automatické odstraňování měnových symbolů (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Formáty data</strong>: Podpora <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code> a lomítkového zápisu <code>DD/MM/YYYY</code>.</li><li><strong>Podporovaní brokeři a zdroje</strong>: <strong>Fio banka e-Broker</strong> (přímý export CSV), <strong>Degiro</strong> (CSV transakcí), <strong>Interactive Brokers</strong> (přehled obchodů / Activity Flex Query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong> a <strong>Microsoft Excel</strong>.</li></ul>",
+    faq2Body: "<p>Piggy podporuje import přetažením souboru (drag &amp; drop), výběrem ze zařízení i přímým vložením ze schránky (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>Typy souborů</strong>: <code>.csv</code>, <code>.tsv</code> a <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Oddělovače</strong>: Automatická detekce středníku (<code>;</code>), čárky (<code>,</code>) i tabulátoru (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Dynamické mapování sloupců</strong>: Sloupce mohou být v libovolném pořadí — Piggy rozpozná záhlaví automaticky.</li><li style=\"margin-bottom:6px\"><strong>Číselné formáty</strong>: Podpora české desetinné čárky (<code>120,50</code>) i tečky (<code>120.50</code>), mezer mezi tisíci (<code>1 250,00</code>) a automatické odstraňování měnových symbolů (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Formáty data</strong>: Podpora <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code> a lomítkového zápisu <code>DD/MM/YYYY</code>.</li><li><strong>Podporovaní brokeři a zdroje</strong>: <strong>Fio banka e-Broker</strong> (přímý export CSV), <strong>Degiro</strong> (CSV transakcí), <strong>Interactive Brokers</strong> (přehled obchodů / Activity Flex Query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong> a <strong>Microsoft Excel</strong>.</li></ul>",
     faq3Summary: "📋 Požadované sloupce a názvy záhlaví (česky a anglicky)",
-    faq3Body: "<p>Piggy rozpoznává jak české standardní názvy sloupců (např. export z Fio e-Brokera), tak anglické alternativy:</p><table class=\"faq-cols\"><thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Význam &amp; povolené hodnoty</th><th>Příklad</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Časové razítko provedení transakce</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B nebo Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Ticker akcie, ETF nebo tag aktiva</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Realizační cena za kus / podíl</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Počet kusů / množství</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Celkový objem obchodu před poplatky</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Poplatek brokerovi za provedení obchodu</td><td>10,00 $</td></tr></tbody></table>"
+    faq3Body: "<p>Piggy rozpoznává jak české standardní názvy sloupců (např. export z Fio e-Brokera), tak anglické alternativy v libovolném pořadí:</p><table class=\"faq-cols\"><thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Význam &amp; povolené hodnoty</th><th>Příklad</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Časové razítko provedení transakce</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B nebo Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Ticker akcie, ETF nebo tag aktiva</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Realizační cena za kus / podíl</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Počet kusů / množství</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Celkový objem obchodu před poplatky</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Poplatek brokerovi za provedení obchodu</td><td>10,00 $</td></tr><tr><td><code>Typ aktiva</code></td><td><code>Asset Type</code>, <code>Category</code></td><td>Nepovinné: Akcie / Cenný papír vs Kryptoaktivum / Virtuální aktivum / Kryptoměna (výchozí: Cenný papír)</td><td>Akcie</td></tr></tbody></table>"
   },
   en: {
     pageTitle: "Piggy – Czech Securities Tax & FIFO Engine",
@@ -1599,6 +1719,10 @@ const I18N = {
     colTaxIncCZK: "Taxable Income (CZK)",
     colTaxOutCZK: "Taxable Expenses (CZK)",
     colTaxBaseCZK: "Net Tax Base (Základ daně CZK)",
+    colExemptCZK: "Exempt Income (CZK / Osvobozené příjmy)",
+    colAssetType: "Asset Type (Typ aktiva)",
+    tagCrypto: "Crypto-asset (Kryptoaktivum)",
+    tagSecurity: "Security (Cenný papír)",
     colViewTrades: "View trades →",
     colDateTime: "Date & Time",
     colDirection: "Direction (Směr)",
@@ -1626,7 +1750,11 @@ const I18N = {
     shares: "shares",
     lots: "lots",
     lot: "Lot",
-    alert100k: "💡 Gross annual revenues in {year} did not exceed 100 000 Kč — sales may qualify for exemption under § 4(1)(w) ZDP (Časový test / Limit 100k). Consult your tax advisor.",
+    alert100k: "💡 Total gross proceeds from securities transfers in {year} ({val}) did not exceed 100 000 Kč — all securities sales are exempt from income tax under § 4(1)(w) ZDP.",
+    alert40M2025: "⚠️ In 2025, exempt securities proceeds exceeded the statutory ceiling of 40,000,000 CZK ({val}). The amount over 40M CZK is subject to taxation under the Consolidation Package.",
+    alert5M: "📢 Exempt income in {year} exceeded 5,000,000 CZK ({val}). Remember to file the 'Notification of Exempt Income' under § 38v ZDP with the Czech tax office!",
+    warnUnsupportedCurrs: "Some rows were skipped due to unsupported currency: {currs}. Piggy supports CZK, USD, and EUR with official GFŘ uniform rates.",
+    warnProvisionalRate: "Official GFŘ uniform rates for {year} have not yet been gazetted. Calculations for {year} are provisional estimates using 2025 rates.",
     taxBaseNote: "Tax Base (Základ daně) = Taxable Income − Taxable Expenses. Note that under Czech tax law, security trading losses cannot be offset against ordinary employment income or carried forward to future years.",
     itemsCount: "{n} items",
     itemCount: "1 item",
@@ -1638,11 +1766,11 @@ const I18N = {
     exportByYear: "BY YEAR (PODLE ROKŮ)",
     faqSectionTitle: "Czech Tax Guide & Import Documentation",
     faq1Summary: "🇨🇿 Czech Tax Law Foundations & § 10 ZDP Use Case",
-    faq1Body: "<p>Piggy is built specifically for tax residents in the <strong>Czech Republic</strong> trading securities (shares, ETFs, investment funds, bonds) and cryptocurrencies under the Czech Income Tax Act (<em>Zákon o daních z příjmů č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Other Income – Capital Gains / Ostatní příjmy)</strong>: Profit from securities sales by individuals is taxed as other income. Tax Base = Gross Taxable Revenues − (Acquisition Costs + Acquisition &amp; Disposition Transaction Fees).</li><li style=\"margin-bottom:8px\"><strong>Strict FIFO Lot Matching</strong>: Under Czech Supreme Administrative Court (NSS) jurisprudence (notably 2019), lot matching across time must follow the chronological <strong>First-In, First-Out (FIFO)</strong> methodology. Piggy automatically splits purchases, matches lots chronologically, and tracks remaining balances.</li><li style=\"margin-bottom:8px\"><strong>3-Year Time Test Exemption (<em>Časový test</em> § 4(1)(w) ZDP)</strong>: Income from securities held for longer than <strong>36 months (3 years)</strong> is completely tax-exempt. (For securities acquired before 1.1.2014, the historical 6-month test applies). Piggy automatically identifies exempt trades, isolates their cost bases, and outputs exempt proceeds separately.</li><li style=\"margin-bottom:8px\"><strong>100 000 Kč Annual Revenue Limit (§ 4(1)(w) ZDP)</strong>: If your total gross annual proceeds from non-exempt security sales in a calendar year do not exceed 100 000 Kč, the income is legally exempt from income tax and does not need to be declared under § 10. Piggy alerts you with a highlight banner whenever a year qualifies.</li><li style=\"margin-bottom:8px\"><strong>Official GFŘ Uniform Exchange Rates (<em>Jednotné kurzy</em>)</strong>: Multi-currency trades (USD, EUR, CZK) are converted using the official annual uniform exchange rates published by the Czech General Financial Directorate (GFŘ). Acquisition expenses are converted at the uniform rate of the purchase year; sales revenues are converted at the uniform rate of the sale year.</li><li><strong>Loss Asymmetry Notice</strong>: Under Czech tax law, net security trading losses in a calendar year cannot be offset against ordinary employment (§ 6) or business (§ 7) income, nor can they be carried forward to future tax years.</li></ul>",
+    faq1Body: "<p>Piggy is built specifically for tax residents in the <strong>Czech Republic</strong> trading securities (shares, ETFs, investment funds, bonds) and crypto-assets under the Czech Income Tax Act (<em>Zákon o daních z příjmů č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Other Income – Capital Gains / Ostatní příjmy)</strong>: Profit from securities sales by individuals is taxed as other income. Tax Base = Gross Taxable Revenues − (Acquisition Costs + Acquisition &amp; Disposition Transaction Fees).</li><li style=\"margin-bottom:8px\"><strong>Strict FIFO Lot Matching</strong>: Under Czech Supreme Administrative Court (NSS) jurisprudence (notably 2019), lot matching across time must follow the chronological <strong>First-In, First-Out (FIFO)</strong> methodology. Piggy automatically splits purchases, matches lots chronologically, and tracks remaining balances.</li><li style=\"margin-bottom:8px\"><strong>3-Year Time Test Exemption (<em>Časový test</em> § 4(1)(w) ZDP)</strong>: Income from securities held for longer than <strong>36 months (3 years)</strong> is completely tax-exempt. (For securities acquired before 1.1.2014, the historical 6-month test applies). Piggy automatically identifies exempt trades, isolates their cost bases, and outputs exempt proceeds separately.</li><li style=\"margin-bottom:8px\"><strong>100 000 Kč Annual Revenue Limit (§ 4(1)(w) ZDP)</strong>: If your total gross annual proceeds from all securities transfers in a calendar year do not exceed 100 000 Kč, the income is legally exempt. If gross proceeds exceed this limit, the exemption cannot be claimed and only trades meeting the 3-year time test are exempt.</li><li style=\"margin-bottom:8px\"><strong>Crypto-assets (§ 10(1)(q) ZDP / 2025 Reform)</strong>: For tax years up through 2024, crypto-assets (cryptocurrencies / virtual assets under MiCA and AML legislation) are treated as other movable property with NO 3-year time test and NO 100k exemption (all sales are taxable). Starting 2025, crypto-assets qualify for a 3-year holding exemption under enacted legislation.</li><li style=\"margin-bottom:8px\"><strong>2025 40M CZK Exemption Cap &amp; 5M Notification (§ 38v ZDP)</strong>: For 2025, exempt proceeds from securities are capped at 40,000,000 CZK. Furthermore, if annual exempt income exceeds 5,000,000 CZK, taxpayers must file a 'Notification of Exempt Income' with the tax authority.</li><li style=\"margin-bottom:8px\"><strong>Official GFŘ Uniform Exchange Rates (<em>Jednotné kurzy</em>)</strong>: Multi-currency trades (USD, EUR, CZK) are converted using the official annual uniform exchange rates published by the Czech General Financial Directorate (GFŘ). Acquisition expenses are converted at the uniform rate of the purchase year; sales revenues are converted at the uniform rate of the sale year.</li><li><strong>Loss Asymmetry Notice</strong>: Under Czech tax law, net security trading losses in a calendar year cannot be offset against ordinary employment (§ 6) or business (§ 7) income, nor can they be carried forward to future tax years.</li></ul>",
     faq2Summary: "📂 Supported Import Formats, Delimiters & Brokers",
-    faq2Body: "<p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li><li><strong>Supported Brokers</strong>: <strong>Fio banka e-Broker</strong> (direct CSV export), <strong>Degiro</strong> (Transactions CSV), <strong>Interactive Brokers</strong> (Trades report / custom flex query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.</li></ul>",
+    faq2Body: "<p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Dynamic Column Mapping</strong>: Columns can be in any arbitrary order — Piggy maps them automatically.</li><li style=\"margin-bottom:6px\"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li><li><strong>Supported Brokers</strong>: <strong>Fio banka e-Broker</strong> (direct CSV export), <strong>Degiro</strong> (Transactions CSV), <strong>Interactive Brokers</strong> (Trades report / custom flex query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.</li></ul>",
     faq3Summary: "📋 Required Columns & Multilingual Headers (Czech & English)",
-    faq3Body: "<p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers:</p><table class=\"faq-cols\"><thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr></tbody></table>"
+    faq3Body: "<p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers in any column order:</p><table class=\"faq-cols\"><thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr><tr><td><code>Typ aktiva</code></td><td><code>Asset Type</code>, <code>Category</code></td><td>Optional: Security / Stock vs Crypto-asset / Virtual Asset / Crypto (default: Security)</td><td>Akcie</td></tr></tbody></table>"
   }
 };
 
@@ -1687,26 +1815,26 @@ function applyI18n(){
 // Updated Demo Portfolio spanning 2022, 2023, 2024, and 2025 featuring HOLDING-3Y, FIFO, SHORT, and USDT
 const DEMOS = {
   demo:
-"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky\n" +
-"12.1.2022 10:15;Nákup;HOLDING-3Y;850;150;CZK;-127 540,00;40,00\n" +
-"15.3.2022 14:30;Nákup;FIFO;90;25;USD;-2 260,00;10,00\n" +
-"20.8.2022 11:00;Nákup;FIFO;110;20;USD;-2 212,00;12,00\n" +
-"10.11.2022 15:45;Prodej;FIFO;130;15;USD;1 940,00;10,00\n" +
-"14.2.2023 9:30;Prodej;SHORT;65;40;EUR;2 592,00;8,00\n" +
-"18.5.2023 13:20;Nákup;FIFO;120;30;USD;-3 615,00;15,00\n" +
-"22.9.2023 11:10;Nákup;SHORT;52;40;EUR;-2 088,00;8,00\n" +
-"15.11.2023 16:00;Prodej;FIFO;145;20;USD;2 890,00;10,00\n" +
-"20.1.2024 10:00;Prodej;SHORT;70;25;EUR;1 745,00;5,00\n" +
-"10.4.2024 14:00;Nákup;FIFO;135;20;USD;-2 712,00;12,00\n" +
-"15.6.2024 15:30;Prodej;FIFO;160;25;USD;3 988,00;12,00\n" +
-"15.8.2024 11:00;Nákup;SHORT;58;25;EUR;-1 456,00;6,00\n" +
-"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 000,00;0,00\n" +
-"15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00\n" +
-"20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00\n",
+"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva\n" +
+"12.1.2022 10:15;Nákup;HOLDING-3Y;850;150;CZK;-127 540,00;40,00;Akcie\n" +
+"15.3.2022 14:30;Nákup;FIFO;90;25;USD;-2 260,00;10,00;Akcie\n" +
+"20.8.2022 11:00;Nákup;FIFO;110;20;USD;-2 212,00;12,00;Akcie\n" +
+"10.11.2022 15:45;Prodej;FIFO;130;15;USD;1 940,00;10,00;Akcie\n" +
+"14.2.2023 9:30;Prodej;SHORT;65;40;EUR;2 592,00;8,00;Akcie\n" +
+"18.5.2023 13:20;Nákup;FIFO;120;30;USD;-3 615,00;15,00;Akcie\n" +
+"22.9.2023 11:10;Nákup;SHORT;52;40;EUR;-2 088,00;8,00;Akcie\n" +
+"15.11.2023 16:00;Prodej;FIFO;145;20;USD;2 890,00;10,00;Akcie\n" +
+"20.1.2024 10:00;Prodej;SHORT;70;25;EUR;1 745,00;5,00;Akcie\n" +
+"10.4.2024 14:00;Nákup;FIFO;135;20;USD;-2 712,00;12,00;Akcie\n" +
+"15.6.2024 15:30;Prodej;FIFO;160;25;USD;3 988,00;12,00;Akcie\n" +
+"15.8.2024 11:00;Nákup;SHORT;58;25;EUR;-1 456,00;6,00;Akcie\n" +
+"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 000,00;0,00;Kryptoaktivum\n" +
+"15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00;Akcie\n" +
+"20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00;Akcie\n",
   Template:
-"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky\n" +
-"1.1.2025 0:00;Nákup;FIFO;100,00;20;USD;-2 010,00;10,00\n" +
-"30.6.2025 0:00;Prodej;FIFO;150,00;20;USD;2 982,25;17,75\n"
+"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva\n" +
+"1.1.2025 0:00;Nákup;FIFO;100,00;20;USD;-2 010,00;10,00;Akcie\n" +
+"30.6.2025 0:00;Prodej;FIFO;150,00;20;USD;2 982,25;17,75;Akcie\n"
 };
 
 // ---- Formatting with Direct Currency Symbols ------------------------------
@@ -1750,11 +1878,13 @@ function typeLabel(tObj, groups){
   return g && g.hasOpenShort ? {text: t('typeShortSale'), cls:'t-short'} : {text: t('typeSell'), cls:'t-sell'};
 }
 
-// ---- File & Data Ingestion ------------------------------------------------
 function processText(text, sourceName){
   const csv = parseCsv(text);
   if (csv.error){ showError(csv.error + (sourceName ? ' ('+sourceName+')' : '')); return null; }
-  const { trades } = normalizeRows(csv);
+  const { trades, discarded, unsupportedCurrencies } = normalizeRows(csv);
+  if (unsupportedCurrencies && unsupportedCurrencies.length){
+    showError(t('warnUnsupportedCurrs', { currs: unsupportedCurrencies.join(', ') }) + (sourceName ? ' ('+sourceName+')' : ''));
+  }
   if (!trades.length){ showError('No valid trades found in "'+sourceName+'".'); return null; }
   return trades;
 }
@@ -1895,6 +2025,7 @@ function renderSouhrn(st){
     '<th class="num">' + t('colTaxOut') + '</th>' +
     '<th class="num">' + t('colTaxIncCZK') + '</th>' +
     '<th class="num">' + t('colTaxOutCZK') + '</th>' +
+    '<th class="num">' + t('colExemptCZK') + '</th>' +
     '<th class="num">' + t('colTaxBaseCZK') + '</th>' +
     '<th></th></tr></thead><tbody>';
 
@@ -1904,6 +2035,7 @@ function renderSouhrn(st){
       h += '<tr><td>'+(r===yr.rows[0]?'<strong>'+yr.year+'</strong>':'')+'</td><td>'+esc(r.currency)+'</td>' +
         '<td class="num">'+fmtMoney(r.incN, r.currency)+'</td><td class="num">'+fmtMoney(-r.outN, r.currency)+'</td>' +
         '<td class="num">'+fmtMoney(r.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-r.outC, 'CZK')+'</td>' +
+        '<td class="num">'+fmtMoney(r.exemptC, 'CZK')+'</td>' +
         '<td class="num" style="font-weight:700;color:'+(zakl>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(zakl, 'CZK')+'</td>' +
         '<td>'+(r===yr.rows[0]?'<button class="look" data-goto="rok-'+yr.year+'">'+t('colViewTrades')+'</button>':'')+'</td></tr>';
     }
@@ -1911,11 +2043,27 @@ function renderSouhrn(st){
     const totNet = tot.incC - tot.outC;
     h += '<tr class="total-row"><td>' + t('yearTotal') + ' ' + yr.year + '</td><td></td><td class="num"></td><td class="num"></td>' +
       '<td class="num">'+fmtMoney(tot.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-tot.outC, 'CZK')+'</td>' +
+      '<td class="num">'+fmtMoney(tot.exemptC, 'CZK')+'</td>' +
       '<td class="num" style="font-weight:800;color:'+(totNet>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(totNet, 'CZK')+'</td><td></td></tr>';
 
-    if (tot.incC > 0 && tot.incC <= 100000){
-      h += '<tr class="dim"><td colspan="8">' +
-        t('alert100k', { year: yr.year }) +
+    // 100k Exemption Check: applies only if gross proceeds of all securities transfers <= 100,000 CZK
+    if (tot.grossSecuritiesCZK > 0 && tot.grossSecuritiesCZK <= 100000){
+      h += '<tr class="dim"><td colspan="9">' +
+        t('alert100k', { year: yr.year, val: fmtMoney(tot.grossSecuritiesCZK, 'CZK') }) +
+        '</td></tr>';
+    }
+
+    // 2025 40M CZK exemption ceiling alert
+    if (yr.year === 2025 && tot.exemptSecuritiesCZK > 40000000){
+      h += '<tr class="dim" style="background:#fffbeb;color:#b45309;font-weight:600"><td colspan="9">' +
+        t('alert40M2025', { val: fmtMoney(tot.exemptSecuritiesCZK, 'CZK') }) +
+        '</td></tr>';
+    }
+
+    // 5M CZK notification requirement under § 38v ZDP
+    if (tot.exemptC > 5000000){
+      h += '<tr class="dim" style="background:#eff6ff;color:#1e40af;font-weight:600"><td colspan="9">' +
+        t('alert5M', { year: yr.year, val: fmtMoney(tot.exemptC, 'CZK') }) +
         '</td></tr>';
     }
   }
@@ -1939,6 +2087,7 @@ function renderRoky(st){
       '<th>' + t('colDateTime') + '</th>' +
       '<th>' + t('colDirection') + '</th>' +
       '<th>' + t('colSymbol') + '</th>' +
+      '<th>' + t('colAssetType') + '</th>' +
       '<th class="num">' + t('colQuantity') + '</th>' +
       '<th class="num">' + t('colPrice') + '</th>' +
       '<th class="num">' + t('colFees') + '</th>' +
@@ -1953,10 +2102,14 @@ function renderRoky(st){
       const groups = st.groups.filter(g=>g.symbol===tTrade.symbol);
       const tl = typeLabel(tTrade, groups);
       const g = isSale ? groups.find(x=>x.trade.id===tTrade.id) : null;
+      const assetTag = tTrade.assetType === 'crypto'
+        ? '<span class="tag tag-crypto">🪙 '+t('tagCrypto')+'</span>'
+        : '<span class="tag tag-sec">📈 '+t('tagSecurity')+'</span>';
       h += '<tr data-symbol="'+esc(tTrade.symbol)+'" data-trade="'+tTrade.id+'"' + (isSale ? ' data-rowhl="sale-'+tTrade.id+'"' : '') + '>' +
         '<td>'+esc(fmtDateTime(tTrade.tradeDate))+'</td>' +
         '<td><span class="type '+tl.cls+'">'+tl.text+'</span></td>' +
         '<td><span class="sym" data-symbol2="'+esc(tTrade.symbol)+'">'+esc(tTrade.symbol)+'</span></td>' +
+        '<td>'+assetTag+'</td>' +
         '<td class="num">'+fmt(tTrade.qty, 4)+'</td>' +
         '<td class="num">'+fmtMoney(tTrade.price, tTrade.currency)+'</td>' +
         '<td class="num">'+fmtMoney(tTrade.fee, tTrade.currency)+'</td>' +
@@ -2475,32 +2628,84 @@ function download(name, text){
 function exportReport(){
   if (!state) return;
   const L = [];
-  L.push(t('exportReportTitle'));
+  L.push(sanitizeCSVCell(t('exportReportTitle')));
   L.push('');
-  L.push(t('exportSummary'));
-  L.push([t('colYear'), t('colCurrency'), t('colTaxInc'), t('colTaxOut'), t('colTaxIncCZK'), t('colTaxOutCZK'), t('colTaxBaseCZK')].join(';'));
+  L.push(sanitizeCSVCell(t('exportSummary')));
+  L.push([
+    t('colYear'),
+    t('colCurrency'),
+    t('colTaxInc'),
+    t('colTaxOut'),
+    t('colTaxIncCZK'),
+    t('colTaxOutCZK'),
+    t('colExemptCZK'),
+    t('colTaxBaseCZK')
+  ].map(sanitizeCSVCell).join(';'));
+
   for (const yr of state.byYear){
     for (const r of yr.rows){
-      L.push([yr.year, r.currency, fmtMoney(r.incN, r.currency), fmtMoney(-r.outN, r.currency), fmtMoney(r.incC, 'CZK'), fmtMoney(-r.outC, 'CZK'), fmtMoney(r.incC - r.outC, 'CZK')].join(';'));
+      L.push([
+        yr.year,
+        sanitizeCSVCell(r.currency),
+        fmtMoney(r.incN, r.currency),
+        fmtMoney(-r.outN, r.currency),
+        fmtMoney(r.incC, 'CZK'),
+        fmtMoney(-r.outC, 'CZK'),
+        fmtMoney(r.exemptC, 'CZK'),
+        fmtMoney(r.incC - r.outC, 'CZK')
+      ].join(';'));
     }
   }
-  L.push(''); L.push(t('exportByYear')); 
+  L.push('');
+  L.push(sanitizeCSVCell(t('exportByYear')));
   for (const yr of state.byYear){
-    L.push(t('colYear') + ' ' + yr.year);
-    L.push([t('colDateTime'), t('colSymbol'), t('colQuantity'), t('colPrice'), t('colFees'), t('colVolume'), t('colProfit'), t('colTaxIncCZK'), t('colTaxOutCZK')].join(';'));
+    L.push(sanitizeCSVCell(t('colYear') + ' ' + yr.year));
+    L.push([
+      t('colDateTime'),
+      t('colSymbol'),
+      t('colAssetType'),
+      t('colQuantity'),
+      t('colPrice'),
+      t('colFees'),
+      t('colVolume'),
+      t('colProfit'),
+      t('colTaxIncCZK'),
+      t('colTaxOutCZK'),
+      t('colExemptCZK')
+    ].map(sanitizeCSVCell).join(';'));
+
     for (const r of yr.rows){
       for (const g of r.list){
-        L.push([fmtDateTime(g.trade.tradeDate), g.symbol, fmt(g.trade.qty, 4),
-          fmtMoney(g.trade.price, g.trade.currency), fmtMoney(g.trade.fee, g.trade.currency), fmtMoney(g.trade.qty*g.trade.price - g.trade.fee, g.trade.currency), fmtMoney(g.profit, g.trade.currency), fmtMoney(g.taxInc, 'CZK'), fmtMoney(-g.taxOut, 'CZK')].join(';'));
+        const assetLabel = g.trade.assetType === 'crypto' ? t('tagCrypto') : t('tagSecurity');
+        L.push([
+          fmtDateTime(g.trade.tradeDate),
+          sanitizeCSVCell(g.symbol),
+          sanitizeCSVCell(assetLabel),
+          fmt(g.trade.qty, 4),
+          fmtMoney(g.trade.price, g.trade.currency),
+          fmtMoney(g.trade.fee, g.trade.currency),
+          fmtMoney(g.trade.qty*g.trade.price - g.trade.fee, g.trade.currency),
+          fmtMoney(g.profit, g.trade.currency),
+          fmtMoney(g.taxInc, 'CZK'),
+          fmtMoney(-g.taxOut, 'CZK'),
+          fmtMoney(g.exemptC, 'CZK')
+        ].join(';'));
       }
     }
   }
   download('piggy-report.csv', L.join('\n'));
 }
 
-// Populate GFŘ exchange rates table
+// Populate GFŘ exchange rates table with 2026 provisional note
 (function(){
   const body = $('rates-body');
+  if (!body) return;
+  // Add 2026 provisional row
+  const tr2026 = document.createElement('tr');
+  const isCs = (localStorage.getItem('piggy_lang') || 'cs') === 'cs';
+  tr2026.innerHTML = '<td><strong>2026</strong> <span style="font-size:11px;color:var(--text-muted);font-weight:600">(' + (isCs ? 'orientační*' : 'provisional*') + ')</span></td><td class="num">' + RATES[2025].usd.toFixed(2).replace('.',',') + ' Kč</td><td class="num">' + RATES[2025].eur.toFixed(2).replace('.',',') + ' Kč</td>';
+  body.appendChild(tr2026);
+
   for (const y of Object.keys(RATES).sort((a,b)=>+a-+b).reverse()){
     const tr=document.createElement('tr');
     tr.innerHTML = '<td><strong>'+y+'</strong></td><td class="num">'+RATES[y].usd.toFixed(2).replace('.',',')+' Kč</td><td class="num">'+RATES[y].eur.toFixed(2).replace('.',',')+' Kč</td>';
