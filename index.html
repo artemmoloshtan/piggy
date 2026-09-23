@@ -910,7 +910,7 @@
       <div class="pig-logo"><img src="images/icon.svg" alt="Piggy Logo" width="44" height="44"></div>
       <div>
         <h1>Piggy</h1>
-        <p id="hdr-subtitle" data-i18n="subtitle">Daňová kalkulačka cenných papírů • Časový test • Zjistěte svůj daňový základ za daný rok</p>
+        <p id="hdr-subtitle" data-i18n="subtitle">Securities Tax Calculator for Czechia • FIFO matching • Time-test check • Annual tax-base estimate</p>
       </div>
     </div>
     <div class="header-badges">
@@ -1455,12 +1455,12 @@ let highlight = { set: new Set() };
 let marketPrices = {};
 
 // Localization (Default: Czech, English includes key Czech terms)
-let currentLang = localStorage.getItem('piggy_lang') || 'cs';
+let currentLang = localStorage.getItem('piggy_lang') || ((navigator.language && (navigator.language.startsWith('cs') || navigator.language.startsWith('sk'))) ? 'cs' : 'en');
 
 const I18N = {
   cs: {
     pageTitle: "Piggy – Daňová kalkulačka cenných papírů & FIFO engine",
-    subtitle: "Daňová kalkulačka cenných papírů • Časový test • Zjistěte svůj daňový základ za daný rok",
+    subtitle: "Daňová kalkulačka cenných papírů pro ČR • Párování FIFO • Kontrola časového testu • Odhad ročního daňového základu",
     privacyBadge: "100% soukromí v prohlížeči",
     langName: "Čeština",
     langFlag: "🇨🇿",
@@ -1553,7 +1553,7 @@ const I18N = {
   },
   en: {
     pageTitle: "Piggy – Czech Securities Tax & FIFO Engine",
-    subtitle: "Czech Securities Tax & FIFO Engine • Time Test (Časový test) • Get your tax base for the year",
+    subtitle: "Securities Tax Calculator for Czechia • FIFO matching • Time-test check • Annual tax-base estimate",
     privacyBadge: "100% Client-Side Privacy",
     langName: "English",
     langFlag: "🇬🇧",
