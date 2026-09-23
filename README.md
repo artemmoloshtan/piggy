@@ -21,12 +21,12 @@ Retail investors in the Czech Republic face rigorous tax calculation rules when 
 ### Key Capabilities
 
 - **Combined Open Positions with Live Price Editing**: Real-time valuation, allocation donut charts, and instant unrealized P/L calculation without losing focus while typing. Unrealized P/L defaults cleanly to `0.00` until you input custom market prices.
-- **Strict FIFO Pairing**: Matches buy and sell lots chronologically, supporting partial lot executions, split orders, and short sales.
+- **Disclosed FIFO Pairing**: Matches buy and sell lots chronologically, supporting partial lots and split orders. The selected method is stated in every authority-facing report.
 - **Holding-Period Tests (*Časový test*)**: Separates qualifying securities and explicitly eligible crypto disposals from taxable income.
-- **Official GFŘ Uniform Exchange Rates (*Jednotné kurzy*)**: Accurately translates multi-currency trades (USD, EUR, CZK) from 2011 to 2025 in line with the Czech Supreme Administrative Court (NSS) ruling of 2019.
+- **GFŘ Uniform Exchange Rates (*Jednotné kurzy*)**: Translates supported multi-currency trades (USD, EUR, CZK) using the published annual rates from 2011 to 2025 and discloses the method in the report.
 - **Annual Proceeds Tests**: Applies the 100,000 CZK amount test separately to securities and explicitly eligible crypto transactions.
 - **Multilingual Broker CSV Ingestion**: Drag & drop or copy-paste directly with both Czech (`Datum obchodu;Směr;...`) and English (`Date;Direction;...`) headers.
-- **Reviewable Export & Print**: Generates a CSV calculation report (`piggy-report.csv`) for review and supporting documentation.
+- **Authority-supporting Export Package**: Generates an Annex 2 summary, taxable-disposal ledger, exempt-income ledger, FIFO reconciliation, validation report, and a printable Czech PDF summary.
 
 ---
 
@@ -40,13 +40,13 @@ $$\text{Tax Base} = \text{Gross Taxable Sales Revenues} - (\text{Acquisition Cos
 - Fees incurred at purchase increase the acquisition cost.
 - Fees incurred at sale reduce the net sales proceeds.
 
-### 2. Mandatory FIFO Lot Matching
-Under Czech Supreme Administrative Court (*Nejvyšší správní soud – NSS*) case law (ruling 2 Afs 376/2018), taxpayers trading the same issue of securities must calculate capital gains using the chronological **FIFO (First-In, First-Out)** method. Piggy matches sell transactions against the oldest available buy lots, accurately managing split executions and partial lots.
+### 2. FIFO Lot Matching
+Piggy uses chronological **FIFO (First-In, First-Out)** matching and discloses that choice in the report. The taxpayer remains responsible for ensuring that the method is consistent with the identification and evidence in the source records. Piggy does not present FIFO as a universally mandatory statutory method.
 
 ### 3. 3-Year Time Test Exemption (*Časový test* § 4(1)(w) ZDP)
 - Income from the sale of securities held for **more than 36 months (3 years)** is entirely exempt from income tax.
 - *(For securities acquired before January 1, 2014, the previous 6-month test applies).*
-- Piggy isolates exempt sales from the tax base and reports exempt income (*osvobozené příjmy*) in a dedicated column so you can verify if you exceed the 5 000 000 CZK exempt income notification threshold (*oznámení o osvobozených příjmech*).
+- Piggy isolates exempt sales and flags individual exempt-income candidates above CZK 5,000,000 for a separate § 38v review. It does not incorrectly apply this test only to the annual aggregate.
 
 ### 4. 100 000 Kč Annual Gross Revenue Exemption (§ 4(1)(w) ZDP)
 - The amount test is assessed using gross annual proceeds from all relevant securities transfers, before applying the holding-period test.
@@ -54,8 +54,8 @@ Under Czech Supreme Administrative Court (*Nejvyšší správní soud – NSS*) 
 
 ### 5. Crypto and Stablecoin Transactions
 - Merely acquiring or holding a cryptoasset does not create taxable income in Piggy. Tax treatment is evaluated when the asset is disposed of by sale, spending, or exchange.
-- Crypto exemptions effective from 15 February 2025 are applied only when the optional `Krypto osvobození` / `Crypto exemption eligible` field is explicitly set to `Ano` / `Yes`.
-- Stablecoins such as USDT are not assumed to qualify for an exemption. Their acquisition remains an open position; a later sale or swap is the disposal event.
+- Crypto exemptions effective from 15 February 2025 are applied only when `Krypto osvobození` / `Crypto exemption eligible` explicitly confirms regulatory eligibility and the transaction is outside business property.
+- `EMT` (electronic-money token) is a separate classification. EMT disposals are excluded from the crypto CZK 100,000 proceeds test, but the separate holding-period analysis is retained. A stablecoin must not be classified from its ticker alone.
 - Represent a DEX swap as two rows at the same timestamp: a `Sell` of the token given and a `Buy` of the token received, using consistent market values. Piggy does not import blockchain transactions or determine token eligibility automatically.
 
 ### 6. GFŘ Official Uniform Annual Exchange Rates (*Jednotné kurzy*)
@@ -96,7 +96,13 @@ Piggy supports both standard Czech broker headers (matching Fio e-Broker) and En
 | `Poplatky` | `Fees`, `Fee`, `Commission` | Broker commission / transaction fees | `12,00` |
 | `Typ aktiva` | `Asset Type`, `Category` | `Akcie`/security, ETF, or `Kryptoaktivum`/crypto | `Kryptoaktivum` |
 | `Krypto osvobození` | `Crypto exemption eligible` | Optional explicit confirmation that a cryptoasset may use the crypto exemptions | `Ano` / `Yes` |
-| `Poznámka` | `Note` | Optional human-readable explanation; ignored by the calculator | `DEX swap: outgoing leg` |
+| `Obchodní majetek` | `Business asset` | Whether the asset is or was business property | `Ne` / `No` |
+| `ID transakce` | `Transaction ID`, `Tx hash` | Broker trade ID or blockchain transaction hash | `0xdex-swap` |
+| `Zdroj` | `Source`, `Broker`, `Exchange` | Broker, exchange, or protocol | `Uniswap` |
+| `Peněženka` | `Wallet` | Account or wallet identifier | `0xwallet` |
+| `Protihodnota` | `Counter asset` | Asset or fiat received/given | `ETH` |
+| `Zdroj ocenění` | `Valuation source` | Evidence for the market value used | `Uniswap execution` |
+| `Poznámka` | `Note` | Human-readable supporting explanation | `DEX swap: outgoing leg` |
 
 ### Compatible Broker Exports
 - **Fio banka e-Broker**: Direct CSV export (zero modification required).
@@ -115,7 +121,7 @@ The downloadable template includes:
 - a stablecoin purchase;
 - a DEX swap represented by matching stablecoin-sale and crypto-purchase rows.
 
-Broker-specific exports may still require column mapping or cleanup. Always verify discarded-row and unsupported-currency warnings before using the result.
+Broker-specific exports may still require column mapping or cleanup. Unsupported operations such as staking rewards, mining, airdrops, gifts, lending, liquidity-pool transactions, derivatives, and transfers are not silently treated as ordinary buys or sells; they require separate classification. Always resolve every blocking validation item before using the PDF.
 
 ---
 

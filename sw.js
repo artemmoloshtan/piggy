@@ -1,5 +1,5 @@
 // Service Worker for Piggy offline capability
-const CACHE_NAME = 'piggy-v1.0.4';
+const CACHE_NAME = 'piggy-v1.1.0';
 const ASSETS = [
   './',
   './index.html',
