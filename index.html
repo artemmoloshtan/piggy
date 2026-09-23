@@ -833,26 +833,6 @@
     margin-top: 8px;
   }
 
-  /* Footer */
-  footer {
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 16px 20px 32px;
-    color: var(--ink-sub);
-    font-size: 13px;
-    border-top: 1px solid var(--glass-border-subtle);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  footer a {
-    color: var(--ink);
-    font-weight: 600;
-    text-decoration: underline;
-  }
-
   /* Mobile Responsive & Touch Optimizations */
   @media (max-width: 768px) {
     header { padding: max(6px, env(safe-area-inset-top, 6px)) 12px 6px; }
@@ -904,8 +884,6 @@
       border-radius: var(--radius-md);
       margin-top: 8px;
     }
-
-    footer { padding: 14px 12px max(28px, env(safe-area-inset-bottom, 28px)); }
   }
 
   @media (max-width: 480px) {
@@ -915,7 +893,7 @@
   /* Print Stylesheet for Tax Filing */
   @media print {
     header { background: none; border-bottom: 2px solid #000; padding: 10px 0; }
-    .glass-card, .toolbar, nav.tabs, .tabs-actions, footer, .badge-github, .chart-card { display: none !important; }
+    .glass-card, .toolbar, nav.tabs, .tabs-actions, .badge-github, .chart-card { display: none !important; }
     .panel { display: block !important; border: none; box-shadow: none; padding: 0; background: none; }
     body { background: #fff; color: #000; font-size: 11px; }
     table { min-width: 100%; font-size: 10px; page-break-inside: auto; background: #fff; }
@@ -1047,16 +1025,71 @@
       Daňové příjmy a výdaje jsou přepočítávány v souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019.
     </p>
   </details>
-</main>
 
-<footer>
-  <div>
-    <strong>Piggy</strong> • <span data-i18n="footerPrivacy">100% soukromí v prohlížeči • Žádná data neopouštějí váš počítač</span>
-  </div>
-  <div>
-    <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer">GitHub</a>
-  </div>
-</footer>
+  <!-- Comprehensive Legal Use Case & Technical Guide -->
+  <h2 class="section" style="margin-top:32px" data-i18n="faqSectionTitle">Daňový průvodce ČR &amp; dokumentace k importu</h2>
+
+  <details class="faq" open>
+    <summary data-i18n="faq1Summary">🇨🇿 Základy daňového práva ČR &amp; použití § 10 ZDP</summary>
+    <div data-i18n-html="faq1Body">
+      <p>Piggy je navržen speciálně pro daňové rezidenty v <strong>České republice</strong> obchodující s cennými papíry (akcie, ETF, podílové fondy, dluhopisy) a kryptoměnami podle Zákona o daních z příjmů (<em>č. 586/1992 Sb. – ZDP</em>):</p>
+      <ul>
+        <li style="margin-bottom:8px"><strong>§ 10 ZDP (Ostatní příjmy – Kapitálové zisky)</strong>: Příjmy z úplatného převodu cenných papírů u fyzických osob podléhají dani jako ostatní příjmy. Základ daně = Zdanitelné příjmy − (Výdaje na pořízení + Poplatky související s pořízením a prodejem).</li>
+        <li style="margin-bottom:8px"><strong>Párování metodou FIFO</strong>: V souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019 se při postupném nákupu a prodeji stejného cenného papíru používá metoda <strong>First-In, First-Out (FIFO)</strong>. Piggy automaticky chronologicky páruje nákupní a prodejní dávky a eviduje zbývající zůstatky.</li>
+        <li style="margin-bottom:8px"><strong>3letý časový test (§ 4 odst. 1 písm. w) ZDP)</strong>: Příjmy z prodeje cenných papírů držených déle než <strong>36 měsíců (3 roky)</strong> jsou zcela osvobozeny od daně z příjmů. (U CP pořízených do 31. 12. 2013 platí historický 6měsíční test). Piggy automaticky detekuje osvobozené obchody, odděluje jejich výdaje a osvobozené příjmy vykazuje zvlášť.</li>
+        <li style="margin-bottom:8px"><strong>Roční limit příjmů 100 000 Kč (§ 4 odst. 1 písm. w) ZDP)</strong>: Pokud celkové hrubé příjmy z neosvobozených prodejů cenných papírů nepřesáhnou v kalendářním roce 100 000 Kč, jsou tyto příjmy ze zákona osvobozeny a neuvádějí se v daňovém přiznání. Piggy vás na splnění limitu automaticky upozorní.</li>
+        <li style="margin-bottom:8px"><strong>Jednotné kurzy GFŘ</strong>: Obchody v cizích měnách (USD, EUR) jsou přepočítávány oficiálními jednotnými kurzy vyhlašovanými každoročně Generálním finančním ředitelstvím (GFŘ). Nákupy se přepočítávají kurzem roku pořízení, prodeje kurzem roku prodeje.</li>
+        <li><strong>Zákaz kompenzace ztrát</strong>: Ztrátu z obchodování s cennými papíry nelze v ČR kompenzovat proti příjmům ze zaměstnání (§ 6) ani podnikání (§ 7) a nelze ji přenášet do dalších zdaňovacích období.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="faq">
+    <summary data-i18n="faq2Summary">📂 Podporované formáty importu, oddělovače a brokeři</summary>
+    <div data-i18n-html="faq2Body">
+      <p>Piggy podporuje import přetažením souboru (drag &amp; drop), výběrem ze zařízení i přímým vložením ze schránky (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p>
+      <ul>
+        <li style="margin-bottom:6px"><strong>Typy souborů</strong>: <code>.csv</code>, <code>.tsv</code> a <code>.txt</code>.</li>
+        <li style="margin-bottom:6px"><strong>Oddělovače</strong>: Automatická detekce středníku (<code>;</code>), čárky (<code>,</code>) i tabulátoru (<code>\t</code>).</li>
+        <li style="margin-bottom:6px"><strong>Číselné formáty</strong>: Podpora české desetinné čárky (<code>120,50</code>) i tečky (<code>120.50</code>), mezer mezi tisíci (<code>1 250,00</code>) a automatické odstraňování měnových symbolů (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li>
+        <li style="margin-bottom:6px"><strong>Formáty data</strong>: Podpora <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code> a lomítkového zápisu <code>DD/MM/YYYY</code>.</li>
+        <li><strong>Podporovaní brokeři a zdroje</strong>:
+          <strong>Fio banka e-Broker</strong> (přímý export CSV),
+          <strong>Degiro</strong> (CSV transakcí),
+          <strong>Interactive Brokers</strong> (přehled obchodů / Activity Flex Query),
+          <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong> a <strong>Microsoft Excel</strong>.
+        </li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="faq">
+    <summary data-i18n="faq3Summary">📋 Požadované sloupce a názvy záhlaví (česky a anglicky)</summary>
+    <div data-i18n-html="faq3Body">
+      <p>Piggy rozpoznává jak české standardní názvy sloupců (např. export z Fio e-Brokera), tak anglické alternativy:</p>
+      <table class="faq-cols">
+        <thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Význam &amp; povolené hodnoty</th><th>Příklad</th></tr></thead>
+        <tbody>
+          <tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Časové razítko provedení transakce</td><td>15.03.2023 14:30</td></tr>
+          <tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B nebo Prodej / Sell / S</td><td>Nákup</td></tr>
+          <tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Ticker akcie, ETF nebo tag aktiva</td><td>FIFO</td></tr>
+          <tr><td><code>Cena</code></td><td><code>Price</code></td><td>Realizační cena za kus / podíl</td><td>120,00 $</td></tr>
+          <tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Počet kusů / množství</td><td>25</td></tr>
+          <tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr>
+          <tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Celkový objem obchodu před poplatky</td><td>-3 000,00 $</td></tr>
+          <tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Poplatek brokerovi za provedení obchodu</td><td>10,00 $</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="faq">
+    <summary data-i18n="faq4Summary">📑 Lze tento report použít jako podklad pro daňové přiznání?</summary>
+    <div data-i18n-html="faq4Body">
+      <p>Ano. Exportovaný soubor <code>piggy-report.csv</code> poskytuje podrobné párování jednotlivých dávek metodou FIFO, vyhodnocení časového testu, přepočty jednotnými kurzy GFŘ a stanovení základu daně, které finanční úřady vyžadují jako doložení výpočtu k <strong>Příloze č. 2 daňového přiznání</strong> k dani z příjmů fyzických osob (§ 10 ZDP).</p>
+    </div>
+  </details>
+</main>
 
 <script id="engine">
 // ---------------------------------------------------------------------------
@@ -1516,7 +1549,16 @@ const I18N = {
     clipboardNotAvail: "API schránky není v tomto prohlížeči k dispozici. Použijte Ctrl+V nebo Cmd+V.",
     exportReportTitle: "Přehled obchodů s cennými papíry",
     exportSummary: "SOUHRN",
-    exportByYear: "PODLE ROKŮ"
+    exportByYear: "PODLE ROKŮ",
+    faqSectionTitle: "Daňový průvodce ČR & dokumentace k importu",
+    faq1Summary: "🇨🇿 Základy daňového práva ČR & použití § 10 ZDP",
+    faq1Body: "<p>Piggy je navržen speciálně pro daňové rezidenty v <strong>České republice</strong> obchodující s cennými papíry (akcie, ETF, podílové fondy, dluhopisy) a kryptoměnami podle Zákona o daních z příjmů (<em>č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Ostatní příjmy – Kapitálové zisky)</strong>: Příjmy z úplatného převodu cenných papírů u fyzických osob podléhají dani jako ostatní příjmy. Základ daně = Zdanitelné příjmy − (Výdaje na pořízení + Poplatky související s pořízením a prodejem).</li><li style=\"margin-bottom:8px\"><strong>Párování metodou FIFO</strong>: V souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019 se při postupném nákupu a prodeji stejného cenného papíru používá metoda <strong>First-In, First-Out (FIFO)</strong>. Piggy automaticky chronologicky páruje nákupní a prodejní dávky a eviduje zbývající zůstatky.</li><li style=\"margin-bottom:8px\"><strong>3letý časový test (§ 4 odst. 1 písm. w) ZDP)</strong>: Příjmy z prodeje cenných papírů držených déle než <strong>36 měsíců (3 roky)</strong> jsou zcela osvobozeny od daně z příjmů. (U CP pořízených do 31. 12. 2013 platí historický 6měsíční test). Piggy automaticky detekuje osvobozené obchody, odděluje jejich výdaje a osvobozené příjmy vykazuje zvlášť.</li><li style=\"margin-bottom:8px\"><strong>Roční limit příjmů 100 000 Kč (§ 4 odst. 1 písm. w) ZDP)</strong>: Pokud celkové hrubé příjmy z neosvobozených prodejů cenných papírů nepřesáhnou v kalendářním roce 100 000 Kč, jsou tyto příjmy ze zákona osvobozeny a neuvádějí se v daňovém přiznání. Piggy vás na splnění limitu automaticky upozorní.</li><li style=\"margin-bottom:8px\"><strong>Jednotné kurzy GFŘ</strong>: Obchody v cizích měnách (USD, EUR) jsou přepočítávány oficiálními jednotnými kurzy vyhlašovanými každoročně Generálním finančním ředitelstvím (GFŘ). Nákupy se přepočítávají kurzem roku pořízení, prodeje kurzem roku prodeje.</li><li><strong>Zákaz kompenzace ztrát</strong>: Ztrátu z obchodování s cennými papíry nelze v ČR kompenzovat proti příjmům ze zaměstnání (§ 6) ani podnikání (§ 7) a nelze ji přenášet do dalších zdaňovacích období.</li></ul>",
+    faq2Summary: "📂 Podporované formáty importu, oddělovače a brokeři",
+    faq2Body: "<p>Piggy podporuje import přetažením souboru (drag &amp; drop), výběrem ze zařízení i přímým vložením ze schránky (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>Typy souborů</strong>: <code>.csv</code>, <code>.tsv</code> a <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Oddělovače</strong>: Automatická detekce středníku (<code>;</code>), čárky (<code>,</code>) i tabulátoru (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Číselné formáty</strong>: Podpora české desetinné čárky (<code>120,50</code>) i tečky (<code>120.50</code>), mezer mezi tisíci (<code>1 250,00</code>) a automatické odstraňování měnových symbolů (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Formáty data</strong>: Podpora <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code> a lomítkového zápisu <code>DD/MM/YYYY</code>.</li><li><strong>Podporovaní brokeři a zdroje</strong>: <strong>Fio banka e-Broker</strong> (přímý export CSV), <strong>Degiro</strong> (CSV transakcí), <strong>Interactive Brokers</strong> (přehled obchodů / Activity Flex Query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong> a <strong>Microsoft Excel</strong>.</li></ul>",
+    faq3Summary: "📋 Požadované sloupce a názvy záhlaví (česky a anglicky)",
+    faq3Body: "<p>Piggy rozpoznává jak české standardní názvy sloupců (např. export z Fio e-Brokera), tak anglické alternativy:</p><table class=\"faq-cols\"><thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Význam &amp; povolené hodnoty</th><th>Příklad</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Časové razítko provedení transakce</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B nebo Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Ticker akcie, ETF nebo tag aktiva</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Realizační cena za kus / podíl</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Počet kusů / množství</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Celkový objem obchodu před poplatky</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Poplatek brokerovi za provedení obchodu</td><td>10,00 $</td></tr></tbody></table>",
+    faq4Summary: "📑 Lze tento report použít jako podklad pro daňové přiznání?",
+    faq4Body: "<p>Ano. Exportovaný soubor <code>piggy-report.csv</code> poskytuje podrobné párování jednotlivých dávek metodou FIFO, vyhodnocení časového testu, přepočty jednotnými kurzy GFŘ a stanovení základu daně, které finanční úřady vyžadují jako doložení výpočtu k <strong>Příloze č. 2 daňového přiznání</strong> k dani z příjmů fyzických osob (§ 10 ZDP).</p>"
   },
   en: {
     pageTitle: "Piggy – Czech Securities Tax & FIFO Engine",
@@ -1602,7 +1644,16 @@ const I18N = {
     clipboardNotAvail: "Clipboard API is not available. Please use Ctrl+V or Cmd+V.",
     exportReportTitle: "Report of Securities Trading (Přehled obchodů s CP)",
     exportSummary: "SUMMARY (SOUHRN)",
-    exportByYear: "BY YEAR (PODLE ROKŮ)"
+    exportByYear: "BY YEAR (PODLE ROKŮ)",
+    faqSectionTitle: "Czech Tax Guide & Import Documentation",
+    faq1Summary: "🇨🇿 Czech Tax Law Foundations & § 10 ZDP Use Case",
+    faq1Body: "<p>Piggy is built specifically for tax residents in the <strong>Czech Republic</strong> trading securities (shares, ETFs, investment funds, bonds) and cryptocurrencies under the Czech Income Tax Act (<em>Zákon o daních z příjmů č. 586/1992 Sb. – ZDP</em>):</p><ul><li style=\"margin-bottom:8px\"><strong>§ 10 ZDP (Other Income – Capital Gains / Ostatní příjmy)</strong>: Profit from securities sales by individuals is taxed as other income. Tax Base = Gross Taxable Revenues − (Acquisition Costs + Acquisition &amp; Disposition Transaction Fees).</li><li style=\"margin-bottom:8px\"><strong>Strict FIFO Lot Matching</strong>: Under Czech Supreme Administrative Court (NSS) jurisprudence (notably 2019), lot matching across time must follow the chronological <strong>First-In, First-Out (FIFO)</strong> methodology. Piggy automatically splits purchases, matches lots chronologically, and tracks remaining balances.</li><li style=\"margin-bottom:8px\"><strong>3-Year Time Test Exemption (<em>Časový test</em> § 4(1)(w) ZDP)</strong>: Income from securities held for longer than <strong>36 months (3 years)</strong> is completely tax-exempt. (For securities acquired before 1.1.2014, the historical 6-month test applies). Piggy automatically identifies exempt trades, isolates their cost bases, and outputs exempt proceeds separately.</li><li style=\"margin-bottom:8px\"><strong>100 000 Kč Annual Revenue Limit (§ 4(1)(w) ZDP)</strong>: If your total gross annual proceeds from non-exempt security sales in a calendar year do not exceed 100 000 Kč, the income is legally exempt from income tax and does not need to be declared under § 10. Piggy alerts you with a highlight banner whenever a year qualifies.</li><li style=\"margin-bottom:8px\"><strong>Official GFŘ Uniform Exchange Rates (<em>Jednotné kurzy</em>)</strong>: Multi-currency trades (USD, EUR, CZK) are converted using the official annual uniform exchange rates published by the Czech General Financial Directorate (GFŘ). Acquisition expenses are converted at the uniform rate of the purchase year; sales revenues are converted at the uniform rate of the sale year.</li><li><strong>Loss Asymmetry Notice</strong>: Under Czech tax law, net security trading losses in a calendar year cannot be offset against ordinary employment (§ 6) or business (§ 7) income, nor can they be carried forward to future tax years.</li></ul>",
+    faq2Summary: "📂 Supported Import Formats, Delimiters & Brokers",
+    faq2Body: "<p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li><li><strong>Supported Brokers</strong>: <strong>Fio banka e-Broker</strong> (direct CSV export), <strong>Degiro</strong> (Transactions CSV), <strong>Interactive Brokers</strong> (Trades report / custom flex query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.</li></ul>",
+    faq3Summary: "📋 Required Columns & Multilingual Headers (Czech & English)",
+    faq3Body: "<p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers:</p><table class=\"faq-cols\"><thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr></tbody></table>",
+    faq4Summary: "📑 Can this report be submitted as tax evidence?",
+    faq4Body: "<p>Yes. The exported <code>piggy-report.csv</code> provides the exact lot-by-lot FIFO matching, holding period classifications, GFŘ exchange rate conversions, and net tax bases expected by financial offices (<em>finanční úřad</em>) as supporting annex documentation for § 10 of your tax return (<em>Příloha č. 2 daňového přiznání</em>).</p>"
   }
 };
 
@@ -1630,6 +1681,12 @@ function applyI18n(){
     const key = el.dataset.i18n;
     if (key){
       el.textContent = t(key);
+    }
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    if (key){
+      el.innerHTML = t(key);
     }
   });
   const flagEl = $('langFlag');
