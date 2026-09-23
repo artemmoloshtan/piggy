@@ -1070,43 +1070,60 @@
     </p>
   </details>
 
-  <!-- Frequently Asked Questions -->
-  <h2 class="section" style="margin-top:32px">Frequently Asked Questions</h2>
+  <!-- Comprehensive Legal Use Case & Technical Guide -->
+  <h2 class="section" style="margin-top:32px">Czech Tax Guide &amp; Import Documentation</h2>
 
-  <details class="faq">
-    <summary>Which tax jurisdiction is Piggy built for?</summary>
-    <p>Piggy is specifically designed for the <strong>Czech Republic</strong>. It enforces the rules of the Czech Income Tax Act (Zákon o daních z příjmů č. 586/1992 Sb.):
-      the 3-year holding period exemption ("časový test"), the 100,000 CZK threshold under § 4(1)(w),
-      currency translation using GFŘ uniform exchange rates, and the FIFO pairing method aligned with the 2019 Supreme Administrative Court (NSS) ruling.</p>
+  <details class="faq" open>
+    <summary>🇨🇿 Czech Tax Law Foundations &amp; § 10 ZDP Use Case</summary>
+    <p>Piggy is built specifically for tax residents in the <strong>Czech Republic</strong> trading securities (shares, ETFs, investment funds, bonds) and stablecoins under the Czech Income Tax Act (<em>Zákon o daních z příjmů č. 586/1992 Sb. – ZDP</em>):</p>
+    <ul>
+      <li style="margin-bottom:8px"><strong>§ 10 ZDP (Other Income – Capital Gains)</strong>: Profit from securities sales by individuals is taxed as other income. Tax Base = Gross Taxable Revenues − (Acquisition Costs + Acquisition &amp; Disposition Transaction Fees).</li>
+      <li style="margin-bottom:8px"><strong>Strict FIFO Lot Matching</strong>: Under Czech Supreme Administrative Court (NSS) jurisprudence (notably 2019), lot matching across time must follow the chronological <strong>First-In, First-Out (FIFO)</strong> methodology. Piggy automatically splits purchases, matches lots chronologically, and tracks remaining balances.</li>
+      <li style="margin-bottom:8px"><strong>3-Year Time Test Exemption (<em>Časový test</em> § 4(1)(w) ZDP)</strong>: Income from securities held for longer than <strong>36 months (3 years)</strong> is completely tax-exempt. (For securities acquired before 1.1.2014, the historical 6-month test applies). Piggy automatically identifies exempt trades, isolates their cost bases, and outputs exempt proceeds separately.</li>
+      <li style="margin-bottom:8px"><strong>100 000 Kč Annual Revenue Limit (§ 4(1)(w) ZDP)</strong>: If your total gross annual proceeds from non-exempt security sales in a calendar year do not exceed 100 000 Kč, the income is legally exempt from income tax and does not need to be declared under § 10. Piggy alerts you with a highlight banner whenever a year qualifies.</li>
+      <li style="margin-bottom:8px"><strong>Official GFŘ Uniform Exchange Rates (<em>Jednotné kurzy</em>)</strong>: Multi-currency trades (USD, EUR, CZK) are converted using the official annual uniform exchange rates published by the Czech General Financial Directorate (GFŘ). Acquisition expenses are converted at the uniform rate of the purchase year; sales revenues are converted at the uniform rate of the sale year.</li>
+      <li><strong>Loss Asymmetry Notice</strong>: Under Czech tax law, net security trading losses in a calendar year cannot be offset against ordinary employment (§ 6) or business (§ 7) income, nor can they be carried forward to future tax years.</li>
+    </ul>
   </details>
 
   <details class="faq">
-    <summary>Why does the input format use Czech broker headers?</summary>
-    <p>The standard columns match the export format from Czech brokerages (specifically FIO e-Broker): <code>Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky</code>.
-      Keeping standard naming allows you to load trade history directly from your broker export with zero manual reformatting.</p>
+    <summary>📂 Supported Import Formats, Delimiters &amp; Brokers</summary>
+    <p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p>
+    <ul>
+      <li style="margin-bottom:6px"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li>
+      <li style="margin-bottom:6px"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\t</code>).</li>
+      <li style="margin-bottom:6px"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li>
+      <li style="margin-bottom:6px"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li>
+      <li><strong>Supported Brokers</strong>:
+        <strong>Fio banka e-Broker</strong> (direct CSV export),
+        <strong>Degiro</strong> (Transactions CSV),
+        <strong>Interactive Brokers</strong> (Trades report / custom flex query),
+        <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.
+      </li>
+    </ul>
   </details>
 
   <details class="faq">
-    <summary>Can this report be submitted as tax evidence?</summary>
-    <p>Yes. The exported <code>piggy-report.csv</code> or the Print/PDF output provides the exact trade-by-trade pairings and calculations that financial offices (finanční úřad) expect
-      to see as supporting documentation for § 10 of your tax return.</p>
-  </details>
-
-  <details class="faq">
-    <summary>What are the column definitions?</summary>
+    <summary>📋 Required Columns &amp; Multilingual Headers (Czech &amp; English)</summary>
+    <p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers:</p>
     <table class="faq-cols">
-      <thead><tr><th>Column</th><th>Meaning</th><th>Example</th></tr></thead>
+      <thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead>
       <tbody>
-        <tr><td><code>Datum obchodu</code></td><td>Trade timestamp (dd.mm.yyyy hh:mm)</td><td>15.03.2023 14:30</td></tr>
-        <tr><td><code>Směr</code></td><td>Trade direction: Nákup (Buy) or Prodej (Sell)</td><td>Nákup</td></tr>
-        <tr><td><code>Symbol</code></td><td>Security ticker / symbol</td><td>FIFO</td></tr>
-        <tr><td><code>Cena</code></td><td>Execution price per share</td><td>120$</td></tr>
-        <tr><td><code>Počet</code></td><td>Volume / Quantity of shares traded</td><td>30</td></tr>
-        <tr><td><code>Měna</code></td><td>Currency (CZK, USD, EUR)</td><td>USD</td></tr>
-        <tr><td><code>Objem</code></td><td>Total transaction value before fees</td><td>-3 600$</td></tr>
-        <tr><td><code>Poplatky</code></td><td>Broker commission / transaction fees</td><td>15$</td></tr>
+        <tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr>
+        <tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr>
+        <tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr>
+        <tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr>
+        <tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr>
+        <tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr>
+        <tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr>
+        <tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr>
       </tbody>
     </table>
+  </details>
+
+  <details class="faq">
+    <summary>📑 Can this report be submitted as tax evidence?</summary>
+    <p>Yes. The exported <code>piggy-report.csv</code> provides the exact lot-by-lot FIFO matching, holding period classifications, GFŘ exchange rate conversions, and net tax bases expected by financial offices (<em>finanční úřad</em>) as supporting annex documentation for § 10 of your tax return (<em>Příloha č. 2 daňového přiznání</em>).</p>
   </details>
 </main>
 
@@ -1165,7 +1182,8 @@ function pairTaxable(sell, buy){
 
 function parseNumber(s){
   if (s == null) return 0;
-  s = String(s).trim().replace(/\s+/g,'');
+  // Clean whitespace and any embedded currency labels/signs
+  s = String(s).trim().replace(/[\s\u00A0$€KčkčCZKUSDEUR]/gi,'');
   if (s === '') return 0;
   const lastSep = Math.max(s.lastIndexOf(','), s.lastIndexOf('.'));
   let v;
@@ -1184,12 +1202,14 @@ function parseNumber(s){
 function parseDateTime(s){
   if (!s) return null;
   s = s.trim();
-  let m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
+  // Support DD.MM.YYYY, DD/MM/YYYY, DD-MM-YYYY with optional HH:MM(:SS)
+  let m = s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})(?:\s+(\d{1,2}):(\d{1,2}))?/);
   if (m){
     let y = +m[3]; if (y < 100) y += 2000;
     return new Date(y, +m[2]-1, +m[1], m[4]?+m[4]:0, m[5]?+m[5]:0);
   }
-  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s]+(\d{1,2}):(\d{1,2}))?/);
+  // Support ISO YYYY-MM-DD, YYYY/MM/DD with optional T HH:MM(:SS)
+  m = s.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})(?:[T\s]+(\d{1,2}):(\d{1,2}))?/);
   if (m) return new Date(+m[1], +m[2]-1, +m[3], m[4]?+m[4]:0, m[5]?+m[5]:0);
   return null;
 }
@@ -1204,17 +1224,20 @@ function parseCsv(text){
   for (const delim of [';', '\t', ',']){
     for (let i=0;i<Math.min(lines0.length,40);i++){
       const cells = splitLine(lines0[i], delim);
-      if (cells.length && String(cells[0]).trim() === 'Datum obchodu'){
-        if (cells.length !== 8){
-          result.error = 'Invalid format – table header has '+cells.length+' columns; 8 expected (Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky).';
-          return result;
+      if (cells.length){
+        const firstCol = String(cells[0]).trim().toLowerCase().replace(/^["']|["']$/g, '');
+        if (['datum obchodu', 'datum', 'date', 'trade date', 'timestamp'].includes(firstCol)){
+          if (cells.length < 8){
+            result.error = 'Invalid format – table header has '+cells.length+' columns; 8 expected (Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky or Date;Direction;Symbol;Price;Quantity;Currency;Volume;Fees).';
+            return result;
+          }
+          delimiter = delim; headerIdx = i; header = cells; break;
         }
-        delimiter = delim; headerIdx = i; header = cells; break;
       }
     }
     if (delimiter) break;
   }
-  if (!delimiter){ result.error = 'Invalid file – header row (Datum obchodu;Směr;…) was not found.'; return result; }
+  if (!delimiter){ result.error = 'Invalid file – header row (Datum obchodu;Směr;… or Date;Direction;…) was not found.'; return result; }
   result.header = header; result.delimiter = delimiter;
   for (let i=headerIdx+1;i<lines0.length;i++){
     const line = lines0[i];
@@ -1258,8 +1281,9 @@ function normalizeRows(csvResult){
   let discarded = 0;
   for (const r of csvResult.rows){
     if (r.length < 8) continue;
-    const dirRaw = String(r[1]||'').trim();
-    const dir = dirRaw.toLowerCase() === 'nákup' ? 'B' : (dirRaw.toLowerCase() === 'prodej' ? 'S' : null);
+    const dirRaw = String(r[1]||'').trim().toLowerCase();
+    const dir = (dirRaw === 'nákup' || dirRaw === 'nakup' || dirRaw === 'buy' || dirRaw === 'b') ? 'B'
+              : (dirRaw === 'prodej' || dirRaw === 'sell' || dirRaw === 's') ? 'S' : null;
     if (!dir){ discarded++; continue; }
 
     const tradeDate = parseDateTime(r[0]);
@@ -1499,7 +1523,7 @@ const DEMOS = {
 "10.4.2024 14:00;Nákup;FIFO;135;20;USD;-2 712,00;12,00\n" +
 "15.6.2024 15:30;Prodej;FIFO;160;25;USD;3 988,00;12,00\n" +
 "15.8.2024 11:00;Nákup;SHORT;58;25;EUR;-1 456,00;6,00\n" +
-"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 002,00;2,00\n" +
+"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 000,00;0,00\n" +
 "15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00\n" +
 "20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00\n",
   Template:
@@ -1789,140 +1813,49 @@ function renderAkcie(st){
 }
 
 // ---- Open Positions with Real-Time Current Market Price & P/L --------------
-function renderPozice(st){
-  const el = $('out-pozice');
+function getCombinedPositions(st){
   const currYear = new Date().getFullYear();
+  const combined = new Map();
+  if (!st || !st.openPos) return combined;
 
-  // Aggregate open positions by symbol
-  const bySymbol = new Map();
   for (const pos of st.openPos){
     const sym = pos.trade.symbol;
     const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
-    const bookCostCZK = Math.abs(pos.objem) * rate;
+    const bookCostNative = Math.abs(pos.objem);
+    const bookCostCZK = bookCostNative * rate;
 
-    // Set initial default market price from entry price if not set
-    if (marketPrices[sym] == null){
-      marketPrices[sym] = pos.trade.price;
-    }
-    const currentPrice = marketPrices[sym];
-    const marketValueNative = currentPrice * pos.qty;
-    const marketValueCZK = marketValueNative * rate;
-
-    if (!bySymbol.has(sym)){
-      bySymbol.set(sym, {
+    if (!combined.has(sym)){
+      combined.set(sym, {
         symbol: sym,
-        qty: 0,
-        bookCostCZK: 0,
-        marketValueCZK: 0,
         currency: pos.trade.currency,
+        kind: pos.kind,
         isStable: isStablecoin(sym),
-        currentPrice: currentPrice,
-        items: []
+        totalQty: 0,
+        totalBookCostNative: 0,
+        totalBookCostCZK: 0,
+        lots: []
       });
     }
-    const rec = bySymbol.get(sym);
-    rec.qty += pos.qty;
-    rec.bookCostCZK += bookCostCZK;
-    rec.marketValueCZK += marketValueCZK;
-    rec.items.push(pos);
+    const rec = combined.get(sym);
+    rec.totalQty += pos.qty;
+    rec.totalBookCostNative += bookCostNative;
+    rec.totalBookCostCZK += bookCostCZK;
+    rec.lots.push(pos);
   }
 
-  // Calculate custom uninvested stablecoin value
-  const customRate = rateFor(customStablecoin.currency, currYear);
-  const customCZK = (customStablecoin.amount || 0) * customRate;
-
-  // Compute portfolio valuation totals
-  let totalSecuritiesMarketCZK = 0;
-  let totalSecuritiesBookCZK = 0;
-  let totalStablecoinsCZK = customCZK;
-
-  for (const [sym, item] of bySymbol.entries()){
-    if (item.isStable){
-      totalStablecoinsCZK += item.marketValueCZK;
-    } else {
-      totalSecuritiesMarketCZK += item.marketValueCZK;
-      totalSecuritiesBookCZK += item.bookCostCZK;
-    }
+  for (const [sym, rec] of combined.entries()){
+    rec.avgEntryPrice = rec.totalQty > 0 ? (rec.totalBookCostNative / rec.totalQty) : 0;
   }
+  return combined;
+}
 
-  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
-  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
-  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
-  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
-
-  if (!st.openPos.length && customCZK <= 0){
-    el.innerHTML = '<p class="info">No open positions remaining. All positions are closed.</p>';
-    return;
-  }
-
-  let h = '';
-
-  // 1. Open Positions Dashboard Metrics Cards
-  h += '<div class="openpos-kpi-row">';
-  h += '<div class="openpos-kpi"><div class="label">Total Portfolio Value</div><div class="val">' + fmtMoney(totalPortfolioCZK, 'CZK') + '</div></div>';
-  h += '<div class="openpos-kpi"><div class="label">Securities Valuation</div><div class="val">' + fmtMoney(totalSecuritiesMarketCZK, 'CZK') + '</div></div>';
-  h += '<div class="openpos-kpi" style="border-color:'+(unrealizedProfitCZK>=0?'#6ee7b7':'#fca5a5')+';background:'+(unrealizedProfitCZK>=0?'#ecfdf5':'#fef2f2')+'">' +
-    '<div class="label">Unrealized P/L</div>' +
-    '<div class="val" style="color:'+(unrealizedProfitCZK>=0?'var(--green)':'var(--red)')+'">' + (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span></div></div>';
-  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val">' + fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span></div></div>';
-  h += '</div>';
-
-  // 2. Custom Stablecoin / Cash Adjuster Input
-  h += '<div class="stablecoin-input-bar">';
-  h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
-  h += '<input type="number" id="inp-stable-amt" placeholder="e.g. 1000" min="0" step="any" value="' + (customStablecoin.amount > 0 ? customStablecoin.amount : '') + '">';
-  h += '<select id="inp-stable-curr">';
-  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC ($)</option>';
-  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC (€)</option>';
-  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK (Kč)</option>';
-  h += '</select>';
-  h += '<button class="btn primary" id="btnApplyStable">Update Allocation</button>';
-  if (customStablecoin.amount > 0){
-    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 12px">Reset Cash</button>';
-  }
-  h += '</div>';
-
-  // 3. Asset Allocation Donut / Pie Chart
-  const slices = [];
-  const palette = [
-    '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
-    '#06b6d4', '#f97316', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'
-  ];
-  let pIdx = 0;
-
-  for (const [sym, item] of bySymbol.entries()){
-    if (item.marketValueCZK > 0){
-      slices.push({
-        label: sym,
-        czk: item.marketValueCZK,
-        color: item.isStable ? '#10b981' : palette[pIdx++ % palette.length],
-        isStable: item.isStable,
-        qty: item.qty
-      });
-    }
-  }
-  if (customCZK > 0){
-    slices.push({
-      label: 'Cash Reserve (' + customStablecoin.currency + ')',
-      czk: customCZK,
-      color: '#059669',
-      isStable: true,
-      qty: customStablecoin.amount
-    });
-  }
-
-  slices.sort((a,b)=>b.czk - a.czk);
-
-  h += '<div class="pie-card">';
+function renderPieCardHtml(slices, totalPortfolioCZK){
+  let h = '<div class="pie-card">';
   h += '<div class="pie-card-title"><span>Portfolio Allocation Breakdown (Market Value)</span><span style="font-size:12.5px;font-weight:700;color:var(--ink-sub)">Total: ' + fmtMoney(totalPortfolioCZK, 'CZK') + '</span></div>';
   h += '<div class="pie-flex">';
-  
-  // Render SVG Donut Chart
   h += '<div class="pie-chart-wrap">';
   h += renderDonutSvg(slices, totalPortfolioCZK);
   h += '</div>';
-
-  // Render Legend
   h += '<div class="pie-legend-list">';
   for (const s of slices){
     const pct = totalPortfolioCZK > 0 ? (s.czk / totalPortfolioCZK) * 100 : 0;
@@ -1940,49 +1873,276 @@ function renderPozice(st){
     h += '</div>';
     h += '</div>';
   }
-  h += '</div>'; // end pie-legend-list
-  h += '</div>'; // end pie-flex
-  h += '</div>'; // end pie-card
+  h += '</div>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
 
-  // 4. Open Positions Detailed Table with Interactive Current Price & P/L
-  h += '<h3 class="group" style="margin-top:24px">Individual Open Positions &amp; Live Price Inputs</h3>';
-  h += '<table><thead><tr><th>Symbol</th><th>Type</th><th>Purchase Date</th>' +
+// In-place live valuation updates without rebuilding DOM inputs (preserves typing focus)
+function updatePositionsLive(){
+  if (!state || !state.openPos) return;
+  const currYear = new Date().getFullYear();
+  const combined = getCombinedPositions(state);
+
+  const customRate = rateFor(customStablecoin.currency, currYear);
+  const customCZK = (customStablecoin.amount || 0) * customRate;
+
+  let totalSecuritiesMarketCZK = 0;
+  let totalSecuritiesBookCZK = 0;
+  let totalStablecoinsCZK = customCZK;
+
+  const slices = [];
+  const palette = [
+    '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
+    '#06b6d4', '#f97316', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'
+  ];
+  let pIdx = 0;
+
+  for (const [sym, rec] of combined.entries()){
+    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : rec.avgEntryPrice;
+    const rate = rateFor(rec.currency, currYear);
+    const curValueNative = curPrice * rec.totalQty;
+    const curValueCZK = curValueNative * rate;
+    rec.curPrice = curPrice;
+    rec.curValueNative = curValueNative;
+    rec.curValueCZK = curValueCZK;
+
+    const isShort = rec.kind === 'S';
+    rec.posProfitNative = isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative);
+    rec.posRoiPct = rec.totalBookCostNative > 0 ? (rec.posProfitNative / rec.totalBookCostNative) * 100 : 0;
+
+    if (rec.isStable){
+      totalStablecoinsCZK += curValueCZK;
+    } else {
+      totalSecuritiesMarketCZK += curValueCZK;
+      totalSecuritiesBookCZK += rec.totalBookCostCZK;
+    }
+
+    if (curValueCZK > 0){
+      slices.push({
+        label: sym,
+        czk: curValueCZK,
+        color: rec.isStable ? '#10b981' : palette[pIdx++ % palette.length],
+        isStable: rec.isStable,
+        qty: rec.totalQty
+      });
+    }
+  }
+
+  if (customCZK > 0){
+    slices.push({
+      label: 'Cash Reserve (' + customStablecoin.currency + ')',
+      czk: customCZK,
+      color: '#059669',
+      isStable: true,
+      qty: customStablecoin.amount
+    });
+  }
+  slices.sort((a,b)=>b.czk - a.czk);
+
+  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
+  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
+  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
+  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
+
+  // Update KPI card DOM in-place
+  const elTot = $('kpi-total-portfolio');
+  if (elTot) elTot.textContent = fmtMoney(totalPortfolioCZK, 'CZK');
+  const elSec = $('kpi-sec-valuation');
+  if (elSec) elSec.textContent = fmtMoney(totalSecuritiesMarketCZK, 'CZK');
+  const elPnlCard = $('kpi-card-pnl');
+  if (elPnlCard){
+    elPnlCard.style.borderColor = unrealizedProfitCZK >= 0 ? '#6ee7b7' : '#fca5a5';
+    elPnlCard.style.background = unrealizedProfitCZK >= 0 ? '#ecfdf5' : '#fef2f2';
+    const elPnlVal = $('kpi-pnl-val');
+    if (elPnlVal){
+      elPnlVal.style.color = unrealizedProfitCZK >= 0 ? 'var(--green)' : 'var(--red)';
+      elPnlVal.innerHTML = (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span>';
+    }
+  }
+  const elStable = $('kpi-stable-val');
+  if (elStable) elStable.innerHTML = fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span>';
+
+  // Update individual table rows in-place
+  for (const [sym, rec] of combined.entries()){
+    const row = $('pos-row-' + sym);
+    if (!row) continue;
+    const curValCell = row.querySelector('.cell-cur-val');
+    if (curValCell) curValCell.textContent = fmtMoney(rec.curValueNative, rec.currency);
+
+    const pnlCell = row.querySelector('.cell-pnl');
+    if (pnlCell){
+      pnlCell.style.color = rec.posProfitNative >= 0 ? 'var(--green)' : 'var(--red)';
+      pnlCell.innerHTML = (rec.posProfitNative>=0?'+':'') + fmtMoney(rec.posProfitNative, rec.currency) +
+        '<br><span style="font-size:11px;font-weight:600">(' + (rec.posRoiPct>=0?'+':'') + rec.posRoiPct.toFixed(1) + '%)</span>';
+    }
+
+    const weight = totalPortfolioCZK > 0 ? (rec.curValueCZK / totalPortfolioCZK) * 100 : 0;
+    const weightCell = row.querySelector('.cell-weight');
+    if (weightCell) weightCell.textContent = weight.toFixed(1) + '%';
+  }
+
+  // Update allocation donut chart in-place
+  const pieContainer = $('openpos-pie-container');
+  if (pieContainer){
+    pieContainer.innerHTML = renderPieCardHtml(slices, totalPortfolioCZK);
+  }
+}
+
+function renderPozice(st){
+  const el = $('out-pozice');
+  const currYear = new Date().getFullYear();
+  const combined = getCombinedPositions(st);
+
+  // Initialize marketPrices with avgEntryPrice if null so default P/L is cleanly 0.00
+  for (const [sym, rec] of combined.entries()){
+    if (marketPrices[sym] == null){
+      marketPrices[sym] = Number(rec.avgEntryPrice.toFixed(4));
+    }
+  }
+
+  const customRate = rateFor(customStablecoin.currency, currYear);
+  const customCZK = (customStablecoin.amount || 0) * customRate;
+
+  if (!st.openPos.length && customCZK <= 0){
+    el.innerHTML = '<p class="info">No open positions remaining. All positions are closed.</p>';
+    return;
+  }
+
+  let totalSecuritiesMarketCZK = 0;
+  let totalSecuritiesBookCZK = 0;
+  let totalStablecoinsCZK = customCZK;
+
+  const slices = [];
+  const palette = [
+    '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899',
+    '#06b6d4', '#f97316', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'
+  ];
+  let pIdx = 0;
+
+  for (const [sym, rec] of combined.entries()){
+    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : rec.avgEntryPrice;
+    const rate = rateFor(rec.currency, currYear);
+    const curValueNative = curPrice * rec.totalQty;
+    const curValueCZK = curValueNative * rate;
+    rec.curPrice = curPrice;
+    rec.curValueNative = curValueNative;
+    rec.curValueCZK = curValueCZK;
+
+    const isShort = rec.kind === 'S';
+    rec.posProfitNative = isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative);
+    rec.posRoiPct = rec.totalBookCostNative > 0 ? (rec.posProfitNative / rec.totalBookCostNative) * 100 : 0;
+
+    if (rec.isStable){
+      totalStablecoinsCZK += curValueCZK;
+    } else {
+      totalSecuritiesMarketCZK += curValueCZK;
+      totalSecuritiesBookCZK += rec.totalBookCostCZK;
+    }
+
+    if (curValueCZK > 0){
+      slices.push({
+        label: sym,
+        czk: curValueCZK,
+        color: rec.isStable ? '#10b981' : palette[pIdx++ % palette.length],
+        isStable: rec.isStable,
+        qty: rec.totalQty
+      });
+    }
+  }
+
+  if (customCZK > 0){
+    slices.push({
+      label: 'Cash Reserve (' + customStablecoin.currency + ')',
+      czk: customCZK,
+      color: '#059669',
+      isStable: true,
+      qty: customStablecoin.amount
+    });
+  }
+  slices.sort((a,b)=>b.czk - a.czk);
+
+  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
+  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
+  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
+  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
+
+  let h = '';
+
+  // 1. Dashboard Metrics Cards
+  h += '<div class="openpos-kpi-row">';
+  h += '<div class="openpos-kpi"><div class="label">Total Portfolio Value</div><div class="val" id="kpi-total-portfolio">' + fmtMoney(totalPortfolioCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">Securities Valuation</div><div class="val" id="kpi-sec-valuation">' + fmtMoney(totalSecuritiesMarketCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi" id="kpi-card-pnl" style="border-color:'+(unrealizedProfitCZK>=0?'#6ee7b7':'#fca5a5')+';background:'+(unrealizedProfitCZK>=0?'#ecfdf5':'#fef2f2')+'">' +
+    '<div class="label">Unrealized P/L</div>' +
+    '<div class="val" id="kpi-pnl-val" style="color:'+(unrealizedProfitCZK>=0?'var(--green)':'var(--red)')+'">' + (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span></div></div>';
+  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val" id="kpi-stable-val">' + fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span></div></div>';
+  h += '</div>';
+
+  // 2. Custom Stablecoin / Cash Adjuster Input
+  h += '<div class="stablecoin-input-bar">';
+  h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
+  h += '<input type="number" id="inp-stable-amt" placeholder="e.g. 1000" min="0" step="any" value="' + (customStablecoin.amount > 0 ? customStablecoin.amount : '') + '">';
+  h += '<select id="inp-stable-curr">';
+  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC ($)</option>';
+  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC (€)</option>';
+  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK (Kč)</option>';
+  h += '</select>';
+  h += '<button class="btn primary" id="btnApplyStable">Update Allocation</button>';
+  if (customStablecoin.amount > 0){
+    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 12px">Reset Cash</button>';
+  }
+  h += '</div>';
+
+  // 3. Asset Allocation Donut / Pie Chart Container
+  h += '<div id="openpos-pie-container">';
+  h += renderPieCardHtml(slices, totalPortfolioCZK);
+  h += '</div>';
+
+  // 4. Combined Open Positions Detailed Table with Interactive Current Price & P/L
+  h += '<h3 class="group" style="margin-top:24px">Combined Open Positions &amp; Live Price Inputs</h3>';
+  h += '<table id="table-openpos"><thead><tr><th>Symbol</th><th>Type</th><th>Acquisition</th>' +
     '<th class="num">Open Qty</th>' +
-    '<th class="num">Entry Price</th>' +
+    '<th class="num">Avg Entry Price</th>' +
     '<th class="num">Current Price</th>' +
     '<th class="num">Book Cost</th>' +
     '<th class="num">Current Value</th>' +
     '<th class="num">Unrealized P/L</th>' +
     '<th class="num">Weight</th></tr></thead><tbody>';
 
-  for (const pos of st.openPos){
-    const sym = pos.trade.symbol;
-    const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
-    const bookCostNative = Math.abs(pos.objem);
-    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : pos.trade.price;
-    const curValueNative = curPrice * pos.qty;
-    const curValueCZK = curValueNative * rate;
-    const posProfitNative = curValueNative - bookCostNative;
-    const posRoiPct = bookCostNative > 0 ? (posProfitNative / bookCostNative) * 100 : 0;
-    const weight = totalPortfolioCZK > 0 ? (curValueCZK / totalPortfolioCZK) * 100 : 0;
-    const stable = isStablecoin(sym);
+  for (const [sym, rec] of combined.entries()){
+    const weight = totalPortfolioCZK > 0 ? (rec.curValueCZK / totalPortfolioCZK) * 100 : 0;
+    const curPriceStr = Number(rec.curPrice.toFixed(4));
 
-    h += '<tr><td><strong>' + esc(sym) + '</strong></td>' +
-      '<td>' + (stable ? '<span class="type t-stable">Stablecoin</span>' : '<span class="type ' + (pos.kind==='B'?'t-buy':'t-short') + '">' + (pos.kind==='B'?'Long':'Short') + '</span>') + '</td>' +
-      '<td>' + esc(fmtDateTime(pos.trade.tradeDate)) + '</td>' +
-      '<td class="num">' + fmt(pos.qty, 4) + '</td>' +
-      '<td class="num">' + fmtMoney(pos.trade.price, pos.trade.currency) + '</td>' +
-      '<td class="num">' +
-        '<input type="number" class="price-input" data-sym="' + esc(sym) + '" value="' + curPrice + '" step="any" min="0">' +
-        ' <span class="dim">' + currSign(pos.trade.currency).trim() + '</span>' +
+    // Determine acquisition description
+    let acqHtml = '';
+    if (rec.lots.length === 1){
+      acqHtml = esc(fmtDateTime(rec.lots[0].trade.tradeDate));
+    } else {
+      const dates = rec.lots.map(l => l.trade.tradeDate).sort((a,b)=>a-b);
+      const startStr = fmtDateTime(dates[0]).split(' ')[0];
+      const endStr = fmtDateTime(dates[dates.length-1]).split(' ')[0];
+      const lotsTitle = rec.lots.map((l,idx)=>'Lot '+(idx+1)+': '+fmt(l.qty,4)+' @ '+fmtMoney(l.trade.price, rec.currency)+' ('+fmtDateTime(l.trade.tradeDate)+')').join('\n');
+      acqHtml = '<span title="'+esc(lotsTitle)+'" style="cursor:help;border-bottom:1px dotted var(--ink-sub)">'+startStr+' – '+endStr+' ('+rec.lots.length+' lots)</span>';
+    }
+
+    h += '<tr id="pos-row-' + esc(sym) + '" data-sym="' + esc(sym) + '"><td><strong>' + esc(sym) + '</strong></td>' +
+      '<td>' + (rec.isStable ? '<span class="type t-stable">Stablecoin</span>' : '<span class="type ' + (rec.kind==='B'?'t-buy':'t-short') + '">' + (rec.kind==='B'?'Long':'Short') + '</span>') + '</td>' +
+      '<td>' + acqHtml + '</td>' +
+      '<td class="num">' + fmt(rec.totalQty, 4) + '</td>' +
+      '<td class="num">' + fmtMoney(rec.avgEntryPrice, rec.currency) + '</td>' +
+      '<td class="num cell-cur-price">' +
+        '<input type="number" class="price-input" data-sym="' + esc(sym) + '" value="' + curPriceStr + '" step="any" min="0">' +
+        ' <span class="dim">' + currSign(rec.currency).trim() + '</span>' +
       '</td>' +
-      '<td class="num">' + fmtMoney(bookCostNative, pos.trade.currency) + '</td>' +
-      '<td class="num" style="font-weight:700">' + fmtMoney(curValueNative, pos.trade.currency) + '</td>' +
-      '<td class="num" style="font-weight:700;color:'+(posProfitNative>=0?'var(--green)':'var(--red)')+'">' +
-        (posProfitNative>=0?'+':'') + fmtMoney(posProfitNative, pos.trade.currency) +
-        '<br><span style="font-size:11px;font-weight:600">(' + (posRoiPct>=0?'+':'') + posRoiPct.toFixed(1) + '%)</span>' +
+      '<td class="num">' + fmtMoney(rec.totalBookCostNative, rec.currency) + '</td>' +
+      '<td class="num cell-cur-val" style="font-weight:700">' + fmtMoney(rec.curValueNative, rec.currency) + '</td>' +
+      '<td class="num cell-pnl" style="font-weight:700;color:'+(rec.posProfitNative>=0?'var(--green)':'var(--red)')+'">' +
+        (rec.posProfitNative>=0?'+':'') + fmtMoney(rec.posProfitNative, rec.currency) +
+        '<br><span style="font-size:11px;font-weight:600">(' + (rec.posRoiPct>=0?'+':'') + rec.posRoiPct.toFixed(1) + '%)</span>' +
       '</td>' +
-      '<td class="num" style="font-size:12px;color:var(--ink-sub)">' + weight.toFixed(1) + '%</td></tr>';
+      '<td class="num cell-weight" style="font-size:12px;color:var(--ink-sub)">' + weight.toFixed(1) + '%</td></tr>';
   }
   h += '</tbody></table>';
   el.innerHTML = h;
@@ -2125,15 +2285,21 @@ document.addEventListener('click', e=>{
   }
 });
 
-// Interactive Current Price input changes in Open Positions
+// Interactive Current Price input changes in Open Positions (live in-place updates without losing focus)
 document.addEventListener('input', e=>{
-  if (e.target && e.target.classList.contains('price-input')){
-    const sym = e.target.dataset.sym;
-    const val = parseFloat(e.target.value);
+  const input = e.target.closest('.price-input');
+  if (input){
+    const sym = input.dataset.sym;
+    const rawVal = input.value;
+    const val = parseFloat(rawVal);
     if (!isNaN(val) && val >= 0){
       marketPrices[sym] = val;
-      if (state) renderPozice(state);
+    } else if (rawVal.trim() === ''){
+      delete marketPrices[sym];
+    } else {
+      return;
     }
+    updatePositionsLive();
   }
 });
 
@@ -2155,8 +2321,10 @@ $('file').addEventListener('change', ()=>{
   $('file').value = '';
 });
 document.addEventListener('paste', k=>{
+  // Don't hijack paste inside input fields or textareas
+  if (k.target && (k.target.tagName === 'INPUT' || k.target.tagName === 'TEXTAREA' || k.target.isContentEditable)) return;
   const text = (k.clipboardData||window.clipboardData).getData('text/plain');
-  if (text && /Datum obchodu/.test(text)){
+  if (text && /(Datum obchodu|Trade Date|Date|Nákup|Prodej|Buy|Sell)/i.test(text)){
     k.preventDefault();
     loadText(text, 'Pasted from clipboard');
   }

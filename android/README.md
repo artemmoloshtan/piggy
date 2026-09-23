@@ -1,4 +1,6 @@
-# Piggy Android App
+# Piggy Android App (Deprecated)
+
+> ⚠️ **DEPRECATION NOTICE**: The native Android WebView wrapper is deprecated. Piggy is actively maintained as a responsive, zero-dependency Progressive Web Application (PWA). Android users are advised to access the web application at [https://artemmoloshtan.github.io/piggy](https://artemmoloshtan.github.io/piggy) and tap **"Add to Home screen"** for the best native-like experience.
 
 Android clone and mobile package for **Piggy** – the Czech tax calculator for stock and security trading profits.
 
