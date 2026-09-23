@@ -1712,7 +1712,7 @@ const I18N = {
     alert40M2025: "⚠️ V roce 2025 způsobilé osvobozené příjmy ({val}) přesáhly limit 40 000 000 Kč. Piggy poměrně převedl část nad limit do zdanitelných příjmů; výsledek ověřte s daňovým poradcem.",
     alert5M: "📢 Osvobozené příjmy v roce {year} přesáhly 5 000 000 Kč ({val}). Nezapomeňte podat finančnímu úřadu 'Oznámení o osvobozených příjmech' podle § 38v ZDP!",
     warnUnsupportedCurrs: "Některé řádky byly přeskočeny kvůli nepodporované měně: {currs}. Piggy podporuje CZK, USD a EUR s oficiálními jednotnými kurzy GFŘ.",
-    warnCryptoEligibility: "Kryptoaktiva {symbols} jsou počítána jako zdanitelná. Pro použití krypto osvobození přidejte sloupec „Krypto osvobození“ s hodnotou Ano pouze po ověření, že nejde o elektronický peněžní token ani omezený obchodní majetek. DEX swapy nejsou podporovány.",
+    warnCryptoEligibility: "U kryptoaktiv {symbols} se osvobození neuplatní automaticky. Samotné otevřené držení se nezdaňuje; jako zdanitelné jsou počítány až prodeje nebo swapy. Pro použití osvobození nastavte „Krypto osvobození“ na Ano pouze po ověření způsobilosti. DEX swap zadejte jako prodej odeslaného a nákup přijatého tokenu.",
     warnProvisionalRate: "Pro rok {year} ještě GFŘ nevyhlásilo oficiální jednotné kurzy měn. Výpočty pro rok {year} jsou orientační s použitím kurzu roku 2025.",
     taxBaseNote: "Základ daně = Daňové příjmy − Daňové výdaje. Upozornění: Ztrátu z prodeje cenných papírů nelze v ČR kompenzovat proti příjmům ze zaměstnání ani přenášet do dalších let.",
     itemsCount: "{n} položek",
@@ -1815,7 +1815,7 @@ const I18N = {
     alert40M2025: "⚠️ In 2025, qualifying exempt proceeds ({val}) exceeded the 40,000,000 CZK ceiling. Piggy proportionally reclassified the excess as taxable income; verify the result with a tax adviser.",
     alert5M: "📢 Exempt income in {year} exceeded 5,000,000 CZK ({val}). Remember to file the 'Notification of Exempt Income' under § 38v ZDP with the Czech tax office!",
     warnUnsupportedCurrs: "Some rows were skipped due to unsupported currency: {currs}. Piggy supports CZK, USD, and EUR with official GFŘ uniform rates.",
-    warnCryptoEligibility: "Crypto-assets {symbols} are treated as taxable. To apply a crypto exemption, add a “Crypto exemption eligible” column set to Yes only after confirming the asset is not an e-money token or restricted business property. DEX swaps are not supported.",
+    warnCryptoEligibility: "Crypto exemptions are not applied automatically to {symbols}. An open holding is not taxed; only a later sale or swap is treated as taxable. Set “Crypto exemption eligible” to Yes only after confirming eligibility. Record a DEX swap as a sale of the outgoing token and a purchase of the incoming token.",
     warnProvisionalRate: "Official GFŘ uniform rates for {year} have not yet been gazetted. Calculations for {year} are provisional estimates using 2025 rates.",
     taxBaseNote: "Tax Base (Základ daně) = Taxable Income − Taxable Expenses. Note that under Czech tax law, security trading losses cannot be offset against ordinary employment income or carried forward to future years.",
     itemsCount: "{n} items",
@@ -1894,9 +1894,15 @@ const DEMOS = {
 "15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00;Akcie\n" +
 "20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00;Akcie\n",
   Template:
-"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození\n" +
-"1.1.2025 0:00;Nákup;FIFO;100,00;20;USD;-2 010,00;10,00;Akcie\n" +
-"30.6.2025 0:00;Prodej;FIFO;150,00;20;USD;2 982,25;17,75;Akcie\n"
+"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození;Poznámka\n" +
+"10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;-1 300,00;2,00;Akcie;;Nákup akcie\n" +
+"15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;-525,00;1,50;ETF;;Nákup ETF\n" +
+"20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;760,00;2,00;Akcie;;Částečný prodej akcie\n" +
+"16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;-950,00;3,00;Kryptoaktivum;Ano;Nákup způsobilého kryptoaktiva\n" +
+"1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;-1 000,00;1,00;Kryptoaktivum;Ne;Nákup stablecoinu\n" +
+"10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;1 000,00;2,00;Kryptoaktivum;Ne;DEX swap USDT za ETH - výstupní část\n" +
+"10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;-1 000,00;0,00;Kryptoaktivum;Ano;DEX swap USDT za ETH - vstupní část\n" +
+"30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;300,00;1,50;Kryptoaktivum;Ano;Částečný prodej kryptoaktiva\n"
 };
 
 // ---- Formatting with Direct Currency Symbols ------------------------------

@@ -1,3 +1,9 @@
-Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození
-1.1.2025 0:00;Nákup;AKCIE-1;100,00;20;CZK;-2 010,00;10,00;Akcie
-30.6.2025 0:00;Prodej;AKCIE-1;150,00;20;CZK;2 982,25;17,75;Akcie
+Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození;Poznámka
+10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;-1 300,00;2,00;Akcie;;Nákup akcie
+15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;-525,00;1,50;ETF;;Nákup ETF
+20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;760,00;2,00;Akcie;;Částečný prodej akcie
+16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;-950,00;3,00;Kryptoaktivum;Ano;Nákup způsobilého kryptoaktiva
+1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;-1 000,00;1,00;Kryptoaktivum;Ne;Nákup stablecoinu
+10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;1 000,00;2,00;Kryptoaktivum;Ne;DEX swap USDT za ETH - výstupní část
+10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;-1 000,00;0,00;Kryptoaktivum;Ano;DEX swap USDT za ETH - vstupní část
+30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;300,00;1,50;Kryptoaktivum;Ano;Částečný prodej kryptoaktiva

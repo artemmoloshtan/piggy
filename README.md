@@ -1,6 +1,6 @@
-# 🐷 Piggy – Czech Securities Tax & FIFO Engine
+# 🐷 Piggy – Czech Securities & Crypto Tax Calculator
 
-A fast, zero-dependency, single-file financial web application that computes capital gains tax and tax bases for stock, ETF, bond, and cryptocurrency trading under Czech income tax law (*Zákon o daních z příjmů č. 586/1992 Sb.*).
+A private, zero-dependency web calculator for estimating Czech tax bases from securities and supported crypto transactions. Piggy performs FIFO lot matching, holding-period and annual-proceeds tests, GFŘ currency conversion, and exempt-income reporting entirely in the browser.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
@@ -16,17 +16,17 @@ A fast, zero-dependency, single-file financial web application that computes cap
 
 Retail investors in the Czech Republic face rigorous tax calculation rules when trading securities across multiple currencies (CZK, USD, EUR). Calculating the proper tax base requires matching lots using the **FIFO** (First-In, First-Out) method, tracking individual holding periods for statutory exemptions, converting foreign currencies using official annual uniform exchange rates published by the General Financial Directorate (GFŘ), and separating exempt income from taxable profits.
 
-**Piggy** is engineered as a **100% client-side, single-file application** that handles all of this automatically in your browser—without sending a single byte of financial data over the internet.
+**Piggy** is a **100% client-side, single-file application**. Imported financial data stays in the browser and is not uploaded by the app.
 
 ### Key Capabilities
 
 - **Combined Open Positions with Live Price Editing**: Real-time valuation, allocation donut charts, and instant unrealized P/L calculation without losing focus while typing. Unrealized P/L defaults cleanly to `0.00` until you input custom market prices.
 - **Strict FIFO Pairing**: Matches buy and sell lots chronologically, supporting partial lot executions, split orders, and short sales.
-- **3-Year Holding Period Exemption (*Časový test*)**: Automatically detects shares held for > 3 years (or 6 months for acquisitions prior to 2014) and isolates exempt income under § 4(1)(w) ZDP.
+- **Holding-Period Tests (*Časový test*)**: Separates qualifying securities and explicitly eligible crypto disposals from taxable income.
 - **Official GFŘ Uniform Exchange Rates (*Jednotné kurzy*)**: Accurately translates multi-currency trades (USD, EUR, CZK) from 2011 to 2025 in line with the Czech Supreme Administrative Court (NSS) ruling of 2019.
-- **100 000 Kč Exemption Threshold Alert**: Alerts you when yearly gross revenues do not exceed the 100k CZK statutory exemption threshold under § 4(1)(w) ZDP.
+- **Annual Proceeds Tests**: Applies the 100,000 CZK amount test separately to securities and explicitly eligible crypto transactions.
 - **Multilingual Broker CSV Ingestion**: Drag & drop or copy-paste directly with both Czech (`Datum obchodu;Směr;...`) and English (`Date;Direction;...`) headers.
-- **Formal Tax Export & Print**: Generates audit-ready CSV reports (`piggy-report.csv`) for submission as tax annex documentation (Příloha č. 2).
+- **Reviewable Export & Print**: Generates a CSV calculation report (`piggy-report.csv`) for review and supporting documentation.
 
 ---
 
@@ -49,16 +49,22 @@ Under Czech Supreme Administrative Court (*Nejvyšší správní soud – NSS*) 
 - Piggy isolates exempt sales from the tax base and reports exempt income (*osvobozené příjmy*) in a dedicated column so you can verify if you exceed the 5 000 000 CZK exempt income notification threshold (*oznámení o osvobozených příjmech*).
 
 ### 4. 100 000 Kč Annual Gross Revenue Exemption (§ 4(1)(w) ZDP)
-- If your total annual gross proceeds (revenues) from all non-exempt security sales in a calendar year do **not exceed 100 000 Kč**, the income is completely tax-free and does not need to be declared on your tax return.
-- Piggy highlights eligible tax years with an informational alert banner.
+- The amount test is assessed using gross annual proceeds from all relevant securities transfers, before applying the holding-period test.
+- Piggy applies the exemption to the calculated tax base and highlights eligible years.
 
-### 5. GFŘ Official Uniform Annual Exchange Rates (*Jednotné kurzy*)
+### 5. Crypto and Stablecoin Transactions
+- Merely acquiring or holding a cryptoasset does not create taxable income in Piggy. Tax treatment is evaluated when the asset is disposed of by sale, spending, or exchange.
+- Crypto exemptions effective from 15 February 2025 are applied only when the optional `Krypto osvobození` / `Crypto exemption eligible` field is explicitly set to `Ano` / `Yes`.
+- Stablecoins such as USDT are not assumed to qualify for an exemption. Their acquisition remains an open position; a later sale or swap is the disposal event.
+- Represent a DEX swap as two rows at the same timestamp: a `Sell` of the token given and a `Buy` of the token received, using consistent market values. Piggy does not import blockchain transactions or determine token eligibility automatically.
+
+### 6. GFŘ Official Uniform Annual Exchange Rates (*Jednotné kurzy*)
 Non-business investors converting foreign currency transactions typically use the official uniform annual exchange rates published annually in January by the Czech General Financial Directorate (*Generální finanční ředitelství – GFŘ*):
 - Acquisition costs are translated using the uniform rate of the **acquisition year**.
 - Sales revenues and sales fees are translated using the uniform rate of the **disposition year**.
 - Piggy includes built-in official rates from 2011 through 2025.
 
-### 6. Loss Offset Restrictions
+### 7. Loss Offset Restrictions
 Under Czech tax law, net security trading losses incurred in a calendar year cannot be offset against ordinary employment income (§ 6) or business income (§ 7), nor can losses be carried forward to offset future tax years.
 
 ---
@@ -88,6 +94,9 @@ Piggy supports both standard Czech broker headers (matching Fio e-Broker) and En
 | `Měna` | `Currency` | Transaction currency (`CZK`, `USD`, `EUR`) | `USD` |
 | `Objem` | `Volume`, `Total`, `Amount` | Total transaction value before fees | `-2 700,00` |
 | `Poplatky` | `Fees`, `Fee`, `Commission` | Broker commission / transaction fees | `12,00` |
+| `Typ aktiva` | `Asset Type`, `Category` | `Akcie`/security, ETF, or `Kryptoaktivum`/crypto | `Kryptoaktivum` |
+| `Krypto osvobození` | `Crypto exemption eligible` | Optional explicit confirmation that a cryptoasset may use the crypto exemptions | `Ano` / `Yes` |
+| `Poznámka` | `Note` | Optional human-readable explanation; ignored by the calculator | `DEX swap: outgoing leg` |
 
 ### Compatible Broker Exports
 - **Fio banka e-Broker**: Direct CSV export (zero modification required).
@@ -95,6 +104,18 @@ Piggy supports both standard Czech broker headers (matching Fio e-Broker) and En
 - **Interactive Brokers (IBKR)**: Trades activity statement or custom flex query CSV.
 - **Revolut / XTB / Trading 212 / Saxo Bank**: Exported transaction sheets.
 - **Spreadsheets**: Copy-pasting directly from Google Sheets or Microsoft Excel.
+
+### Template Examples
+
+The downloadable template includes:
+
+- stock and ETF purchases;
+- a partial stock sale;
+- an ordinary crypto purchase and disposal;
+- a stablecoin purchase;
+- a DEX swap represented by matching stablecoin-sale and crypto-purchase rows.
+
+Broker-specific exports may still require column mapping or cleanup. Always verify discarded-row and unsupported-currency warnings before using the result.
 
 ---
 
@@ -135,4 +156,4 @@ open index.html # On macOS (or double-click the file on Windows/Linux)
 
 ## ⚖️ Legal Disclaimer
 
-Piggy is an open-source calculation helper. It does not provide certified legal or tax advice. Final figures should always be reviewed with a licensed Czech tax advisor (*daňový poradce*) before submitting your tax return.
+Piggy is an open-source calculation helper, not tax-filing software or certified legal advice. It cannot determine whether a token is an electronic-money token, whether an asset belongs to business property, or whether an on-chain transaction has additional legs or fees. Review the imported ledger and final figures with a Czech tax adviser before filing.
