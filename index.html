@@ -814,6 +814,47 @@
     border-radius: var(--radius-sm);
     background: #fff;
   }
+  .cash-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-pill);
+    padding: 4px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #166534;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  }
+  .cash-chip button {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .cash-chip button:hover {
+    background: #dc2626;
+    color: #ffffff;
+  }
+  .cash-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+  }
 
   /* Collapsible / FAQ */
   details {
@@ -1496,7 +1537,9 @@ const $ = (id)=>document.getElementById(id);
 let state = null;
 let loadedFiles = [];
 let highlight = { set: new Set() };
-let customStablecoin = { amount: 0, currency: 'USD' };
+let customCashEntries = [];
+let cashIdCounter = 1;
+let customStablecoin = { amount: 0, currency: 'USD' }; // backward-compat alias
 
 // User-defined / live market price overrides for open positions
 let marketPrices = {};
@@ -1629,6 +1672,7 @@ function clearAll(){
   loadedFiles = [];
   state = null;
   marketPrices = {};
+  customCashEntries = [];
   $('results').hidden = true;
   $('messages').innerHTML = '';
   renderLoaded();
@@ -1885,12 +1929,16 @@ function updatePositionsLive(){
   const currYear = new Date().getFullYear();
   const combined = getCombinedPositions(state);
 
-  const customRate = rateFor(customStablecoin.currency, currYear);
-  const customCZK = (customStablecoin.amount || 0) * customRate;
+  let totalCustomCashCZK = 0;
+  for (const c of customCashEntries){
+    const rate = rateFor(c.currency, currYear);
+    c.czk = (c.amount || 0) * rate;
+    totalCustomCashCZK += c.czk;
+  }
 
   let totalSecuritiesMarketCZK = 0;
   let totalSecuritiesBookCZK = 0;
-  let totalStablecoinsCZK = customCZK;
+  let totalStablecoinsCZK = totalCustomCashCZK;
 
   const slices = [];
   const palette = [
@@ -1930,14 +1978,18 @@ function updatePositionsLive(){
     }
   }
 
-  if (customCZK > 0){
-    slices.push({
-      label: 'Cash Reserve (' + customStablecoin.currency + ')',
-      czk: customCZK,
-      color: '#059669',
-      isStable: true,
-      qty: customStablecoin.amount
-    });
+  const cashPalette = ['#059669', '#10b981', '#0d9488', '#14b8a6', '#047857', '#065f46'];
+  let cIdx = 0;
+  for (const c of customCashEntries){
+    if (c.czk > 0){
+      slices.push({
+        label: c.label ? (c.label + ' (' + c.currency + ')') : (c.currency + ' Cash'),
+        czk: c.czk,
+        color: cashPalette[cIdx++ % cashPalette.length],
+        isStable: true,
+        qty: c.amount
+      });
+    }
   }
   slices.sort((a,b)=>b.czk - a.czk);
 
@@ -2002,17 +2054,21 @@ function renderPozice(st){
     }
   }
 
-  const customRate = rateFor(customStablecoin.currency, currYear);
-  const customCZK = (customStablecoin.amount || 0) * customRate;
+  let totalCustomCashCZK = 0;
+  for (const c of customCashEntries){
+    const rate = rateFor(c.currency, currYear);
+    c.czk = (c.amount || 0) * rate;
+    totalCustomCashCZK += c.czk;
+  }
 
-  if (!st.openPos.length && customCZK <= 0){
+  if (!st.openPos.length && totalCustomCashCZK <= 0){
     el.innerHTML = '<p class="info">No open positions remaining. All positions are closed.</p>';
     return;
   }
 
   let totalSecuritiesMarketCZK = 0;
   let totalSecuritiesBookCZK = 0;
-  let totalStablecoinsCZK = customCZK;
+  let totalStablecoinsCZK = totalCustomCashCZK;
 
   const slices = [];
   const palette = [
@@ -2052,14 +2108,18 @@ function renderPozice(st){
     }
   }
 
-  if (customCZK > 0){
-    slices.push({
-      label: 'Cash Reserve (' + customStablecoin.currency + ')',
-      czk: customCZK,
-      color: '#059669',
-      isStable: true,
-      qty: customStablecoin.amount
-    });
+  const cashPalette = ['#059669', '#10b981', '#0d9488', '#14b8a6', '#047857', '#065f46'];
+  let cIdx = 0;
+  for (const c of customCashEntries){
+    if (c.czk > 0){
+      slices.push({
+        label: c.label ? (c.label + ' (' + c.currency + ')') : (c.currency + ' Cash'),
+        czk: c.czk,
+        color: cashPalette[cIdx++ % cashPalette.length],
+        isStable: true,
+        qty: c.amount
+      });
+    }
   }
   slices.sort((a,b)=>b.czk - a.czk);
 
@@ -2080,18 +2140,33 @@ function renderPozice(st){
   h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val" id="kpi-stable-val">' + fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span></div></div>';
   h += '</div>';
 
-  // 2. Custom Stablecoin / Cash Adjuster Input
+  // 2. Custom Stablecoin / Cash Adjuster Input Bar
   h += '<div class="stablecoin-input-bar">';
+  h += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">';
   h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
-  h += '<input type="number" id="inp-stable-amt" placeholder="e.g. 1000" min="0" step="any" value="' + (customStablecoin.amount > 0 ? customStablecoin.amount : '') + '">';
+  h += '<input type="number" id="inp-stable-amt" placeholder="Amount (e.g. 1000)" min="0" step="any">';
   h += '<select id="inp-stable-curr">';
-  h += '<option value="USD"' + (customStablecoin.currency==='USD'?' selected':'') + '>USD / USDT / USDC ($)</option>';
-  h += '<option value="EUR"' + (customStablecoin.currency==='EUR'?' selected':'') + '>EUR / EURC (€)</option>';
-  h += '<option value="CZK"' + (customStablecoin.currency==='CZK'?' selected':'') + '>CZK (Kč)</option>';
+  h += '<option value="USD">USD / USDT / USDC ($)</option>';
+  h += '<option value="EUR">EUR / EURC (€)</option>';
+  h += '<option value="CZK">CZK (Kč)</option>';
   h += '</select>';
-  h += '<button class="btn primary" id="btnApplyStable">Update Allocation</button>';
-  if (customStablecoin.amount > 0){
-    h += '<button class="btn btn-clear" id="btnResetStable" style="padding:6px 12px">Reset Cash</button>';
+  h += '<input type="text" id="inp-stable-label" placeholder="Note / Broker (optional)" style="width:160px">';
+  h += '<button class="btn primary" id="btnAddCash">+ Add Entry</button>';
+  if (customCashEntries.length > 0){
+    h += '<button class="btn btn-clear" id="btnResetCash" style="padding:6px 12px">Clear All Cash</button>';
+  }
+  h += '</div>';
+
+  if (customCashEntries.length > 0){
+    h += '<div class="cash-chips-row">';
+    h += '<span style="font-size:12px;font-weight:700;color:var(--ink-sub);margin-right:2px">Active Cash Reserves (' + customCashEntries.length + '):</span>';
+    for (const c of customCashEntries){
+      h += '<span class="cash-chip">' +
+        '<span>🪙 ' + esc(c.label || c.currency + ' Cash') + ': <strong>' + fmtMoney(c.amount, c.currency) + '</strong> (' + fmtMoney(c.czk, 'CZK') + ')</span>' +
+        '<button data-rm-cash="' + c.id + '" title="Remove this cash entry">✕</button>' +
+        '</span>';
+    }
+    h += '</div>';
   }
   h += '</div>';
 
@@ -2221,6 +2296,30 @@ function applyRowHl(){
   });
 }
 
+function addCashEntry(){
+  const amtEl = $('inp-stable-amt');
+  const currEl = $('inp-stable-curr');
+  const labelEl = $('inp-stable-label');
+  const amt = parseFloat(amtEl?.value);
+  if (!amt || isNaN(amt) || amt <= 0){
+    showError('Please enter a valid positive cash/stablecoin amount.');
+    if (amtEl) amtEl.focus();
+    return;
+  }
+  const curr = currEl?.value || 'USD';
+  const label = (labelEl?.value || '').trim();
+  customCashEntries.push({
+    id: cashIdCounter++,
+    amount: amt,
+    currency: curr,
+    label: label || (curr + ' Cash')
+  });
+  if (amtEl) amtEl.value = '';
+  if (labelEl) labelEl.value = '';
+  $('messages').innerHTML = '';
+  if (state) renderPozice(state);
+}
+
 // Event Listeners
 document.addEventListener('click', e=>{
   const t = e.target;
@@ -2242,15 +2341,19 @@ document.addEventListener('click', e=>{
     }
     return;
   }
-  if (t.closest('#btnApplyStable')){
-    const amt = parseFloat($('inp-stable-amt')?.value) || 0;
-    const curr = $('inp-stable-curr')?.value || 'USD';
-    customStablecoin = { amount: Math.max(0, amt), currency: curr };
+  if (t.closest('#btnAddCash') || t.closest('#btnApplyStable')){
+    addCashEntry();
+    return;
+  }
+  if (t.closest('#btnResetCash') || t.closest('#btnResetStable')){
+    customCashEntries = [];
     if (state) renderPozice(state);
     return;
   }
-  if (t.closest('#btnResetStable')){
-    customStablecoin = { amount: 0, currency: 'USD' };
+  const rmCashBtn = t.closest('[data-rm-cash]');
+  if (rmCashBtn){
+    const cid = +rmCashBtn.dataset.rmCash;
+    customCashEntries = customCashEntries.filter(c => c.id !== cid);
     if (state) renderPozice(state);
     return;
   }
@@ -2300,6 +2403,17 @@ document.addEventListener('input', e=>{
       return;
     }
     updatePositionsLive();
+  }
+});
+
+// Press Enter inside cash amount or label inputs to add entry
+document.addEventListener('keydown', e=>{
+  if (e.key === 'Enter'){
+    const t = e.target;
+    if (t && (t.id === 'inp-stable-amt' || t.id === 'inp-stable-label')){
+      e.preventDefault();
+      addCashEntry();
+    }
   }
 });
 
