@@ -112,6 +112,18 @@ test('CSV formula injection and delimiters are escaped', () => {
   ok(escaped === '"\'=SUM(1;2)"', 'unexpected escaped value: ' + escaped);
 });
 
+test('English validation guidance names the Czech source columns', () => {
+  for (const column of ['Směr', 'Datum obchodu', 'Symbol', 'Měna', 'Typ aktiva', 'Cena', 'Počet', 'Krypto osvobození', 'ID transakce', 'Zdroj ocenění']) {
+    ok(html.includes('Czech source column') && html.includes('“' + column + '”'), 'missing English guidance for Czech column: ' + column);
+  }
+});
+
+test('warnings and issue descriptions remain translatable after import', () => {
+  ok(html.includes("importWarnings.push({code:'CRYPTO_ELIGIBILITY'"), 'crypto warning is stored as translated text');
+  ok(html.includes("warnings.push({code:'PROVISIONAL_RATE', year})"), 'rate warning is stored as translated text');
+  ok(html.includes('esc(issueText(x))'), 'validation table does not translate issue codes at render time');
+});
+
 let passed = 0;
 for (const item of tests) {
   try {

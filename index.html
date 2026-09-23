@@ -1369,20 +1369,20 @@ function normalizeRows(csvResult){
     const dirRaw = String(r[colMap.dir]||'').trim().toLowerCase();
     const dir = (dirRaw === 'nákup' || dirRaw === 'nakup' || dirRaw === 'buy' || dirRaw === 'b') ? 'B'
               : (dirRaw === 'prodej' || dirRaw === 'sell' || dirRaw === 's') ? 'S' : null;
-    if (!dir){ discarded++; issues.push({severity:'error', row:sourceRow, code:'UNSUPPORTED_OPERATION', message:'Nepodporovaný nebo chybějící typ operace.'}); continue; }
+    if (!dir){ discarded++; issues.push({severity:'error', row:sourceRow, code:'UNSUPPORTED_OPERATION'}); continue; }
 
     const tradeDate = parseDateTime(r[colMap.date]);
-    if (!tradeDate){ discarded++; issues.push({severity:'error', row:sourceRow, code:'INVALID_DATE', message:'Chybí nebo je neplatné datum transakce.'}); continue; }
+    if (!tradeDate){ discarded++; issues.push({severity:'error', row:sourceRow, code:'INVALID_DATE'}); continue; }
     const settleDate = new Date(tradeDate.getFullYear(), tradeDate.getMonth(), tradeDate.getDate());
     const symbol = String(r[colMap.symbol]||'').trim() || null;
-    if (!symbol){ discarded++; issues.push({severity:'error', row:sourceRow, code:'MISSING_SYMBOL', message:'Chybí symbol aktiva.'}); continue; }
+    if (!symbol){ discarded++; issues.push({severity:'error', row:sourceRow, code:'MISSING_SYMBOL'}); continue; }
 
     const rawCurr = String(r[colMap.currency] || '').trim();
     const currency = normalizeCurrency(rawCurr);
     if (!currency){
       discarded++;
       unsupportedCurrs.add(rawCurr || 'UNKNOWN');
-      issues.push({severity:'error', row:sourceRow, code:'UNSUPPORTED_CURRENCY', message:'Nepodporovaná měna: '+(rawCurr || 'neuvedena')});
+      issues.push({severity:'error', row:sourceRow, code:'UNSUPPORTED_CURRENCY', value:rawCurr || ''});
       continue;
     }
 
@@ -1406,10 +1406,10 @@ function normalizeRows(csvResult){
       ? normalizeBool(r[colMap.cryptoEligible]) : false;
     const cryptoEligibilityProvided = isCryptoType(assetType) && colMap.cryptoEligible >= 0 && String(r[colMap.cryptoEligible] || '').trim() !== '';
     const businessAsset = colMap.businessAsset >= 0 ? normalizeBool(r[colMap.businessAsset]) : false;
-    if (assetType === 'unknown') issues.push({severity:'error', row:sourceRow, code:'UNKNOWN_ASSET_TYPE', message:'Neznámá klasifikace aktiva '+symbol+': '+String(assetTypeRaw || 'neuvedena')});
+    if (assetType === 'unknown') issues.push({severity:'error', row:sourceRow, code:'UNKNOWN_ASSET_TYPE', symbol, value:String(assetTypeRaw || '')});
     if (price <= 0 || qty <= 0){
       discarded++;
-      issues.push({severity:'error', row:sourceRow, code:'INVALID_AMOUNT', message:'Cena a množství musí být kladné: '+symbol});
+      issues.push({severity:'error', row:sourceRow, code:'INVALID_AMOUNT', symbol});
       continue;
     }
 
@@ -1552,8 +1552,8 @@ function computeAll(trades){
     yearTot.applied40MCap = (capByYear.get(year) || 0) > 40000000;
     yearTot.exemptBefore40MCap = capByYear.get(year) || 0;
 
-    if (year >= 2026 && !warnings.some(w => w.includes(String(year)))){
-      warnings.push(t('warnProvisionalRate', { year }));
+    if (year >= 2026 && !warnings.some(w => w.code === 'PROVISIONAL_RATE' && w.year === year)){
+      warnings.push({code:'PROVISIONAL_RATE', year});
     }
 
     byYearList.push({ year, rows, count: rows.reduce((a,r)=>a+r.count,0), totals: yearTot });
@@ -1577,16 +1577,16 @@ function computeAll(trades){
 
   for (const g of groups){
     if (g.hasOpenShort){
-      issues.push({severity:'error', row:g.trade.sourceRow, code:'MISSING_ACQUISITION', message:'Prodej '+g.symbol+' nemá dostatečnou historii pořízení ('+g.openQty+' jednotek).'});
+      issues.push({severity:'error', row:g.trade.sourceRow, code:'MISSING_ACQUISITION', symbol:g.symbol, qty:g.openQty});
     }
     if (isCryptoType(g.trade.assetType) && !g.trade.cryptoEligibilityProvided){
-      issues.push({severity:'error', row:g.trade.sourceRow, code:'CRYPTO_ELIGIBILITY_UNCONFIRMED', message:'U '+g.symbol+' chybí potvrzení regulatorní způsobilosti pro osvobození.'});
+      issues.push({severity:'error', row:g.trade.sourceRow, code:'CRYPTO_ELIGIBILITY_UNCONFIRMED', symbol:g.symbol});
     }
     if (isCryptoType(g.trade.assetType) && !g.trade.transactionId){
-      issues.push({severity:'warning', row:g.trade.sourceRow, code:'MISSING_TX_ID', message:'U prodeje/swapu '+g.symbol+' chybí ID transakce nebo tx hash.'});
+      issues.push({severity:'warning', row:g.trade.sourceRow, code:'MISSING_TX_ID', symbol:g.symbol});
     }
     if (isCryptoType(g.trade.assetType) && !g.trade.valuationSource){
-      issues.push({severity:'warning', row:g.trade.sourceRow, code:'MISSING_VALUATION_SOURCE', message:'U prodeje/swapu '+g.symbol+' chybí zdroj tržního ocenění.'});
+      issues.push({severity:'warning', row:g.trade.sourceRow, code:'MISSING_VALUATION_SOURCE', symbol:g.symbol});
     }
   }
 
@@ -1851,6 +1851,16 @@ const I18N = {
     warnUnsupportedCurrs: "Některé řádky byly přeskočeny kvůli nepodporované měně: {currs}. Piggy podporuje CZK, USD a EUR s oficiálními jednotnými kurzy GFŘ.",
     warnCryptoEligibility: "U kryptoaktiv {symbols} se osvobození neuplatní automaticky. Samotné otevřené držení se nezdaňuje; jako zdanitelné jsou počítány až prodeje nebo swapy. Pro použití osvobození nastavte „Krypto osvobození“ na Ano pouze po ověření způsobilosti. DEX swap zadejte jako prodej odeslaného a nákup přijatého tokenu.",
     warnProvisionalRate: "Pro rok {year} ještě GFŘ nevyhlásilo oficiální jednotné kurzy měn. Výpočty pro rok {year} jsou orientační s použitím kurzu roku 2025.",
+    issueUnsupportedOperation: "Ve sloupci „Směr“ chybí podporovaná operace (Nákup nebo Prodej).",
+    issueInvalidDate: "Ve sloupci „Datum obchodu“ chybí platné datum transakce.",
+    issueMissingSymbol: "Ve sloupci „Symbol“ chybí označení aktiva.",
+    issueUnsupportedCurrency: "Sloupec „Měna“ obsahuje nepodporovanou hodnotu: {value}.",
+    issueUnknownAssetType: "Ve sloupci „Typ aktiva“ je u {symbol} neznámá klasifikace: {value}.",
+    issueInvalidAmount: "Hodnoty ve sloupcích „Cena“ a „Počet“ musí být u {symbol} kladné.",
+    issueMissingAcquisition: "Prodej {symbol} nemá dostatečnou historii nákupu ({qty} jednotek). Zkontrolujte sloupce „Směr“, „Symbol“ a „Počet“ v dřívějších řádcích.",
+    issueCryptoEligibility: "U {symbol} chybí potvrzení regulatorní způsobilosti ve sloupci „Krypto osvobození“.",
+    issueMissingTxId: "U prodeje/swapu {symbol} chybí hodnota ve sloupci „ID transakce“ (nebo tx hash).",
+    issueMissingValuation: "U prodeje/swapu {symbol} chybí hodnota ve sloupci „Zdroj ocenění“.",
     taxBaseNote: "Základ daně = Daňové příjmy − Daňové výdaje. Upozornění: Ztrátu z prodeje cenných papírů nelze v ČR kompenzovat proti příjmům ze zaměstnání ani přenášet do dalších let.",
     itemsCount: "{n} položek",
     itemCount: "1 položka",
@@ -1977,6 +1987,16 @@ const I18N = {
     warnUnsupportedCurrs: "Some rows were skipped due to unsupported currency: {currs}. Piggy supports CZK, USD, and EUR with official GFŘ uniform rates.",
     warnCryptoEligibility: "Crypto exemptions are not applied automatically to {symbols}. An open holding is not taxed; only a later sale or swap is treated as taxable. Set “Crypto exemption eligible” to Yes only after confirming eligibility. Record a DEX swap as a sale of the outgoing token and a purchase of the incoming token.",
     warnProvisionalRate: "Official GFŘ uniform rates for {year} have not yet been gazetted. Calculations for {year} are provisional estimates using 2025 rates.",
+    issueUnsupportedOperation: "Enter Buy or Sell in the Czech source column “Směr”.",
+    issueInvalidDate: "Enter a valid transaction date in the Czech source column “Datum obchodu”.",
+    issueMissingSymbol: "Enter the asset identifier in the Czech source column “Symbol”.",
+    issueUnsupportedCurrency: "The Czech source column “Měna” contains an unsupported value: {value}.",
+    issueUnknownAssetType: "The Czech source column “Typ aktiva” has an unknown classification for {symbol}: {value}.",
+    issueInvalidAmount: "Values must be positive in the Czech source columns “Cena” (price) and “Počet” (quantity) for {symbol}.",
+    issueMissingAcquisition: "The sale of {symbol} exceeds the available acquisition history by {qty} units. Check earlier rows, especially the Czech columns “Směr”, “Symbol”, and “Počet”.",
+    issueCryptoEligibility: "Confirm regulatory eligibility for {symbol} in the Czech source column “Krypto osvobození”.",
+    issueMissingTxId: "The {symbol} sale/swap is missing the Czech source column “ID transakce” (transaction ID or tx hash).",
+    issueMissingValuation: "The {symbol} sale/swap is missing the Czech source column “Zdroj ocenění” (valuation source).",
     taxBaseNote: "Tax Base (Základ daně) = Taxable Income − Taxable Expenses. Note that under Czech tax law, security trading losses cannot be offset against ordinary employment income or carried forward to future years.",
     itemsCount: "{n} items",
     itemCount: "1 item",
@@ -2005,6 +2025,31 @@ function t(key, params){
     }
   }
   return str;
+}
+
+function issueText(issue){
+  const keys = {
+    UNSUPPORTED_OPERATION:'issueUnsupportedOperation', INVALID_DATE:'issueInvalidDate',
+    MISSING_SYMBOL:'issueMissingSymbol', UNSUPPORTED_CURRENCY:'issueUnsupportedCurrency',
+    UNKNOWN_ASSET_TYPE:'issueUnknownAssetType', INVALID_AMOUNT:'issueInvalidAmount',
+    MISSING_ACQUISITION:'issueMissingAcquisition', CRYPTO_ELIGIBILITY_UNCONFIRMED:'issueCryptoEligibility',
+    MISSING_TX_ID:'issueMissingTxId', MISSING_VALUATION_SOURCE:'issueMissingValuation'
+  };
+  const key = keys[issue.code];
+  if (!key) return issue.message || issue.code || '';
+  return t(key, {
+    symbol: issue.symbol || '—',
+    qty: issue.qty == null ? '—' : fmt(issue.qty, 8),
+    value: issue.value || (currentLang === 'en' ? 'not provided' : 'neuvedeno')
+  });
+}
+
+function warningText(warning){
+  if (typeof warning === 'string') return warning;
+  if (warning.code === 'UNSUPPORTED_CURRENCY') return t('warnUnsupportedCurrs', {currs:warning.currs}) + (warning.source ? ' ('+warning.source+')' : '');
+  if (warning.code === 'CRYPTO_ELIGIBILITY') return t('warnCryptoEligibility', {symbols:warning.symbols});
+  if (warning.code === 'PROVISIONAL_RATE') return t('warnProvisionalRate', {year:warning.year});
+  return warning.message || warning.code || '';
 }
 
 function setLanguage(lang){
@@ -2116,10 +2161,10 @@ function processText(text, sourceName){
   const { trades, discarded, unsupportedCurrencies, issues } = normalizeRows(csv);
   if (issues && issues.length) importIssues.push(...issues.map(x=>({...x, source:sourceName || ''})));
   if (unsupportedCurrencies && unsupportedCurrencies.length){
-    importWarnings.push(t('warnUnsupportedCurrs', { currs: unsupportedCurrencies.join(', ') }) + (sourceName ? ' ('+sourceName+')' : ''));
+    importWarnings.push({code:'UNSUPPORTED_CURRENCY', currs:unsupportedCurrencies.join(', '), source:sourceName || ''});
   }
   const unverifiedCrypto = [...new Set(trades.filter(x => isCryptoType(x.assetType) && !x.cryptoExemptionEligible).map(x => x.symbol))];
-  if (unverifiedCrypto.length) importWarnings.push(t('warnCryptoEligibility', { symbols: unverifiedCrypto.join(', ') }));
+  if (unverifiedCrypto.length) importWarnings.push({code:'CRYPTO_ELIGIBILITY', symbols:unverifiedCrypto.join(', '), source:sourceName || ''});
   if (!trades.length){ showError('No valid trades found in "'+sourceName+'".'); return null; }
   return trades;
 }
@@ -2224,7 +2269,7 @@ function renderReportStatus(st){
   }
   if (st.issues.length){
     h += '<details '+(errors.length?'open':'')+'><summary>'+t('validationDetails')+' ('+st.issues.length+')</summary><table><thead><tr><th>'+t('severity')+'</th><th>'+t('sourceRow')+'</th><th>'+t('issue')+'</th></tr></thead><tbody>'+
-      st.issues.map(x=>'<tr><td>'+(x.severity==='error'?'⛔':'⚠️')+'</td><td>'+esc((x.source?x.source+' / ':'')+(x.row||'—'))+'</td><td>'+esc(x.message)+'</td></tr>').join('')+'</tbody></table></details>';
+      st.issues.map(x=>'<tr><td>'+(x.severity==='error'?'⛔':'⚠️')+'</td><td>'+esc((x.source?x.source+' / ':'')+(x.row||'—'))+'</td><td>'+esc(issueText(x))+'</td></tr>').join('')+'</tbody></table></details>';
   }
   el.innerHTML = h;
 }
@@ -2277,7 +2322,7 @@ function renderChart(st){
 function renderWarnings(w){
   const el = $('warnings');
   if (!w || !w.length){ el.innerHTML=''; return; }
-  el.innerHTML = w.map(x=>'<div class="warn">⚠️ '+esc(x)+'</div>').join('');
+  el.innerHTML = w.map(x=>'<div class="warn">⚠️ '+esc(warningText(x))+'</div>').join('');
 }
 
 function renderSouhrn(st){
@@ -2827,7 +2872,7 @@ document.addEventListener('click', e=>{
     loadedFiles.splice(+target.dataset.rm, 1);
     if (removed){
       importIssues = importIssues.filter(x=>x.source!==removed.name);
-      importWarnings = importWarnings.filter(x=>!x.includes('('+removed.name+')'));
+      importWarnings = importWarnings.filter(x=>x.source !== removed.name);
     }
     renderLoaded(); runAll(); return;
   }
@@ -2974,7 +3019,7 @@ function exportFifo(){
 function exportIssues(){
   if (!state) return;
   const L=[csvRow(['Závažnost','Zdroj','Řádek','Kód','Popis'])];
-  for (const x of state.issues) L.push(csvRow([x.severity==='error'?'CHYBA':'UPOZORNĚNÍ',x.source||'',x.row||'',x.code,x.message]));
+  for (const x of state.issues) L.push(csvRow([x.severity==='error'?'CHYBA':'UPOZORNĚNÍ',x.source||'',x.row||'',x.code,issueText(x)]));
   download('05_kontroly_a_nejasnosti.csv',L.join('\n'));
 }
 
