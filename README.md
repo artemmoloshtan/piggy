@@ -1,6 +1,6 @@
 # 🐷 Piggy – Czech Securities Tax & FIFO Engine
 
-A fast, zero-dependency, single-file financial web application that computes capital gains tax and tax bases for stock, ETF, bond, and crypto/stablecoin trading under Czech income tax law (*Zákon o daních z příjmů č. 586/1992 Sb.*).
+A fast, zero-dependency, single-file financial web application that computes capital gains tax and tax bases for stock, ETF, bond, and cryptocurrency trading under Czech income tax law (*Zákon o daních z příjmů č. 586/1992 Sb.*).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
@@ -8,7 +8,7 @@ A fast, zero-dependency, single-file financial web application that computes cap
 [![Platform: Web & PWA](https://img.shields.io/badge/Platform-Web%20%26%20PWA-047857)](#)
 
 > **🚀 Live Web App**: [https://artemmoloshtan.github.io/piggy](https://artemmoloshtan.github.io/piggy)  
-> **📱 Mobile Experience**: Open in mobile Safari or Chrome and tap **"Add to Home Screen"** for full offline PWA installation. *(Note: The standalone Android APK is deprecated in favor of the Progressive Web App).*
+> **📱 Mobile Experience**: Open in mobile Safari or Chrome and tap **"Add to Home Screen"** for full offline PWA installation.
 
 ---
 
@@ -105,18 +105,18 @@ index.html   <-- Complete, zero-dependency, self-contained application
 ```
 
 - **Zero Build Step**: No `npm install`, no Node.js runtime, no bundling tools.
-- **Portable**: Double-click `index.html` on macOS, Windows, Linux, Android, or iOS to run immediately.
+- **Portable**: Double-click `index.html` on macOS, Windows, Linux, or mobile browsers to run immediately.
 - **Fully Offline**: All styles, icons (pure vector SVGs), and calculation logic are self-contained.
 
 ---
 
-## 📱 Mobile Access & PWA (Android Deprecation Notice)
+## 📱 Mobile Access & PWA
 
-> ⚠️ **Android Version Deprecation**: The native Android APK wrapper is deprecated and no longer actively distributed. Piggy is built and optimized as a responsive, zero-dependency Progressive Web Application (PWA).
+Piggy is built and optimized as a responsive, zero-dependency Progressive Web Application (PWA).
 
-To use Piggy on your mobile device (Android or iOS):
-1. Navigate to [**https://artemmoloshtan.github.io/piggy**](https://artemmoloshtan.github.io/piggy) in your mobile browser (Chrome, Safari, Firefox).
-2. Tap the browser menu and select **"Add to Home Screen"** (or "Install App").
+To use Piggy on your mobile device (iOS Safari or Android Chrome):
+1. Navigate to [**https://artemmoloshtan.github.io/piggy**](https://artemmoloshtan.github.io/piggy) in your mobile browser.
+2. Tap the browser share/menu button and select **"Add to Home Screen"** (or "Install App").
 3. Piggy will launch as a fullscreen, standalone app with complete offline caching, file ingestion, and local data persistence.
 
 ---

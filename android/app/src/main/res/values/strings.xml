@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Piggy</string>
-    <string name="save_report_success">Report saved to Downloads: %s</string>
-    <string name="save_report_error">Failed to save report to Downloads</string>
-    <string name="share_report_title">Share Trade Report</string>
-</resources>

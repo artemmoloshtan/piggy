@@ -60,15 +60,15 @@
 
   /* Header with Liquid Glass Blur */
   header {
-    background: rgba(255, 245, 204, 0.65);
+    background: rgba(255, 245, 204, 0.72);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid var(--glass-border);
-    padding: max(16px, env(safe-area-inset-top, 16px)) 24px 16px;
+    padding: max(8px, env(safe-area-inset-top, 8px)) 20px 8px;
     position: sticky;
     top: 0;
     z-index: 50;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
   }
   header.header-collapsed {
@@ -81,19 +81,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
   }
   .brand {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
   }
   .pig-logo {
-    width: 44px;
-    height: 44px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
-    filter: drop-shadow(0 4px 8px rgba(217, 119, 6, 0.25));
+    filter: drop-shadow(0 2px 6px rgba(217, 119, 6, 0.25));
     user-select: none;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
@@ -103,54 +103,70 @@
   .pig-logo img {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
+    border-radius: 8px;
     object-fit: cover;
   }
   .pig-logo:hover {
-    transform: scale(1.1) rotate(-4deg);
+    transform: scale(1.08) rotate(-3deg);
   }
   header h1 {
     margin: 0;
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: #261d05;
+    line-height: 1.15;
   }
   header p {
-    margin: 2px 0 0;
+    margin: 1px 0 0;
     color: #6d581a;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
+    line-height: 1.2;
   }
   .header-badges {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
   }
   .badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 5px;
+    padding: 4px 10px;
     border-radius: var(--radius-pill);
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    border: 1px solid transparent;
   }
   .badge-privacy {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.75);
     color: #5d460d;
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  }
+  .badge-lang {
+    background: rgba(255, 255, 255, 0.85);
+    color: #3b2d07;
+    border-color: rgba(217, 119, 6, 0.35);
+    box-shadow: 0 1px 4px rgba(217, 119, 6, 0.08);
+    font-family: inherit;
+  }
+  .badge-lang:hover {
+    background: #ffffff;
+    border-color: var(--gold-dark);
+    transform: translateY(-1px);
   }
   .badge-github {
     background: #18181b;
     color: #fafafa;
-    border: 1px solid #27272a;
+    border-color: #27272a;
   }
   .badge-github:hover {
     background: #27272a;
@@ -158,15 +174,15 @@
   }
   .badge-github svg {
     fill: currentColor;
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
   }
 
   /* Main Container */
   main {
     max-width: 1220px;
     margin: 0 auto;
-    padding: 24px 20px 48px;
+    padding: 14px 16px 36px;
   }
 
   /* Liquid Glass Card Containers */
@@ -176,9 +192,9 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    padding: 22px;
+    padding: 16px;
     box-shadow: var(--glass-shadow);
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .glass-card:hover {
@@ -189,14 +205,14 @@
   .input-grid {
     display: grid;
     grid-template-columns: 1.25fr 1fr;
-    gap: 14px;
-    margin-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
   .dropzone {
     border: 2px dashed rgba(200, 192, 175, 0.85);
     background: rgba(255, 255, 255, 0.55);
     border-radius: var(--radius-md);
-    padding: 24px 18px;
+    padding: 16px 14px;
     text-align: center;
     cursor: pointer;
     transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -212,18 +228,18 @@
     box-shadow: 0 6px 16px rgba(217, 119, 6, 0.08);
   }
   .dropzone-icon {
-    font-size: 32px;
-    margin-bottom: 6px;
+    font-size: 26px;
+    margin-bottom: 4px;
   }
   .dropzone .big {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
   }
   .dropzone .small {
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--ink-sub);
-    margin-top: 4px;
+    margin-top: 3px;
   }
 
   /* Dedicated Clipboard Paste Zone - matches Dropzone style */
@@ -231,7 +247,7 @@
     border: 2px dashed rgba(200, 192, 175, 0.85);
     background: rgba(255, 255, 255, 0.55);
     border-radius: var(--radius-md);
-    padding: 24px 18px;
+    padding: 16px 14px;
     text-align: center;
     cursor: pointer;
     transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -247,7 +263,7 @@
     box-shadow: 0 6px 16px rgba(217, 119, 6, 0.08);
   }
   .paste-icon {
-    font-size: 32px;
+    font-size: 26px;
     margin-bottom: 6px;
   }
   .paste-zone .big {
@@ -666,15 +682,15 @@
   /* Open Positions Dashboard & Allocation Pie Chart */
   .openpos-kpi-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
   .openpos-kpi {
     background: rgba(255, 255, 255, 0.65);
     border: 1px solid var(--glass-border-subtle);
     border-radius: var(--radius-md);
-    padding: 14px 18px;
+    padding: 12px 16px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.02);
   }
   .openpos-kpi .label {
@@ -685,19 +701,12 @@
     letter-spacing: 0.04em;
   }
   .openpos-kpi .val {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     color: var(--ink);
     margin-top: 3px;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
-  }
-  .openpos-kpi.highlight-stable {
-    border-color: #2dd4bf;
-    background: rgba(240, 253, 250, 0.85);
-  }
-  .openpos-kpi.highlight-stable .val {
-    color: #0f766e;
   }
 
   .pie-card {
@@ -778,83 +787,6 @@
     text-align: right;
   }
 
-  .stablecoin-input-bar {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: var(--radius-md);
-    padding: 12px 18px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .stablecoin-input-bar label {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .stablecoin-input-bar input {
-    width: 130px;
-    padding: 6px 10px;
-    font-size: 13px;
-    font-family: inherit;
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: var(--radius-sm);
-    background: #fff;
-  }
-  .stablecoin-input-bar select {
-    padding: 6px 8px;
-    font-size: 13px;
-    font-family: inherit;
-    border: 1px solid var(--glass-border-subtle);
-    border-radius: var(--radius-sm);
-    background: #fff;
-  }
-  .cash-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: var(--radius-pill);
-    padding: 4px 12px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #166534;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-  }
-  .cash-chip button {
-    background: rgba(239, 68, 68, 0.12);
-    color: #dc2626;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 1;
-    transition: background 0.15s, color 0.15s;
-  }
-  .cash-chip button:hover {
-    background: #dc2626;
-    color: #ffffff;
-  }
-  .cash-chips-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    width: 100%;
-  }
 
   /* Collapsible / FAQ */
   details {
@@ -905,7 +837,7 @@
   footer {
     max-width: 1220px;
     margin: 0 auto;
-    padding: 24px 20px 48px;
+    padding: 16px 20px 32px;
     color: var(--ink-sub);
     font-size: 13px;
     border-top: 1px solid var(--glass-border-subtle);
@@ -923,65 +855,67 @@
 
   /* Mobile Responsive & Touch Optimizations */
   @media (max-width: 768px) {
-    header { padding: max(14px, env(safe-area-inset-top, 14px)) 16px 12px; }
-    .brand .pig-logo { font-size: 32px; }
-    header h1 { font-size: 20px; }
-    header p { font-size: 12px; }
-    .header-badges { width: 100%; justify-content: flex-start; margin-top: 4px; }
-    main { padding: 14px 12px max(60px, env(safe-area-inset-bottom, 60px)); }
-    .glass-card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
-    .input-grid { grid-template-columns: 1fr; gap: 10px; }
-    .dropzone { padding: 18px 14px; }
-    .dropzone .big { font-size: 14.5px; }
-    .dropzone .small { font-size: 12px; }
-    .paste-zone { padding: 18px 14px; }
-    .paste-zone .big { font-size: 14.5px; }
-    .paste-zone .small { font-size: 12px; }
+    header { padding: max(6px, env(safe-area-inset-top, 6px)) 12px 6px; }
+    .brand { gap: 8px; }
+    .pig-logo { width: 28px; height: 28px; }
+    header h1 { font-size: 16px; }
+    header p { font-size: 11px; }
+    .header-badges { width: 100%; justify-content: flex-start; margin-top: 4px; gap: 4px; }
+    .badge { padding: 3px 8px; font-size: 11px; }
+    main { padding: 10px 10px max(40px, env(safe-area-inset-bottom, 40px)); }
+    .glass-card { padding: 12px; margin-bottom: 12px; border-radius: var(--radius-md); }
+    .input-grid { grid-template-columns: 1fr; gap: 8px; }
+    .dropzone { padding: 12px 10px; }
+    .dropzone .big { font-size: 13.5px; }
+    .dropzone .small { font-size: 11.5px; }
+    .paste-zone { padding: 12px 10px; }
+    .paste-zone .big { font-size: 13.5px; }
+    .paste-zone .small { font-size: 11.5px; }
     .toolbar { gap: 6px; }
-    .btn { min-height: 42px; font-size: 12.5px; padding: 7px 14px; }
+    .btn { min-height: 38px; font-size: 12px; padding: 6px 12px; }
 
-    .openpos-kpi-row { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-    .openpos-kpi { padding: 12px 14px; }
-    .openpos-kpi .val { font-size: 18px; }
+    .openpos-kpi-row { grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
+    .openpos-kpi { padding: 10px 12px; }
+    .openpos-kpi .val { font-size: 17px; }
 
-    .chart-card { padding: 16px; margin-bottom: 16px; border-radius: var(--radius-md); }
+    .chart-card { padding: 12px; margin-bottom: 12px; border-radius: var(--radius-md); }
 
     /* Sticky Tab Bar for easy mobile navigation */
     nav.tabs {
       position: sticky;
-      top: 65px;
+      top: 48px;
       z-index: 30;
-      background: rgba(248, 247, 242, 0.92);
+      background: rgba(248, 247, 242, 0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      padding: 6px 0 8px;
-      margin: 12px 0 0;
+      padding: 4px 0 6px;
+      margin: 8px 0 0;
       transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     body.header-is-collapsed nav.tabs {
       top: 0;
     }
     nav.tabs button {
-      padding: 8px 14px;
-      font-size: 13px;
+      padding: 6px 12px;
+      font-size: 12.5px;
+    }
     .panel {
-      padding: 16px 12px;
+      padding: 14px 10px;
       border-radius: var(--radius-md);
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
-    footer { padding: 18px 14px max(32px, env(safe-area-inset-bottom, 32px)); }
+    footer { padding: 14px 12px max(28px, env(safe-area-inset-bottom, 28px)); }
   }
 
   @media (max-width: 480px) {
-    .openpos-kpi-row { grid-template-columns: 1fr; }
     .toolbar .btn { flex: 1 1 calc(50% - 6px); justify-content: center; text-align: center; }
   }
 
   /* Print Stylesheet for Tax Filing */
   @media print {
     header { background: none; border-bottom: 2px solid #000; padding: 10px 0; }
-    .glass-card, .toolbar, nav.tabs, .tabs-actions, footer, .badge-github, .chart-card, .stablecoin-input-bar { display: none !important; }
+    .glass-card, .toolbar, nav.tabs, .tabs-actions, footer, .badge-github, .chart-card { display: none !important; }
     .panel { display: block !important; border: none; box-shadow: none; padding: 0; background: none; }
     body { background: #fff; color: #000; font-size: 11px; }
     table { min-width: 100%; font-size: 10px; page-break-inside: auto; background: #fff; }
@@ -998,13 +932,16 @@
       <div class="pig-logo"><img src="icon.svg" alt="Piggy Logo" width="44" height="44"></div>
       <div>
         <h1>Piggy</h1>
-        <p>Czech Securities Tax &amp; FIFO Engine • Časový test • GFŘ jednotné kurzy</p>
+        <p id="hdr-subtitle" data-i18n="subtitle">Daňová kalkulačka cenných papírů • Časový test • GFŘ jednotné kurzy</p>
       </div>
     </div>
     <div class="header-badges">
+      <button class="badge badge-lang" id="btnLang" title="Přepnout jazyk / Switch language">
+        <span id="langFlag">🇨🇿</span> <span id="langName">Čeština</span>
+      </button>
       <span class="badge badge-privacy">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
-        100% Client-Side Privacy
+        <span id="badge-privacy-txt" data-i18n="privacyBadge">100% soukromí v prohlížeči</span>
       </span>
       <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer" class="badge badge-github">
         <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -1020,15 +957,15 @@
     <div class="input-grid">
       <div class="dropzone" id="drop">
         <div class="dropzone-icon">📁</div>
-        <div class="big">Drag &amp; drop broker export (.CSV / .TSV)</div>
-        <div class="small">Or click here to browse files on your device</div>
+        <div class="big" data-i18n="dropBig">Přetáhněte export z brokera (.CSV / .TSV)</div>
+        <div class="small" data-i18n="dropSmall">Nebo klikněte sem pro výběr souborů z vašeho zařízení</div>
         <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
       </div>
 
       <div class="paste-zone" id="btnPasteClipboard">
         <div class="paste-icon">📋</div>
-        <div class="big">Paste from Clipboard</div>
-        <div class="small">Click to import copied trade cells, or use <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
+        <div class="big" data-i18n="pasteBig">Vložit ze schránky</div>
+        <div class="small" data-i18n="pasteSmall">Klikněte pro import zkopírovaných obchodů nebo použijte <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
       </div>
     </div>
 
@@ -1036,18 +973,18 @@
     <div class="loaded-files-box" id="loaded-box" hidden>
       <div class="loaded-header">
         <div class="loaded-title">
-          <span>📦 Loaded Files &amp; Datasets</span>
+          <span data-i18n="loadedFiles">📦 Načtené soubory a data</span>
           <span class="badge-count" id="loaded-count">0</span>
         </div>
-        <button class="btn btn-clear" id="btnClear" style="padding:4px 12px;font-size:12px;min-height:auto;">✕ Clear All</button>
+        <button class="btn btn-clear" id="btnClear" style="padding:4px 12px;font-size:12px;min-height:auto;" data-i18n="clearAll">✕ Vymazat vše</button>
       </div>
       <div id="loaded-chips"></div>
     </div>
 
     <div class="toolbar">
-      <button class="btn btn-demo" id="btnDemo">📑 Load Demo Portfolio</button>
-      <button class="btn" id="btnTemplate">📑 Load Template</button>
-      <button class="btn" id="btnDownloadTemplate">⬇️ Download Template (.csv)</button>
+      <button class="btn btn-demo" id="btnDemo" data-i18n="btnDemo">📑 Načíst demo portfolio</button>
+      <button class="btn" id="btnTemplate" data-i18n="btnTemplate">📑 Načíst šablonu</button>
+      <button class="btn" id="btnDownloadTemplate" data-i18n="btnDownloadTemplate">⬇️ Stáhnout šablonu (.csv)</button>
     </div>
     <div id="messages"></div>
   </section>
@@ -1059,12 +996,12 @@
       <div class="chart-header">
         <div class="chart-title">
           <span>📊</span>
-          <span>Yearly Taxable Performance (Přehled daňových příjmů a výdajů v CZK)</span>
+          <span data-i18n="chartTitle">Přehled daňových příjmů a výdajů v CZK</span>
         </div>
         <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot dot-inc"></div> Taxable Income (Příjmy)</div>
-          <div class="legend-item"><div class="legend-dot dot-out"></div> Taxable Expenses (Výdaje)</div>
-          <div class="legend-item"><div class="legend-dot dot-net"></div> Net Tax Base (Základ daně)</div>
+          <div class="legend-item"><div class="legend-dot dot-inc"></div> <span data-i18n="legendInc">Daňové příjmy</span></div>
+          <div class="legend-item"><div class="legend-dot dot-out"></div> <span data-i18n="legendOut">Daňové výdaje</span></div>
+          <div class="legend-item"><div class="legend-dot dot-net"></div> <span data-i18n="legendNet">Základ daně</span></div>
         </div>
       </div>
       <div id="chart-container" style="width: 100%; height: 200px;"></div>
@@ -1072,108 +1009,52 @@
 
     <!-- Navigation Tabs -->
     <nav class="tabs" id="tabs">
-      <button data-tab="souhrn" class="active">Summary (Souhrn)</button>
-      <button data-tab="roky">By Year (Podle roků)</button>
-      <button data-tab="akcie">By Symbol (Podle tickeru)</button>
-      <button data-tab="pozice">Open Positions (Otevřené)</button>
+      <button data-tab="souhrn" class="active" data-i18n="tabSouhrn">Souhrn</button>
+      <button data-tab="roky" data-i18n="tabRoky">Podle roků</button>
+      <button data-tab="akcie" data-i18n="tabAkcie">Podle tickeru</button>
+      <button data-tab="pozice" data-i18n="tabPozice">Otevřené pozice</button>
     </nav>
 
     <div id="warnings"></div>
 
     <div class="panel active" id="panel-souhrn">
-      <h2 class="section">Summary – Taxable Income and Expenses by Year</h2>
+      <h2 class="section" data-i18n="secSouhrn">Souhrn – Zdanitelné příjmy a výdaje podle roků</h2>
       <div id="out-souhrn"></div>
     </div>
     <div class="panel" id="panel-roky">
-      <h2 class="section">Yearly Trade Ledger</h2>
+      <h2 class="section" data-i18n="secRoky">Daňový deník obchodů podle roků</h2>
       <div id="out-roky"></div>
     </div>
     <div class="panel" id="panel-akcie">
-      <h2 class="section">Breakdown by Security Symbol</h2>
+      <h2 class="section" data-i18n="secAkcie">Přehled podle jednotlivých tickerů</h2>
       <div id="out-akcie"></div>
     </div>
     <div class="panel" id="panel-pozice">
-      <h2 class="section">Open Positions &amp; Portfolio Asset Allocation</h2>
+      <h2 class="section" data-i18n="secPozice">Otevřené pozice a alokace portfolia</h2>
       <div id="out-pozice"></div>
     </div>
   </section>
 
   <!-- Technical Information & Exchange Rates -->
   <details id="info-rates">
-    <summary>Exchange Rates Used for Translation (GFŘ Uniform Rate Notice)</summary>
+    <summary data-i18n="ratesSummary">Použité směnné kurzy (Jednotné kurzy GFŘ)</summary>
     <table class="rates">
-      <thead><tr><th>Year</th><th class="num">USD / CZK</th><th class="num">EUR / CZK</th></tr></thead>
+      <thead><tr><th>Rok</th><th class="num">USD / CZK</th><th class="num">EUR / CZK</th></tr></thead>
       <tbody id="rates-body"></tbody>
     </table>
-    <p class="info" style="margin-top:8px">
-      Piggy applies the official uniform exchange rates (jednotné kurzy) published annually by the Czech General Financial Directorate (GFŘ).
-      Taxable income and expenses are converted in accordance with the Supreme Administrative Court (NSS) ruling of 2019.
+    <p class="info" style="margin-top:8px" data-i18n="ratesInfo">
+      Piggy používá oficiální jednotné kurzy vyhlašované každoročně Generálním finančním ředitelstvím (GFŘ).
+      Daňové příjmy a výdaje jsou přepočítávány v souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019.
     </p>
-  </details>
-
-  <!-- Comprehensive Legal Use Case & Technical Guide -->
-  <h2 class="section" style="margin-top:32px">Czech Tax Guide &amp; Import Documentation</h2>
-
-  <details class="faq" open>
-    <summary>🇨🇿 Czech Tax Law Foundations &amp; § 10 ZDP Use Case</summary>
-    <p>Piggy is built specifically for tax residents in the <strong>Czech Republic</strong> trading securities (shares, ETFs, investment funds, bonds) and stablecoins under the Czech Income Tax Act (<em>Zákon o daních z příjmů č. 586/1992 Sb. – ZDP</em>):</p>
-    <ul>
-      <li style="margin-bottom:8px"><strong>§ 10 ZDP (Other Income – Capital Gains)</strong>: Profit from securities sales by individuals is taxed as other income. Tax Base = Gross Taxable Revenues − (Acquisition Costs + Acquisition &amp; Disposition Transaction Fees).</li>
-      <li style="margin-bottom:8px"><strong>Strict FIFO Lot Matching</strong>: Under Czech Supreme Administrative Court (NSS) jurisprudence (notably 2019), lot matching across time must follow the chronological <strong>First-In, First-Out (FIFO)</strong> methodology. Piggy automatically splits purchases, matches lots chronologically, and tracks remaining balances.</li>
-      <li style="margin-bottom:8px"><strong>3-Year Time Test Exemption (<em>Časový test</em> § 4(1)(w) ZDP)</strong>: Income from securities held for longer than <strong>36 months (3 years)</strong> is completely tax-exempt. (For securities acquired before 1.1.2014, the historical 6-month test applies). Piggy automatically identifies exempt trades, isolates their cost bases, and outputs exempt proceeds separately.</li>
-      <li style="margin-bottom:8px"><strong>100 000 Kč Annual Revenue Limit (§ 4(1)(w) ZDP)</strong>: If your total gross annual proceeds from non-exempt security sales in a calendar year do not exceed 100 000 Kč, the income is legally exempt from income tax and does not need to be declared under § 10. Piggy alerts you with a highlight banner whenever a year qualifies.</li>
-      <li style="margin-bottom:8px"><strong>Official GFŘ Uniform Exchange Rates (<em>Jednotné kurzy</em>)</strong>: Multi-currency trades (USD, EUR, CZK) are converted using the official annual uniform exchange rates published by the Czech General Financial Directorate (GFŘ). Acquisition expenses are converted at the uniform rate of the purchase year; sales revenues are converted at the uniform rate of the sale year.</li>
-      <li><strong>Loss Asymmetry Notice</strong>: Under Czech tax law, net security trading losses in a calendar year cannot be offset against ordinary employment (§ 6) or business (§ 7) income, nor can they be carried forward to future tax years.</li>
-    </ul>
-  </details>
-
-  <details class="faq">
-    <summary>📂 Supported Import Formats, Delimiters &amp; Brokers</summary>
-    <p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p>
-    <ul>
-      <li style="margin-bottom:6px"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li>
-      <li style="margin-bottom:6px"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\t</code>).</li>
-      <li style="margin-bottom:6px"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li>
-      <li style="margin-bottom:6px"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li>
-      <li><strong>Supported Brokers</strong>:
-        <strong>Fio banka e-Broker</strong> (direct CSV export),
-        <strong>Degiro</strong> (Transactions CSV),
-        <strong>Interactive Brokers</strong> (Trades report / custom flex query),
-        <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.
-      </li>
-    </ul>
-  </details>
-
-  <details class="faq">
-    <summary>📋 Required Columns &amp; Multilingual Headers (Czech &amp; English)</summary>
-    <p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers:</p>
-    <table class="faq-cols">
-      <thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead>
-      <tbody>
-        <tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr>
-        <tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr>
-        <tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr>
-        <tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr>
-        <tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr>
-        <tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr>
-        <tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr>
-        <tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr>
-      </tbody>
-    </table>
-  </details>
-
-  <details class="faq">
-    <summary>📑 Can this report be submitted as tax evidence?</summary>
-    <p>Yes. The exported <code>piggy-report.csv</code> provides the exact lot-by-lot FIFO matching, holding period classifications, GFŘ exchange rate conversions, and net tax bases expected by financial offices (<em>finanční úřad</em>) as supporting annex documentation for § 10 of your tax return (<em>Příloha č. 2 daňového přiznání</em>).</p>
   </details>
 </main>
 
 <footer>
   <div>
-    <strong>Piggy v1.1.0</strong> • 100% Client-Side Privacy
+    <strong>Piggy</strong> • <span data-i18n="footerPrivacy">100% soukromí v prohlížeči • Žádná data neopouštějí váš počítač</span>
   </div>
   <div>
-    <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer">github.com/artemmoloshtan/piggy</a>
+    <a href="https://github.com/artemmoloshtan/piggy" target="_blank" rel="noopener noreferrer">GitHub</a>
   </div>
 </footer>
 
@@ -1223,9 +1104,12 @@ function pairTaxable(sell, buy){
 
 function parseNumber(s){
   if (s == null) return 0;
+  s = String(s).trim();
+  const isParenNeg = /^\(.*\)$/.test(s);
   // Clean whitespace and any embedded currency labels/signs
-  s = String(s).trim().replace(/[\s\u00A0$€KčkčCZKUSDEUR]/gi,'');
-  if (s === '') return 0;
+  s = s.replace(/[\s\u00A0$€KčkčCZKUSDEUR]/gi,'');
+  if (isParenNeg && !s.startsWith('-')) s = '-' + s.replace(/[()]/g, '');
+  if (s === '' || s === '-') return 0;
   const lastSep = Math.max(s.lastIndexOf(','), s.lastIndexOf('.'));
   let v;
   if (lastSep >= 0){
@@ -1338,6 +1222,9 @@ function normalizeRows(csvResult){
     let qty = Math.abs(parseNumber(r[4]));
     const fee = Math.abs(parseNumber(r[7]));
     let objem = parseNumber(r[6]);
+    if (!objem && price && qty){
+      objem = (dir === 'B' ? -1 : 1) * (price * qty);
+    }
 
     if (!qty){
       const fallback = objem ? Math.abs(objem) : 0;
@@ -1537,17 +1424,218 @@ const $ = (id)=>document.getElementById(id);
 let state = null;
 let loadedFiles = [];
 let highlight = { set: new Set() };
-let customCashEntries = [];
-let cashIdCounter = 1;
-let customStablecoin = { amount: 0, currency: 'USD' }; // backward-compat alias
 
 // User-defined / live market price overrides for open positions
 let marketPrices = {};
 
-const STABLECOIN_SYMBOLS = new Set(['USDT', 'USDC', 'DAI', 'FDUSD', 'BUSD', 'TUSD', 'USDD', 'EURC', 'PYUSD', 'USDP', 'USDG']);
-function isStablecoin(sym){
-  if (!sym) return false;
-  return STABLECOIN_SYMBOLS.has(String(sym).trim().toUpperCase());
+// Localization (Default: Czech, English includes key Czech terms)
+let currentLang = localStorage.getItem('piggy_lang') || 'cs';
+
+const I18N = {
+  cs: {
+    pageTitle: "Piggy – Daňová kalkulačka cenných papírů & FIFO engine",
+    subtitle: "Daňová kalkulačka cenných papírů • Časový test • GFŘ jednotné kurzy",
+    privacyBadge: "100% soukromí v prohlížeči",
+    langName: "Čeština",
+    langFlag: "🇨🇿",
+    dropBig: "Přetáhněte export z brokera (.CSV / .TSV)",
+    dropSmall: "Nebo klikněte sem pro výběr souborů z vašeho zařízení",
+    pasteBig: "Vložit ze schránky",
+    pasteSmall: "Klikněte pro import zkopírovaných obchodů nebo použijte Ctrl+V / Cmd+V",
+    loadedFiles: "📦 Načtené soubory a data",
+    clearAll: "✕ Vymazat vše",
+    btnDemo: "📑 Načíst demo portfolio",
+    btnTemplate: "📑 Načíst šablonu",
+    btnDownloadTemplate: "⬇️ Stáhnout šablonu (.csv)",
+    chartTitle: "Přehled daňových příjmů a výdajů v CZK",
+    legendInc: "Daňové příjmy",
+    legendOut: "Daňové výdaje",
+    legendNet: "Základ daně",
+    tabSouhrn: "Souhrn",
+    tabRoky: "Podle roků",
+    tabAkcie: "Podle tickeru",
+    tabPozice: "Otevřené pozice",
+    secSouhrn: "Souhrn – Zdanitelné příjmy a výdaje podle roků",
+    secRoky: "Daňový deník obchodů podle roků",
+    secAkcie: "Přehled podle jednotlivých tickerů",
+    secPozice: "Otevřené pozice a alokace portfolia",
+    ratesSummary: "Použité směnné kurzy (Jednotné kurzy GFŘ)",
+    ratesInfo: "Piggy používá oficiální jednotné kurzy vyhlašované každoročně Generálním finančním ředitelstvím (GFŘ). Daňové příjmy a výdaje jsou přepočítávány v souladu s judikaturou Nejvyššího správního soudu (NSS) z roku 2019.",
+    footerPrivacy: "100% soukromí v prohlížeči • Žádná data neopouštějí váš počítač",
+    kpiTotalPortfolio: "Celková hodnota portfolia",
+    kpiCostBasis: "Pořizovací hodnota",
+    kpiUnrealizedPnl: "Nerealizovaný zisk / ztráta",
+    pieCardTitle: "Alokace portfolia (tržní hodnota)",
+    pieTotal: "Celkem:",
+    pieTotalVal: "Celková hodnota",
+    noData: "Žádná data",
+    noOpenPos: "Žádné otevřené pozice nezbývají. Všechny pozice jsou uzavřeny.",
+    noRealizedSales: "Žádné realizované zdanitelné prodeje k zobrazení.",
+    noTradesRecorded: "Žádné zaznamenané obchody.",
+    noSymbolData: "Žádná data podle tickerů.",
+    colYear: "Rok",
+    colCurrency: "Měna",
+    colTaxInc: "Daňové příjmy",
+    colTaxOut: "Daňové výdaje",
+    colTaxIncCZK: "Daňové příjmy (CZK)",
+    colTaxOutCZK: "Daňové výdaje (CZK)",
+    colTaxBaseCZK: "Základ daně (CZK)",
+    colViewTrades: "Zobrazit obchody →",
+    colDateTime: "Datum a čas",
+    colDirection: "Směr",
+    colSymbol: "Symbol (Ticker)",
+    colQuantity: "Počet",
+    colPrice: "Cena",
+    colFees: "Poplatky",
+    colVolume: "Objem",
+    colProfit: "Zisk",
+    colNetPos: "Zůstatek",
+    colAcqDate: "Datum pořízení",
+    colAvgEntry: "Prům. nákupní cena",
+    colCurPrice: "Aktuální cena",
+    colCurVal: "Tržní hodnota",
+    colWeight: "Váha",
+    colUnrealizedPnlShort: "Nerealizovaný Z/Z",
+    typeBuy: "Nákup",
+    typeSell: "Prodej",
+    typeShortBuy: "Krytí shortu",
+    typeShortSale: "Prodej na krátko",
+    typeLong: "Long",
+    typeShort: "Short",
+    yearTotal: "Celkem rok",
+    netHolding: "Aktuální držení",
+    shares: "ks",
+    lots: "dávek",
+    lot: "Dávka",
+    alert100k: "💡 Celkové hrubé příjmy v roce {year} nepřesáhly 100 000 Kč — prodeje mohou být osvobozeny od daně podle § 4 odst. 1 písm. w) ZDP. Ověřte u svého daňového poradce.",
+    taxBaseNote: "Základ daně = Daňové příjmy − Daňové výdaje. Upozornění: Ztrátu z prodeje cenných papírů nelze v ČR kompenzovat proti příjmům ze zaměstnání ani přenášet do dalších let.",
+    itemsCount: "{n} položek",
+    itemCount: "1 položka",
+    clipboardEmpty: "Schránka je prázdná nebo neobsahuje text.",
+    clipboardError: "Oprávnění ke schránce nebylo uděleno. Použijte Ctrl+V nebo Cmd+V.",
+    clipboardNotAvail: "API schránky není v tomto prohlížeči k dispozici. Použijte Ctrl+V nebo Cmd+V.",
+    exportReportTitle: "Přehled obchodů s cennými papíry",
+    exportSummary: "SOUHRN",
+    exportByYear: "PODLE ROKŮ"
+  },
+  en: {
+    pageTitle: "Piggy – Czech Securities Tax & FIFO Engine",
+    subtitle: "Czech Securities Tax & FIFO Engine • Time Test (Časový test) • GFŘ Uniform Rates (Jednotné kurzy)",
+    privacyBadge: "100% Client-Side Privacy",
+    langName: "English",
+    langFlag: "🇬🇧",
+    dropBig: "Drag & drop broker export (.CSV / .TSV)",
+    dropSmall: "Or click here to browse files on your device",
+    pasteBig: "Paste from Clipboard",
+    pasteSmall: "Click to import copied trade cells, or use Ctrl+V / Cmd+V",
+    loadedFiles: "📦 Loaded Files & Datasets",
+    clearAll: "✕ Clear All",
+    btnDemo: "📑 Load Demo Portfolio",
+    btnTemplate: "📑 Load Template",
+    btnDownloadTemplate: "⬇️ Download Template (.csv)",
+    chartTitle: "Yearly Taxable Performance (Přehled daňových příjmů a výdajů v CZK)",
+    legendInc: "Taxable Income (Příjmy)",
+    legendOut: "Taxable Expenses (Výdaje)",
+    legendNet: "Net Tax Base (Základ daně)",
+    tabSouhrn: "Summary (Souhrn)",
+    tabRoky: "By Year (Podle roků)",
+    tabAkcie: "By Symbol (Podle tickeru)",
+    tabPozice: "Open Positions (Otevřené pozice)",
+    secSouhrn: "Summary – Taxable Income and Expenses by Year",
+    secRoky: "Yearly Trade Ledger (Deník obchodů podle roků)",
+    secAkcie: "Breakdown by Security Symbol (Podle tickeru)",
+    secPozice: "Open Positions & Portfolio Asset Allocation (Otevřené pozice)",
+    ratesSummary: "Exchange Rates Used for Translation (GFŘ Uniform Rates / Jednotné kurzy)",
+    ratesInfo: "Piggy applies official uniform exchange rates (jednotné kurzy) published annually by the Czech General Financial Directorate (GFŘ). Converted in accordance with Supreme Administrative Court (NSS) case law.",
+    footerPrivacy: "100% Client-Side Privacy • Zero network requests",
+    kpiTotalPortfolio: "Total Portfolio Value",
+    kpiCostBasis: "Cost Basis (Pořizovací hodnota)",
+    kpiUnrealizedPnl: "Unrealized P/L (Nerealizovaný zisk / ztráta)",
+    pieCardTitle: "Portfolio Allocation Breakdown (Market Value)",
+    pieTotal: "Total:",
+    pieTotalVal: "Total Value",
+    noData: "No data",
+    noOpenPos: "No open positions remaining. All positions are closed.",
+    noRealizedSales: "No realized taxable sales to display.",
+    noTradesRecorded: "No trades recorded.",
+    noSymbolData: "No symbol data.",
+    colYear: "Year",
+    colCurrency: "Currency",
+    colTaxInc: "Taxable Income (Příjmy)",
+    colTaxOut: "Taxable Expenses (Výdaje)",
+    colTaxIncCZK: "Taxable Income (CZK)",
+    colTaxOutCZK: "Taxable Expenses (CZK)",
+    colTaxBaseCZK: "Net Tax Base (Základ daně CZK)",
+    colViewTrades: "View trades →",
+    colDateTime: "Date & Time",
+    colDirection: "Direction (Směr)",
+    colSymbol: "Symbol (Ticker)",
+    colQuantity: "Quantity (Počet)",
+    colPrice: "Price (Cena)",
+    colFees: "Fees (Poplatky)",
+    colVolume: "Volume (Objem)",
+    colProfit: "Profit (Zisk)",
+    colNetPos: "Net Position",
+    colAcqDate: "Acquisition Date (Datum pořízení)",
+    colAvgEntry: "Avg Entry Price (Nákupní cena)",
+    colCurPrice: "Market Price (Tržní cena)",
+    colCurVal: "Market Value (Tržní hodnota)",
+    colWeight: "Weight (Váha)",
+    colUnrealizedPnlShort: "Unrealized P/L (Z/Z)",
+    typeBuy: "Buy (Nákup)",
+    typeSell: "Sell (Prodej)",
+    typeShortBuy: "Short Cover (Krytí)",
+    typeShortSale: "Short Sale (Prodej)",
+    typeLong: "Long",
+    typeShort: "Short",
+    yearTotal: "Total for",
+    netHolding: "Net Holding",
+    shares: "shares",
+    lots: "lots",
+    lot: "Lot",
+    alert100k: "💡 Gross annual revenues in {year} did not exceed 100 000 Kč — sales may qualify for exemption under § 4(1)(w) ZDP (Časový test / Limit 100k). Consult your tax advisor.",
+    taxBaseNote: "Tax Base (Základ daně) = Taxable Income − Taxable Expenses. Note that under Czech tax law, security trading losses cannot be offset against ordinary employment income or carried forward to future years.",
+    itemsCount: "{n} items",
+    itemCount: "1 item",
+    clipboardEmpty: "Clipboard is empty or does not contain text.",
+    clipboardError: "Clipboard permission was not granted. Please use Ctrl+V or Cmd+V.",
+    clipboardNotAvail: "Clipboard API is not available. Please use Ctrl+V or Cmd+V.",
+    exportReportTitle: "Report of Securities Trading (Přehled obchodů s CP)",
+    exportSummary: "SUMMARY (SOUHRN)",
+    exportByYear: "BY YEAR (PODLE ROKŮ)"
+  }
+};
+
+function t(key, params){
+  const dict = I18N[currentLang] || I18N.cs;
+  let str = dict[key] != null ? dict[key] : (I18N.cs[key] != null ? I18N.cs[key] : key);
+  if (params){
+    for (const [k, v] of Object.entries(params)){
+      str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), v);
+    }
+  }
+  return str;
+}
+
+function setLanguage(lang){
+  currentLang = (lang === 'en') ? 'en' : 'cs';
+  localStorage.setItem('piggy_lang', currentLang);
+  applyI18n();
+  if (state) renderAll(state);
+}
+
+function applyI18n(){
+  document.title = t('pageTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (key){
+      el.textContent = t(key);
+    }
+  });
+  const flagEl = $('langFlag');
+  if (flagEl) flagEl.textContent = t('langFlag');
+  const nameEl = $('langName');
+  if (nameEl) nameEl.textContent = t('langName');
 }
 
 // Updated Demo Portfolio spanning 2022, 2023, 2024, and 2025 featuring HOLDING-3Y, FIFO, SHORT, and USDT
@@ -1607,13 +1695,13 @@ function fmtDateTime(d){
 function objemOf(t){ return t.dir==='B' ? -(t.price*t.qty + t.fee) : (t.price*t.qty - t.fee); }
 function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function typeLabel(t, groups){
-  if (t.dir === 'B'){
-    const coversShort = groups.some(g=>g.trade.id!==t.id && g.pairs.some(p=>p.buy.id===t.id && p.sell.tradeDate < t.tradeDate));
-    return coversShort ? {text:'Short Buy', cls:'t-cov'} : {text:'Buy', cls:'t-buy'};
+function typeLabel(tObj, groups){
+  if (tObj.dir === 'B'){
+    const coversShort = groups.some(g=>g.trade.id!==tObj.id && g.pairs.some(p=>p.buy.id===tObj.id && p.sell.tradeDate < tObj.tradeDate));
+    return coversShort ? {text: t('typeShortBuy'), cls:'t-cov'} : {text: t('typeBuy'), cls:'t-buy'};
   }
-  const g = groups.find(x=>x.trade.id===t.id);
-  return g && g.hasOpenShort ? {text:'Short Sale', cls:'t-short'} : {text:'Sell', cls:'t-sell'};
+  const g = groups.find(x=>x.trade.id===tObj.id);
+  return g && g.hasOpenShort ? {text: t('typeShortSale'), cls:'t-short'} : {text: t('typeSell'), cls:'t-sell'};
 }
 
 // ---- File & Data Ingestion ------------------------------------------------
@@ -1621,7 +1709,7 @@ function processText(text, sourceName){
   const csv = parseCsv(text);
   if (csv.error){ showError(csv.error + (sourceName ? ' ('+sourceName+')' : '')); return null; }
   const { trades } = normalizeRows(csv);
-  if (!trades.length){ showError('No valid trades found in "'+sourceName+'". Check required columns in FAQ.'); return null; }
+  if (!trades.length){ showError('No valid trades found in "'+sourceName+'".'); return null; }
   return trades;
 }
 
@@ -1660,7 +1748,7 @@ function renderLoaded(){
     return;
   }
   if (box) box.hidden = false;
-  if (countEl) countEl.textContent = loadedFiles.length + (loadedFiles.length === 1 ? ' item' : ' items');
+  if (countEl) countEl.textContent = loadedFiles.length === 1 ? t('itemCount') : t('itemsCount', { n: loadedFiles.length });
   if (chipsEl){
     chipsEl.innerHTML = loadedFiles.map((f,i)=>
       '<span class="file-chip"><span>📄 '+esc(f.name)+' ('+f.trades.length+' trades)</span><button data-rm="'+i+'" title="Remove file">✕</button></span>'
@@ -1672,7 +1760,6 @@ function clearAll(){
   loadedFiles = [];
   state = null;
   marketPrices = {};
-  customCashEntries = [];
   $('results').hidden = true;
   $('messages').innerHTML = '';
   renderLoaded();
@@ -1707,7 +1794,7 @@ function renderChart(st){
   const el = $('chart-container');
   const years = st.byYear.filter(y=>y.totals.incC > 0 || y.totals.outC > 0);
   if (!years.length){
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-sub);font-size:13.5px;font-weight:500">No realized taxable sales to display.</div>';
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-sub);font-size:13.5px;font-weight:500">' + t('noRealizedSales') + '</div>';
     return;
   }
 
@@ -1732,11 +1819,11 @@ function renderChart(st){
     const netColor = net >= 0 ? '#f59e0b' : '#ef4444';
 
     // Income bar (green)
-    svg += '<rect x="'+(cx - barWidth*1.65)+'" y="'+(h - padBottom - incH)+'" width="'+barWidth+'" height="'+incH+'" rx="4" fill="#10b981" title="Taxable Income: '+fmtMoney(yr.totals.incC, 'CZK')+'" />';
+    svg += '<rect x="'+(cx - barWidth*1.65)+'" y="'+(h - padBottom - incH)+'" width="'+barWidth+'" height="'+incH+'" rx="4" fill="#10b981"><title>'+t('legendInc')+': '+fmtMoney(yr.totals.incC, 'CZK')+'</title></rect>';
     // Expense bar (red)
-    svg += '<rect x="'+(cx - barWidth*0.5)+'" y="'+(h - padBottom - outH)+'" width="'+barWidth+'" height="'+outH+'" rx="4" fill="#ef4444" title="Taxable Expenses: '+fmtMoney(yr.totals.outC, 'CZK')+'" />';
+    svg += '<rect x="'+(cx - barWidth*0.5)+'" y="'+(h - padBottom - outH)+'" width="'+barWidth+'" height="'+outH+'" rx="4" fill="#ef4444"><title>'+t('legendOut')+': '+fmtMoney(yr.totals.outC, 'CZK')+'</title></rect>';
     // Net Base bar (amber or red if negative)
-    svg += '<rect x="'+(cx + barWidth*0.65)+'" y="'+(h - padBottom - netH)+'" width="'+barWidth+'" height="'+netH+'" rx="4" fill="'+netColor+'" title="Net Tax Base: '+fmtMoney(net, 'CZK')+'" />';
+    svg += '<rect x="'+(cx + barWidth*0.65)+'" y="'+(h - padBottom - netH)+'" width="'+barWidth+'" height="'+netH+'" rx="4" fill="'+netColor+'"><title>'+t('legendNet')+': '+fmtMoney(net, 'CZK')+'</title></rect>';
 
     // Year label
     svg += '<text x="'+cx+'" y="'+(h - 8)+'" font-size="12.5" font-weight="700" fill="var(--ink)" text-anchor="middle">'+yr.year+'</text>';
@@ -1754,13 +1841,16 @@ function renderWarnings(w){
 
 function renderSouhrn(st){
   const el = $('out-souhrn');
-  if (!st.byYear.length){ el.innerHTML='<p class="info">No realized sales in loaded history.</p>'; return; }
-  let h = '<table><thead><tr><th>Year</th><th>Currency</th>' +
-    '<th class="num">Tax Income</th>' +
-    '<th class="num">Tax Expenses</th>' +
-    '<th class="num">Tax Income (CZK)</th>' +
-    '<th class="num">Tax Expenses (CZK)</th>' +
-    '<th class="num">Tax Base (CZK)</th><th></th></tr></thead><tbody>';
+  if (!st.byYear.length){ el.innerHTML='<p class="info">'+t('noRealizedSales')+'</p>'; return; }
+  let h = '<table><thead><tr>' +
+    '<th>' + t('colYear') + '</th>' +
+    '<th>' + t('colCurrency') + '</th>' +
+    '<th class="num">' + t('colTaxInc') + '</th>' +
+    '<th class="num">' + t('colTaxOut') + '</th>' +
+    '<th class="num">' + t('colTaxIncCZK') + '</th>' +
+    '<th class="num">' + t('colTaxOutCZK') + '</th>' +
+    '<th class="num">' + t('colTaxBaseCZK') + '</th>' +
+    '<th></th></tr></thead><tbody>';
 
   for (const yr of st.byYear){
     for (const r of yr.rows){
@@ -1769,53 +1859,63 @@ function renderSouhrn(st){
         '<td class="num">'+fmtMoney(r.incN, r.currency)+'</td><td class="num">'+fmtMoney(-r.outN, r.currency)+'</td>' +
         '<td class="num">'+fmtMoney(r.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-r.outC, 'CZK')+'</td>' +
         '<td class="num" style="font-weight:700;color:'+(zakl>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(zakl, 'CZK')+'</td>' +
-        '<td>'+(r===yr.rows[0]?'<button class="look" data-goto="rok-'+yr.year+'">View trades →</button>':'')+'</td></tr>';
+        '<td>'+(r===yr.rows[0]?'<button class="look" data-goto="rok-'+yr.year+'">'+t('colViewTrades')+'</button>':'')+'</td></tr>';
     }
     const tot = yr.totals;
     const totNet = tot.incC - tot.outC;
-    h += '<tr class="total-row"><td>'+yr.year+' Total</td><td></td><td class="num"></td><td class="num"></td>' +
+    h += '<tr class="total-row"><td>' + t('yearTotal') + ' ' + yr.year + '</td><td></td><td class="num"></td><td class="num"></td>' +
       '<td class="num">'+fmtMoney(tot.incC, 'CZK')+'</td><td class="num">'+fmtMoney(-tot.outC, 'CZK')+'</td>' +
       '<td class="num" style="font-weight:800;color:'+(totNet>=0?'var(--green)':'var(--red)')+'">'+fmtMoney(totNet, 'CZK')+'</td><td></td></tr>';
 
     if (tot.incC > 0 && tot.incC <= 100000){
       h += '<tr class="dim"><td colspan="8">' +
-        '💡 <em>Total gross income in '+yr.year+' did not exceed 100 000 Kč — sales may qualify for exemption under § 4(1)(w) ZDP. Check with your accountant.</em>' +
+        t('alert100k', { year: yr.year }) +
         '</td></tr>';
     }
   }
   h += '</tbody></table>';
-  h += '<p class="info" style="margin-top:10px">Tax Base = Taxable Income − Taxable Expenses. Note that Czech security trading losses cannot be offset against ordinary employment income or carried over across tax years.</p>';
+  h += '<p class="info" style="margin-top:10px">' + t('taxBaseNote') + '</p>';
   el.innerHTML = h;
 }
 
 function renderRoky(st){
   const el = $('out-roky');
   const years = [...new Set(st.flow.map(f=>f.trade.year))].sort((a,b)=>a-b);
-  if (!years.length){ el.innerHTML='<p class="info">No trades recorded.</p>'; return; }
+  if (!years.length){ el.innerHTML='<p class="info">'+t('noTradesRecorded')+'</p>'; return; }
   let h = '';
   for (const year of years){
     const list = st.flow.filter(f=>f.trade.year===year)
       .sort((a,b)=> a.trade.tradeDate-b.trade.tradeDate || a.trade.id-b.trade.id);
     if (!list.length) continue;
-    h += '<h3 class="group" id="rok-'+year+'">Year '+year+' ('+list.length+' trades)</h3>';
-    h += '<table><thead><tr><th>Date &amp; Time</th><th>Direction</th><th>Symbol</th>' +
-      '<th class="num">Quantity</th><th class="num">Price</th><th class="num">Fees</th><th class="num">Volume</th>' +
-      '<th class="num">Profit</th><th class="num">Tax Income</th><th class="num">Tax Expenses</th></tr></thead><tbody>';
+    const countTrades = list.length === 1 ? t('itemCount') : t('itemsCount', { n: list.length });
+    h += '<h3 class="group" id="rok-'+year+'">' + t('colYear') + ' ' + year + ' (' + countTrades + ')</h3>';
+    h += '<table><thead><tr>' +
+      '<th>' + t('colDateTime') + '</th>' +
+      '<th>' + t('colDirection') + '</th>' +
+      '<th>' + t('colSymbol') + '</th>' +
+      '<th class="num">' + t('colQuantity') + '</th>' +
+      '<th class="num">' + t('colPrice') + '</th>' +
+      '<th class="num">' + t('colFees') + '</th>' +
+      '<th class="num">' + t('colVolume') + '</th>' +
+      '<th class="num">' + t('colProfit') + '</th>' +
+      '<th class="num">' + t('colTaxIncCZK') + '</th>' +
+      '<th class="num">' + t('colTaxOutCZK') + '</th>' +
+      '</tr></thead><tbody>';
     for (const f of list){
-      const t = f.trade;
-      const isSale = t.dir === 'S';
-      const groups = st.groups.filter(g=>g.symbol===t.symbol);
-      const tl = typeLabel(t, groups);
-      const g = isSale ? groups.find(x=>x.trade.id===t.id) : null;
-      h += '<tr data-symbol="'+esc(t.symbol)+'" data-trade="'+t.id+'"' + (isSale ? ' data-rowhl="sale-'+t.id+'"' : '') + '>' +
-        '<td>'+esc(fmtDateTime(t.tradeDate))+'</td>' +
+      const tTrade = f.trade;
+      const isSale = tTrade.dir === 'S';
+      const groups = st.groups.filter(g=>g.symbol===tTrade.symbol);
+      const tl = typeLabel(tTrade, groups);
+      const g = isSale ? groups.find(x=>x.trade.id===tTrade.id) : null;
+      h += '<tr data-symbol="'+esc(tTrade.symbol)+'" data-trade="'+tTrade.id+'"' + (isSale ? ' data-rowhl="sale-'+tTrade.id+'"' : '') + '>' +
+        '<td>'+esc(fmtDateTime(tTrade.tradeDate))+'</td>' +
         '<td><span class="type '+tl.cls+'">'+tl.text+'</span></td>' +
-        '<td><span class="sym" data-symbol2="'+esc(t.symbol)+'">'+esc(t.symbol)+'</span></td>' +
-        '<td class="num">'+fmt(t.qty, 4)+'</td>' +
-        '<td class="num">'+fmtMoney(t.price, t.currency)+'</td>' +
-        '<td class="num">'+fmtMoney(t.fee, t.currency)+'</td>' +
-        '<td class="num">'+fmtMoney(objemOf(t), t.currency)+'</td>' +
-        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, t.currency) : '—')+'</td>' +
+        '<td><span class="sym" data-symbol2="'+esc(tTrade.symbol)+'">'+esc(tTrade.symbol)+'</span></td>' +
+        '<td class="num">'+fmt(tTrade.qty, 4)+'</td>' +
+        '<td class="num">'+fmtMoney(tTrade.price, tTrade.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(tTrade.fee, tTrade.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(objemOf(tTrade), tTrade.currency)+'</td>' +
+        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, tTrade.currency) : '—')+'</td>' +
         '<td class="num">'+(g ? fmtMoney(g.taxInc, 'CZK') : '—')+'</td>' +
         '<td class="num">'+(g ? fmtMoney(-g.taxOut, 'CZK') : '—')+'</td></tr>';
     }
@@ -1826,27 +1926,35 @@ function renderRoky(st){
 
 function renderAkcie(st){
   const el = $('out-akcie');
-  if (!st.bySymbol.length){ el.innerHTML='<p class="info">No symbol data.</p>'; return; }
+  if (!st.bySymbol.length){ el.innerHTML='<p class="info">'+t('noSymbolData')+'</p>'; return; }
   let h = '';
   for (const s of st.bySymbol){
     const lastTrade = s.trades[s.trades.length-1];
-    h += '<h3 class="group" id="sym-'+esc(s.symbol)+'">'+esc(s.symbol)+' • Net Holding: '+fmt(lastTrade.net, 4)+' shares</h3>';
-    h += '<table><thead><tr><th>Date &amp; Time</th><th>Direction</th>' +
-      '<th class="num">Qty</th><th class="num">Price</th><th class="num">Fees</th><th class="num">Volume</th>' +
-      '<th class="num">Profit</th><th class="num">Tax Inc</th><th class="num">Tax Exp</th><th class="num">Net Position</th></tr></thead><tbody>';
+    h += '<h3 class="group" id="sym-'+esc(s.symbol)+'">'+esc(s.symbol)+' • ' + t('netHolding') + ': '+fmt(lastTrade.net, 4)+' ' + t('shares') + '</h3>';
+    h += '<table><thead><tr>' +
+      '<th>' + t('colDateTime') + '</th>' +
+      '<th>' + t('colDirection') + '</th>' +
+      '<th class="num">' + t('colQuantity') + '</th>' +
+      '<th class="num">' + t('colPrice') + '</th>' +
+      '<th class="num">' + t('colFees') + '</th>' +
+      '<th class="num">' + t('colVolume') + '</th>' +
+      '<th class="num">' + t('colProfit') + '</th>' +
+      '<th class="num">' + t('colTaxIncCZK') + '</th>' +
+      '<th class="num">' + t('colTaxOutCZK') + '</th>' +
+      '<th class="num">' + t('colNetPos') + '</th></tr></thead><tbody>';
     for (const f of s.trades){
-      const t = f.trade;
-      const isSale = t.dir === 'S';
-      const tl = typeLabel(t, s.groups);
-      const g = isSale ? s.groups.find(x=>x.trade.id===t.id) : null;
-      h += '<tr data-symbol="'+esc(t.symbol)+'" data-trade="'+t.id+'"' + (isSale ? ' data-rowhl="sale-'+t.id+'"' : '') + '>' +
-        '<td>'+esc(fmtDateTime(t.tradeDate))+'</td>' +
+      const tTrade = f.trade;
+      const isSale = tTrade.dir === 'S';
+      const tl = typeLabel(tTrade, s.groups);
+      const g = isSale ? s.groups.find(x=>x.trade.id===tTrade.id) : null;
+      h += '<tr data-symbol="'+esc(tTrade.symbol)+'" data-trade="'+tTrade.id+'"' + (isSale ? ' data-rowhl="sale-'+tTrade.id+'"' : '') + '>' +
+        '<td>'+esc(fmtDateTime(tTrade.tradeDate))+'</td>' +
         '<td><span class="type '+tl.cls+'">'+tl.text+'</span></td>' +
-        '<td class="num">'+fmt(t.qty, 4)+'</td>' +
-        '<td class="num">'+fmtMoney(t.price, t.currency)+'</td>' +
-        '<td class="num">'+fmtMoney(t.fee, t.currency)+'</td>' +
-        '<td class="num">'+fmtMoney(objemOf(t), t.currency)+'</td>' +
-        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, t.currency) : '—')+'</td>' +
+        '<td class="num">'+fmt(tTrade.qty, 4)+'</td>' +
+        '<td class="num">'+fmtMoney(tTrade.price, tTrade.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(tTrade.fee, tTrade.currency)+'</td>' +
+        '<td class="num">'+fmtMoney(objemOf(tTrade), tTrade.currency)+'</td>' +
+        '<td class="num" style="font-weight:600;color:'+(g && g.profit>=0?'var(--green)':'var(--red)')+'">'+(g ? fmtMoney(g.profit, tTrade.currency) : '—')+'</td>' +
         '<td class="num">'+(g ? fmtMoney(g.taxInc, 'CZK') : '—')+'</td>' +
         '<td class="num">'+(g ? fmtMoney(-g.taxOut, 'CZK') : '—')+'</td>' +
         '<td class="num" style="font-weight:700">'+fmt(f.net, 4)+'</td></tr>';
@@ -1858,32 +1966,26 @@ function renderAkcie(st){
 
 // ---- Open Positions with Real-Time Current Market Price & P/L --------------
 function getCombinedPositions(st){
-  const currYear = new Date().getFullYear();
   const combined = new Map();
   if (!st || !st.openPos) return combined;
 
   for (const pos of st.openPos){
     const sym = pos.trade.symbol;
-    const rate = rateFor(pos.trade.currency, pos.trade.year || currYear);
     const bookCostNative = Math.abs(pos.objem);
-    const bookCostCZK = bookCostNative * rate;
 
     if (!combined.has(sym)){
       combined.set(sym, {
         symbol: sym,
         currency: pos.trade.currency,
         kind: pos.kind,
-        isStable: isStablecoin(sym),
         totalQty: 0,
         totalBookCostNative: 0,
-        totalBookCostCZK: 0,
         lots: []
       });
     }
     const rec = combined.get(sym);
     rec.totalQty += pos.qty;
     rec.totalBookCostNative += bookCostNative;
-    rec.totalBookCostCZK += bookCostCZK;
     rec.lots.push(pos);
   }
 
@@ -1895,7 +1997,7 @@ function getCombinedPositions(st){
 
 function renderPieCardHtml(slices, totalPortfolioCZK){
   let h = '<div class="pie-card">';
-  h += '<div class="pie-card-title"><span>Portfolio Allocation Breakdown (Market Value)</span><span style="font-size:12.5px;font-weight:700;color:var(--ink-sub)">Total: ' + fmtMoney(totalPortfolioCZK, 'CZK') + '</span></div>';
+  h += '<div class="pie-card-title"><span>' + t('pieCardTitle') + '</span><span style="font-size:12.5px;font-weight:700;color:var(--ink-sub)">' + t('pieTotal') + ' ' + fmtMoney(totalPortfolioCZK, 'CZK') + '</span></div>';
   h += '<div class="pie-flex">';
   h += '<div class="pie-chart-wrap">';
   h += renderDonutSvg(slices, totalPortfolioCZK);
@@ -1907,9 +2009,6 @@ function renderPieCardHtml(slices, totalPortfolioCZK){
     h += '<div class="pie-legend-left">';
     h += '<div class="pie-legend-color" style="background:' + s.color + '"></div>';
     h += '<span class="pie-legend-sym">' + esc(s.label) + '</span>';
-    if (s.isStable){
-      h += '<span class="type t-stable">Stablecoin</span>';
-    }
     h += '</div>';
     h += '<div style="display:flex;align-items:center;gap:12px">';
     h += '<span class="pie-legend-val">' + fmtMoney(s.czk, 'CZK') + '</span>';
@@ -1929,16 +2028,9 @@ function updatePositionsLive(){
   const currYear = new Date().getFullYear();
   const combined = getCombinedPositions(state);
 
-  let totalCustomCashCZK = 0;
-  for (const c of customCashEntries){
-    const rate = rateFor(c.currency, currYear);
-    c.czk = (c.amount || 0) * rate;
-    totalCustomCashCZK += c.czk;
-  }
-
-  let totalSecuritiesMarketCZK = 0;
-  let totalSecuritiesBookCZK = 0;
-  let totalStablecoinsCZK = totalCustomCashCZK;
+  let totalPortfolioCZK = 0;
+  let totalCostBasisCZK = 0;
+  let unrealizedProfitCZK = 0;
 
   const slices = [];
   const palette = [
@@ -1948,61 +2040,48 @@ function updatePositionsLive(){
   let pIdx = 0;
 
   for (const [sym, rec] of combined.entries()){
-    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : rec.avgEntryPrice;
+    const hasCustom = marketPrices[sym] != null;
+    const curPrice = hasCustom ? marketPrices[sym] : rec.avgEntryPrice;
+    const curValueNative = hasCustom ? (curPrice * rec.totalQty) : rec.totalBookCostNative;
+    const isShort = rec.kind === 'S';
+    const posProfitNative = hasCustom ? (isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative)) : 0;
+    const posRoiPct = (hasCustom && rec.totalBookCostNative > 0) ? (posProfitNative / rec.totalBookCostNative) * 100 : 0;
+
     const rate = rateFor(rec.currency, currYear);
-    const curValueNative = curPrice * rec.totalQty;
     const curValueCZK = curValueNative * rate;
+    const bookCostCZK = rec.totalBookCostNative * rate;
+    const posProfitCZK = posProfitNative * rate;
+
     rec.curPrice = curPrice;
     rec.curValueNative = curValueNative;
     rec.curValueCZK = curValueCZK;
+    rec.bookCostCZK = bookCostCZK;
+    rec.posProfitNative = posProfitNative;
+    rec.posRoiPct = posRoiPct;
+    rec.posProfitCZK = posProfitCZK;
 
-    const isShort = rec.kind === 'S';
-    rec.posProfitNative = isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative);
-    rec.posRoiPct = rec.totalBookCostNative > 0 ? (rec.posProfitNative / rec.totalBookCostNative) * 100 : 0;
-
-    if (rec.isStable){
-      totalStablecoinsCZK += curValueCZK;
-    } else {
-      totalSecuritiesMarketCZK += curValueCZK;
-      totalSecuritiesBookCZK += rec.totalBookCostCZK;
-    }
+    totalPortfolioCZK += curValueCZK;
+    totalCostBasisCZK += bookCostCZK;
+    unrealizedProfitCZK += posProfitCZK;
 
     if (curValueCZK > 0){
       slices.push({
         label: sym,
         czk: curValueCZK,
-        color: rec.isStable ? '#10b981' : palette[pIdx++ % palette.length],
-        isStable: rec.isStable,
+        color: palette[pIdx++ % palette.length],
         qty: rec.totalQty
       });
     }
   }
 
-  const cashPalette = ['#059669', '#10b981', '#0d9488', '#14b8a6', '#047857', '#065f46'];
-  let cIdx = 0;
-  for (const c of customCashEntries){
-    if (c.czk > 0){
-      slices.push({
-        label: c.label ? (c.label + ' (' + c.currency + ')') : (c.currency + ' Cash'),
-        czk: c.czk,
-        color: cashPalette[cIdx++ % cashPalette.length],
-        isStable: true,
-        qty: c.amount
-      });
-    }
-  }
   slices.sort((a,b)=>b.czk - a.czk);
-
-  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
-  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
-  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
-  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
+  const unrealizedRoiPct = totalCostBasisCZK > 0 ? (unrealizedProfitCZK / totalCostBasisCZK) * 100 : 0;
 
   // Update KPI card DOM in-place
   const elTot = $('kpi-total-portfolio');
   if (elTot) elTot.textContent = fmtMoney(totalPortfolioCZK, 'CZK');
   const elSec = $('kpi-sec-valuation');
-  if (elSec) elSec.textContent = fmtMoney(totalSecuritiesMarketCZK, 'CZK');
+  if (elSec) elSec.textContent = fmtMoney(totalCostBasisCZK, 'CZK');
   const elPnlCard = $('kpi-card-pnl');
   if (elPnlCard){
     elPnlCard.style.borderColor = unrealizedProfitCZK >= 0 ? '#6ee7b7' : '#fca5a5';
@@ -2013,8 +2092,6 @@ function updatePositionsLive(){
       elPnlVal.innerHTML = (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span>';
     }
   }
-  const elStable = $('kpi-stable-val');
-  if (elStable) elStable.innerHTML = fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span>';
 
   // Update individual table rows in-place
   for (const [sym, rec] of combined.entries()){
@@ -2047,28 +2124,14 @@ function renderPozice(st){
   const currYear = new Date().getFullYear();
   const combined = getCombinedPositions(st);
 
-  // Initialize marketPrices with avgEntryPrice if null so default P/L is cleanly 0.00
-  for (const [sym, rec] of combined.entries()){
-    if (marketPrices[sym] == null){
-      marketPrices[sym] = Number(rec.avgEntryPrice.toFixed(4));
-    }
-  }
-
-  let totalCustomCashCZK = 0;
-  for (const c of customCashEntries){
-    const rate = rateFor(c.currency, currYear);
-    c.czk = (c.amount || 0) * rate;
-    totalCustomCashCZK += c.czk;
-  }
-
-  if (!st.openPos.length && totalCustomCashCZK <= 0){
-    el.innerHTML = '<p class="info">No open positions remaining. All positions are closed.</p>';
+  if (!st.openPos.length){
+    el.innerHTML = '<p class="info">' + t('noOpenPos') + '</p>';
     return;
   }
 
-  let totalSecuritiesMarketCZK = 0;
-  let totalSecuritiesBookCZK = 0;
-  let totalStablecoinsCZK = totalCustomCashCZK;
+  let totalPortfolioCZK = 0;
+  let totalCostBasisCZK = 0;
+  let unrealizedProfitCZK = 0;
 
   const slices = [];
   const palette = [
@@ -2078,117 +2141,76 @@ function renderPozice(st){
   let pIdx = 0;
 
   for (const [sym, rec] of combined.entries()){
-    const curPrice = marketPrices[sym] != null ? marketPrices[sym] : rec.avgEntryPrice;
+    const hasCustom = marketPrices[sym] != null;
+    const curPrice = hasCustom ? marketPrices[sym] : rec.avgEntryPrice;
+    const curValueNative = hasCustom ? (curPrice * rec.totalQty) : rec.totalBookCostNative;
+    const isShort = rec.kind === 'S';
+    const posProfitNative = hasCustom ? (isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative)) : 0;
+    const posRoiPct = (hasCustom && rec.totalBookCostNative > 0) ? (posProfitNative / rec.totalBookCostNative) * 100 : 0;
+
     const rate = rateFor(rec.currency, currYear);
-    const curValueNative = curPrice * rec.totalQty;
     const curValueCZK = curValueNative * rate;
+    const bookCostCZK = rec.totalBookCostNative * rate;
+    const posProfitCZK = posProfitNative * rate;
+
     rec.curPrice = curPrice;
     rec.curValueNative = curValueNative;
     rec.curValueCZK = curValueCZK;
+    rec.bookCostCZK = bookCostCZK;
+    rec.posProfitNative = posProfitNative;
+    rec.posRoiPct = posRoiPct;
+    rec.posProfitCZK = posProfitCZK;
 
-    const isShort = rec.kind === 'S';
-    rec.posProfitNative = isShort ? (rec.totalBookCostNative - curValueNative) : (curValueNative - rec.totalBookCostNative);
-    rec.posRoiPct = rec.totalBookCostNative > 0 ? (rec.posProfitNative / rec.totalBookCostNative) * 100 : 0;
-
-    if (rec.isStable){
-      totalStablecoinsCZK += curValueCZK;
-    } else {
-      totalSecuritiesMarketCZK += curValueCZK;
-      totalSecuritiesBookCZK += rec.totalBookCostCZK;
-    }
+    totalPortfolioCZK += curValueCZK;
+    totalCostBasisCZK += bookCostCZK;
+    unrealizedProfitCZK += posProfitCZK;
 
     if (curValueCZK > 0){
       slices.push({
         label: sym,
         czk: curValueCZK,
-        color: rec.isStable ? '#10b981' : palette[pIdx++ % palette.length],
-        isStable: rec.isStable,
+        color: palette[pIdx++ % palette.length],
         qty: rec.totalQty
       });
     }
   }
 
-  const cashPalette = ['#059669', '#10b981', '#0d9488', '#14b8a6', '#047857', '#065f46'];
-  let cIdx = 0;
-  for (const c of customCashEntries){
-    if (c.czk > 0){
-      slices.push({
-        label: c.label ? (c.label + ' (' + c.currency + ')') : (c.currency + ' Cash'),
-        czk: c.czk,
-        color: cashPalette[cIdx++ % cashPalette.length],
-        isStable: true,
-        qty: c.amount
-      });
-    }
-  }
   slices.sort((a,b)=>b.czk - a.czk);
-
-  const totalPortfolioCZK = totalSecuritiesMarketCZK + totalStablecoinsCZK;
-  const unrealizedProfitCZK = totalSecuritiesMarketCZK - totalSecuritiesBookCZK;
-  const unrealizedRoiPct = totalSecuritiesBookCZK > 0 ? (unrealizedProfitCZK / totalSecuritiesBookCZK) * 100 : 0;
-  const stablePct = totalPortfolioCZK > 0 ? (totalStablecoinsCZK / totalPortfolioCZK) * 100 : 0;
+  const unrealizedRoiPct = totalCostBasisCZK > 0 ? (unrealizedProfitCZK / totalCostBasisCZK) * 100 : 0;
 
   let h = '';
 
   // 1. Dashboard Metrics Cards
   h += '<div class="openpos-kpi-row">';
-  h += '<div class="openpos-kpi"><div class="label">Total Portfolio Value</div><div class="val" id="kpi-total-portfolio">' + fmtMoney(totalPortfolioCZK, 'CZK') + '</div></div>';
-  h += '<div class="openpos-kpi"><div class="label">Securities Valuation</div><div class="val" id="kpi-sec-valuation">' + fmtMoney(totalSecuritiesMarketCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">' + t('kpiTotalPortfolio') + '</div><div class="val" id="kpi-total-portfolio">' + fmtMoney(totalPortfolioCZK, 'CZK') + '</div></div>';
+  h += '<div class="openpos-kpi"><div class="label">' + t('kpiCostBasis') + '</div><div class="val" id="kpi-sec-valuation">' + fmtMoney(totalCostBasisCZK, 'CZK') + '</div></div>';
   h += '<div class="openpos-kpi" id="kpi-card-pnl" style="border-color:'+(unrealizedProfitCZK>=0?'#6ee7b7':'#fca5a5')+';background:'+(unrealizedProfitCZK>=0?'#ecfdf5':'#fef2f2')+'">' +
-    '<div class="label">Unrealized P/L</div>' +
+    '<div class="label">' + t('kpiUnrealizedPnl') + '</div>' +
     '<div class="val" id="kpi-pnl-val" style="color:'+(unrealizedProfitCZK>=0?'var(--green)':'var(--red)')+'">' + (unrealizedProfitCZK>=0?'+':'') + fmtMoney(unrealizedProfitCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+(unrealizedRoiPct>=0?'+':'')+unrealizedRoiPct.toFixed(1)+'%)</span></div></div>';
-  h += '<div class="openpos-kpi highlight-stable"><div class="label">🪙 Stablecoins &amp; Cash</div><div class="val" id="kpi-stable-val">' + fmtMoney(totalStablecoinsCZK, 'CZK') + ' <span style="font-size:13px;font-weight:600">('+stablePct.toFixed(1)+'%)</span></div></div>';
   h += '</div>';
 
-  // 2. Custom Stablecoin / Cash Adjuster Input Bar
-  h += '<div class="stablecoin-input-bar">';
-  h += '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%">';
-  h += '<label>💵 <span>Add Uninvested Stablecoins / Cash:</span></label>';
-  h += '<input type="number" id="inp-stable-amt" placeholder="Amount (e.g. 1000)" min="0" step="any">';
-  h += '<select id="inp-stable-curr">';
-  h += '<option value="USD">USD / USDT / USDC ($)</option>';
-  h += '<option value="EUR">EUR / EURC (€)</option>';
-  h += '<option value="CZK">CZK (Kč)</option>';
-  h += '</select>';
-  h += '<input type="text" id="inp-stable-label" placeholder="Note / Broker (optional)" style="width:160px">';
-  h += '<button class="btn primary" id="btnAddCash">+ Add Entry</button>';
-  if (customCashEntries.length > 0){
-    h += '<button class="btn btn-clear" id="btnResetCash" style="padding:6px 12px">Clear All Cash</button>';
-  }
-  h += '</div>';
-
-  if (customCashEntries.length > 0){
-    h += '<div class="cash-chips-row">';
-    h += '<span style="font-size:12px;font-weight:700;color:var(--ink-sub);margin-right:2px">Active Cash Reserves (' + customCashEntries.length + '):</span>';
-    for (const c of customCashEntries){
-      h += '<span class="cash-chip">' +
-        '<span>🪙 ' + esc(c.label || c.currency + ' Cash') + ': <strong>' + fmtMoney(c.amount, c.currency) + '</strong> (' + fmtMoney(c.czk, 'CZK') + ')</span>' +
-        '<button data-rm-cash="' + c.id + '" title="Remove this cash entry">✕</button>' +
-        '</span>';
-    }
-    h += '</div>';
-  }
-  h += '</div>';
-
-  // 3. Asset Allocation Donut / Pie Chart Container
+  // 2. Asset Allocation Donut / Pie Chart Container
   h += '<div id="openpos-pie-container">';
   h += renderPieCardHtml(slices, totalPortfolioCZK);
   h += '</div>';
 
-  // 4. Combined Open Positions Detailed Table with Interactive Current Price & P/L
-  h += '<h3 class="group" style="margin-top:24px">Combined Open Positions &amp; Live Price Inputs</h3>';
-  h += '<table id="table-openpos"><thead><tr><th>Symbol</th><th>Type</th><th>Acquisition</th>' +
-    '<th class="num">Open Qty</th>' +
-    '<th class="num">Avg Entry Price</th>' +
-    '<th class="num">Current Price</th>' +
-    '<th class="num">Book Cost</th>' +
-    '<th class="num">Current Value</th>' +
-    '<th class="num">Unrealized P/L</th>' +
-    '<th class="num">Weight</th></tr></thead><tbody>';
+  // 3. Combined Open Positions Detailed Table with Interactive Current Price & P/L
+  h += '<h3 class="group" style="margin-top:24px">' + t('secPozice') + '</h3>';
+  h += '<table id="table-openpos"><thead><tr>' +
+    '<th>' + t('colSymbol') + '</th>' +
+    '<th>' + t('colDirection') + '</th>' +
+    '<th>' + t('colAcqDate') + '</th>' +
+    '<th class="num">' + t('colQuantity') + '</th>' +
+    '<th class="num">' + t('colAvgEntry') + '</th>' +
+    '<th class="num">' + t('colCurPrice') + '</th>' +
+    '<th class="num">' + t('kpiCostBasis') + '</th>' +
+    '<th class="num">' + t('colCurVal') + '</th>' +
+    '<th class="num">' + t('colUnrealizedPnlShort') + '</th>' +
+    '<th class="num">' + t('colWeight') + '</th></tr></thead><tbody>';
 
   for (const [sym, rec] of combined.entries()){
     const weight = totalPortfolioCZK > 0 ? (rec.curValueCZK / totalPortfolioCZK) * 100 : 0;
-    const curPriceStr = Number(rec.curPrice.toFixed(4));
+    const curPriceDisplay = marketPrices[sym] != null ? marketPrices[sym] : Number(rec.avgEntryPrice.toFixed(4));
 
     // Determine acquisition description
     let acqHtml = '';
@@ -2198,17 +2220,17 @@ function renderPozice(st){
       const dates = rec.lots.map(l => l.trade.tradeDate).sort((a,b)=>a-b);
       const startStr = fmtDateTime(dates[0]).split(' ')[0];
       const endStr = fmtDateTime(dates[dates.length-1]).split(' ')[0];
-      const lotsTitle = rec.lots.map((l,idx)=>'Lot '+(idx+1)+': '+fmt(l.qty,4)+' @ '+fmtMoney(l.trade.price, rec.currency)+' ('+fmtDateTime(l.trade.tradeDate)+')').join('\n');
-      acqHtml = '<span title="'+esc(lotsTitle)+'" style="cursor:help;border-bottom:1px dotted var(--ink-sub)">'+startStr+' – '+endStr+' ('+rec.lots.length+' lots)</span>';
+      const lotsTitle = rec.lots.map((l,idx)=>t('lot')+' '+(idx+1)+': '+fmt(l.qty,4)+' @ '+fmtMoney(l.trade.price, rec.currency)+' ('+fmtDateTime(l.trade.tradeDate)+')').join('\n');
+      acqHtml = '<span title="'+esc(lotsTitle)+'" style="cursor:help;border-bottom:1px dotted var(--ink-sub)">'+startStr+' – '+endStr+' ('+rec.lots.length+' '+t('lots')+')</span>';
     }
 
     h += '<tr id="pos-row-' + esc(sym) + '" data-sym="' + esc(sym) + '"><td><strong>' + esc(sym) + '</strong></td>' +
-      '<td>' + (rec.isStable ? '<span class="type t-stable">Stablecoin</span>' : '<span class="type ' + (rec.kind==='B'?'t-buy':'t-short') + '">' + (rec.kind==='B'?'Long':'Short') + '</span>') + '</td>' +
+      '<td><span class="type ' + (rec.kind==='B'?'t-buy':'t-short') + '">' + t(rec.kind==='B'?'typeLong':'typeShort') + '</span></td>' +
       '<td>' + acqHtml + '</td>' +
       '<td class="num">' + fmt(rec.totalQty, 4) + '</td>' +
       '<td class="num">' + fmtMoney(rec.avgEntryPrice, rec.currency) + '</td>' +
       '<td class="num cell-cur-price">' +
-        '<input type="number" class="price-input" data-sym="' + esc(sym) + '" value="' + curPriceStr + '" step="any" min="0">' +
+        '<input type="number" class="price-input" data-sym="' + esc(sym) + '" value="' + curPriceDisplay + '" step="any" min="0">' +
         ' <span class="dim">' + currSign(rec.currency).trim() + '</span>' +
       '</td>' +
       '<td class="num">' + fmtMoney(rec.totalBookCostNative, rec.currency) + '</td>' +
@@ -2225,7 +2247,7 @@ function renderPozice(st){
 
 function renderDonutSvg(slices, total){
   if (total <= 0 || !slices.length){
-    return '<svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="75" fill="none" stroke="var(--glass-border-subtle)" stroke-width="36"/><text x="120" y="125" text-anchor="middle" font-size="12" fill="var(--ink-sub)">No data</text></svg>';
+    return '<svg width="240" height="240" viewBox="0 0 240 240"><circle cx="120" cy="120" r="75" fill="none" stroke="var(--glass-border-subtle)" stroke-width="36"/><text x="120" y="125" text-anchor="middle" font-size="12" fill="var(--ink-sub)">' + t('noData') + '</text></svg>';
   }
 
   const cx = 120, cy = 120, R = 96, r = 58;
@@ -2262,7 +2284,7 @@ function renderDonutSvg(slices, total){
   // Center hole text
   svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r - 1) + '" fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.04))"/>';
   svg += '<text x="' + cx + '" y="114" text-anchor="middle" font-size="14.5" font-weight="800" fill="var(--ink)">' + fmtMoney(total, 'CZK', 0) + '</text>';
-  svg += '<text x="' + cx + '" y="132" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink-sub)">Total Value</text>';
+  svg += '<text x="' + cx + '" y="132" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink-sub)">' + t('pieTotalVal') + '</text>';
   svg += '</svg>';
   return svg;
 }
@@ -2296,33 +2318,10 @@ function applyRowHl(){
   });
 }
 
-function addCashEntry(){
-  const amtEl = $('inp-stable-amt');
-  const currEl = $('inp-stable-curr');
-  const labelEl = $('inp-stable-label');
-  const amt = parseFloat(amtEl?.value);
-  if (!amt || isNaN(amt) || amt <= 0){
-    showError('Please enter a valid positive cash/stablecoin amount.');
-    if (amtEl) amtEl.focus();
-    return;
-  }
-  const curr = currEl?.value || 'USD';
-  const label = (labelEl?.value || '').trim();
-  customCashEntries.push({
-    id: cashIdCounter++,
-    amount: amt,
-    currency: curr,
-    label: label || (curr + ' Cash')
-  });
-  if (amtEl) amtEl.value = '';
-  if (labelEl) labelEl.value = '';
-  $('messages').innerHTML = '';
-  if (state) renderPozice(state);
-}
-
 // Event Listeners
 document.addEventListener('click', e=>{
   const t = e.target;
+  if (t.closest('#btnLang')){ setLanguage(currentLang === 'cs' ? 'en' : 'cs'); return; }
   if (t.closest('#btnDemo')){ loadText(DEMOS.demo, 'Demo portfolio'); return; }
   if (t.closest('#btnTemplate')){ loadText(DEMOS.Template, 'Template portfolio'); return; }
   if (t.closest('#btnPasteClipboard')){
@@ -2331,30 +2330,14 @@ document.addEventListener('click', e=>{
         if (text && text.trim()){
           loadText(text, 'Pasted from clipboard');
         } else {
-          showError('Clipboard is empty or does not contain text.');
+          showError(t('clipboardEmpty'));
         }
       }).catch(err => {
-        showError('Clipboard permission was not granted. You can paste using Ctrl+V or Cmd+V directly onto the page.');
+        showError(t('clipboardError'));
       });
     } else {
-      showError('Clipboard API is not available in this browser. Please use Ctrl+V or Cmd+V.');
+      showError(t('clipboardNotAvail'));
     }
-    return;
-  }
-  if (t.closest('#btnAddCash') || t.closest('#btnApplyStable')){
-    addCashEntry();
-    return;
-  }
-  if (t.closest('#btnResetCash') || t.closest('#btnResetStable')){
-    customCashEntries = [];
-    if (state) renderPozice(state);
-    return;
-  }
-  const rmCashBtn = t.closest('[data-rm-cash]');
-  if (rmCashBtn){
-    const cid = +rmCashBtn.dataset.rmCash;
-    customCashEntries = customCashEntries.filter(c => c.id !== cid);
-    if (state) renderPozice(state);
     return;
   }
   if (t.closest('#btnDownloadTemplate')){ download('piggy-template.csv', DEMOS.Template); return; }
@@ -2406,17 +2389,6 @@ document.addEventListener('input', e=>{
   }
 });
 
-// Press Enter inside cash amount or label inputs to add entry
-document.addEventListener('keydown', e=>{
-  if (e.key === 'Enter'){
-    const t = e.target;
-    if (t && (t.id === 'inp-stable-amt' || t.id === 'inp-stable-label')){
-      e.preventDefault();
-      addCashEntry();
-    }
-  }
-});
-
 document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
   b.addEventListener('click', ()=>tab(b.dataset.tab));
 });
@@ -2444,12 +2416,8 @@ document.addEventListener('paste', k=>{
   }
 });
 
-// Native Android & Browser Download
+// Browser Download
 function download(name, text){
-  if (window.Android && typeof window.Android.saveCsv === 'function'){
-    try { window.Android.saveCsv(name, text); return; }
-    catch(e){ console.warn('Android saveCsv fallback to blob', e); }
-  }
   const blob = new Blob(['\uFEFF'+text], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -2461,19 +2429,19 @@ function download(name, text){
 function exportReport(){
   if (!state) return;
   const L = [];
-  L.push('Přehled obchodů s cennými papíry');
+  L.push(t('exportReportTitle'));
   L.push('');
-  L.push('SOUHRN');
-  L.push('Rok;Měna;Daňové příjmy (pův. měna);Daňové výdaje (pův. měna);Daňové příjmy (CZK);Daňové výdaje (CZK);Daňový základ (CZK);Osvobozené příjmy (CZK)');
+  L.push(t('exportSummary'));
+  L.push([t('colYear'), t('colCurrency'), t('colTaxInc'), t('colTaxOut'), t('colTaxIncCZK'), t('colTaxOutCZK'), t('colTaxBaseCZK')].join(';'));
   for (const yr of state.byYear){
     for (const r of yr.rows){
-      L.push([yr.year, r.currency, fmtMoney(r.incN, r.currency), fmtMoney(-r.outN, r.currency), fmtMoney(r.incC, 'CZK'), fmtMoney(-r.outC, 'CZK'), fmtMoney(r.incC - r.outC, 'CZK'), fmtMoney(r.exemptC, 'CZK')].join(';'));
+      L.push([yr.year, r.currency, fmtMoney(r.incN, r.currency), fmtMoney(-r.outN, r.currency), fmtMoney(r.incC, 'CZK'), fmtMoney(-r.outC, 'CZK'), fmtMoney(r.incC - r.outC, 'CZK')].join(';'));
     }
   }
-  L.push(''); L.push('PODLE ROKŮ'); 
+  L.push(''); L.push(t('exportByYear')); 
   for (const yr of state.byYear){
-    L.push('Rok '+yr.year);
-    L.push('Datum obchodu;Symbol;Počet;Cena;Poplatky;Objem;Zisk;Daňové příjmy (CZK);Daňové výdaje (CZK)');
+    L.push(t('colYear') + ' ' + yr.year);
+    L.push([t('colDateTime'), t('colSymbol'), t('colQuantity'), t('colPrice'), t('colFees'), t('colVolume'), t('colProfit'), t('colTaxIncCZK'), t('colTaxOutCZK')].join(';'));
     for (const r of yr.rows){
       for (const g of r.list){
         L.push([fmtDateTime(g.trade.tradeDate), g.symbol, fmt(g.trade.qty, 4),
@@ -2520,6 +2488,9 @@ function exportReport(){
     lastScrollY = Math.max(0, currentScrollY);
   }, { passive: true });
 })();
+
+// Initialize localization on boot
+applyI18n();
 </script>
 </body>
 </html>
