@@ -1,8 +1,8 @@
-# 🐷 Piggy – Czech Securities & Crypto Tax Calculator
+# Piggy — Czech Securities and Crypto Tax Reporting
 
-A private, zero-dependency web calculator for estimating Czech tax bases from securities and supported crypto transactions. Piggy performs FIFO lot matching, holding-period and annual-proceeds tests, GFŘ currency conversion, and exempt-income reporting entirely in the browser.
+A privacy-first, zero-dependency web application that turns securities and supported crypto transaction exports into reviewable Czech § 10 tax calculations. Piggy performs FIFO reconciliation, exemption tests, GFŘ currency conversion, validation, and supporting exports for **Finanční správa ČR**, entirely in the browser.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Personal Use](https://img.shields.io/badge/License-Personal%20Use-f59e0b.svg)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Client--Side-blue.svg)](#)
 [![Platform: Web & PWA](https://img.shields.io/badge/Platform-Web%20%26%20PWA-047857)](#)
@@ -21,12 +21,12 @@ Retail investors in the Czech Republic face rigorous tax calculation rules when 
 ### Key Capabilities
 
 - **Combined Open Positions with Live Price Editing**: Real-time valuation, allocation donut charts, and instant unrealized P/L calculation without losing focus while typing. Unrealized P/L defaults cleanly to `0.00` until you input custom market prices.
-- **Disclosed FIFO Pairing**: Matches buy and sell lots chronologically, supporting partial lots and split orders. The selected method is stated in every authority-facing report.
+- **Disclosed FIFO Pairing**: Matches buy and sell lots chronologically, supporting partial lots and split orders. The selected method is stated in every report prepared for Finanční správa ČR.
 - **Holding-Period Tests (*Časový test*)**: Separates qualifying securities and explicitly eligible crypto disposals from taxable income.
 - **GFŘ Uniform Exchange Rates (*Jednotné kurzy*)**: Translates supported multi-currency trades (USD, EUR, CZK) using the published annual rates from 2011 to 2025 and discloses the method in the report.
 - **Annual Proceeds Tests**: Applies the 100,000 CZK amount test separately to securities and explicitly eligible crypto transactions.
 - **Multilingual Broker CSV Ingestion**: Drag & drop or copy-paste directly with both Czech (`Datum obchodu;Směr;...`) and English (`Date;Direction;...`) headers.
-- **Authority-supporting Export Package**: Generates an Annex 2 summary, taxable-disposal ledger, exempt-income ledger, FIFO reconciliation, validation report, and a printable Czech PDF summary.
+- **Finanční správa ČR Support Package**: Generates an Annex 2 summary, taxable-disposal ledger, exempt-income ledger, FIFO reconciliation, validation report, and a printable Czech PDF summary.
 
 ---
 
@@ -54,7 +54,7 @@ Piggy uses chronological **FIFO (First-In, First-Out)** matching and discloses t
 
 ### 5. Crypto and Stablecoin Transactions
 - Merely acquiring or holding a cryptoasset does not create taxable income in Piggy. Tax treatment is evaluated when the asset is disposed of by sale, spending, or exchange.
-- Crypto exemptions effective from 15 February 2025 are applied only when `Krypto osvobození` / `Crypto exemption eligible` explicitly confirms regulatory eligibility and the transaction is outside business property.
+- Piggy evaluates the applicable crypto holding-period and proceeds tests automatically. Use the optional `Vyloučení z osvobození` / `Exemption restriction` field only when a specific legal restriction prevents an exemption.
 - `EMT` (electronic-money token) is a separate classification. EMT disposals are excluded from the crypto CZK 100,000 proceeds test, but the separate holding-period analysis is retained. A stablecoin must not be classified from its ticker alone.
 - Represent a DEX swap as two rows at the same timestamp: a `Sell` of the token given and a `Buy` of the token received, using consistent market values. Piggy does not import blockchain transactions or determine token eligibility automatically.
 
@@ -80,9 +80,9 @@ Piggy is designed to ingest trade data effortlessly without manual formatting:
 - **Number Formats**: Handles European decimal comma (`120,50`) and standard decimal point (`120.50`), space-separated thousands (`1 250,00`), and automatically cleans currency signs (`100$`, `25 €`, `850 Kč`)
 - **Date Formats**: Supports `DD.MM.YYYY HH:MM`, `DD.MM.YYYY`, `YYYY-MM-DD HH:MM`, `YYYY-MM-DD`, and `DD/MM/YYYY`
 
-### Accepted Table Column Headers
+### Required columns
 
-Piggy supports both standard Czech broker headers (matching Fio e-Broker) and English equivalents:
+The downloadable template places these fields first. They may still appear in any order in an imported file.
 
 | Czech Column Header | English Alternative | Description | Example |
 | :--- | :--- | :--- | :--- |
@@ -92,17 +92,26 @@ Piggy supports both standard Czech broker headers (matching Fio e-Broker) and En
 | `Cena` | `Price` | Execution price per share / unit | `135,00` or `135.00 $` |
 | `Počet` | `Quantity`, `Qty`, `Shares` | Number of shares / units executed | `20` |
 | `Měna` | `Currency` | Transaction currency (`CZK`, `USD`, `EUR`) | `USD` |
-| `Objem` | `Volume`, `Total`, `Amount` | Total transaction value before fees | `-2 700,00` |
-| `Poplatky` | `Fees`, `Fee`, `Commission` | Broker commission / transaction fees | `12,00` |
 | `Typ aktiva` | `Asset Type`, `Category` | `Akcie`/security, ETF, or `Kryptoaktivum`/crypto | `Kryptoaktivum` |
-| `Krypto osvobození` | `Crypto exemption eligible` | Optional explicit confirmation that a cryptoasset may use the crypto exemptions | `Ano` / `Yes` |
+
+### Optional columns
+
+Optional does not mean unimportant. Fill these fields whenever the source statement provides them:
+
+| Czech Column Header | English Alternative | When to fill it | Example |
+| :--- | :--- | :--- | :--- |
+| `Objem` | `Volume`, `Total`, `Amount` | Recommended for exact reconciliation to the statement | `-2 700,00` |
+| `Poplatky` | `Fees`, `Fee`, `Commission` | Recommended whenever fees were charged | `12,00` |
+| `Vyloučení z osvobození` | `Exemption restriction` | Only when a known legal restriction prevents an exemption; otherwise leave blank | `Ano` / `Yes` |
 | `Obchodní majetek` | `Business asset` | Whether the asset is or was business property | `Ne` / `No` |
-| `ID transakce` | `Transaction ID`, `Tx hash` | Broker trade ID or blockchain transaction hash | `0xdex-swap` |
-| `Zdroj` | `Source`, `Broker`, `Exchange` | Broker, exchange, or protocol | `Uniswap` |
-| `Peněženka` | `Wallet` | Account or wallet identifier | `0xwallet` |
-| `Protihodnota` | `Counter asset` | Asset or fiat received/given | `ETH` |
-| `Zdroj ocenění` | `Valuation source` | Evidence for the market value used | `Uniswap execution` |
+| `ID transakce` | `Transaction ID`, `Tx hash` | Strongly recommended for every disposal and crypto swap | `0xdex-swap` |
+| `Zdroj` | `Source`, `Broker`, `Exchange` | Strongly recommended for traceability | `Uniswap` |
+| `Peněženka` | `Wallet` | Strongly recommended for on-chain activity | `0xwallet` |
+| `Protihodnota` | `Counter asset` | Strongly recommended for swaps and non-fiat disposals | `ETH` |
+| `Zdroj ocenění` | `Valuation source` | Strongly recommended when CZK value is derived from a market price | `Uniswap execution` |
 | `Poznámka` | `Note` | Human-readable supporting explanation | `DEX swap: outgoing leg` |
+
+For submissions or follow-up questions from Finanční správa ČR, the strongest evidence package normally includes the transaction ID, platform or wallet, counter-asset, valuation source, original statement, and an explanation of unusual operations.
 
 ### Compatible Broker Exports
 - **Fio banka e-Broker**: Direct CSV export (zero modification required).
@@ -125,10 +134,16 @@ Broker-specific exports may still require column mapping or cleanup. Unsupported
 
 ---
 
-## 📁 Single-File Architecture
+## Repository structure
 
 ```
-index.html   <-- Complete, zero-dependency, self-contained application
+assets/icons/       PWA and browser icons
+docs/sample-report/ Example output for Finanční správa ČR
+examples/           Import template and demo portfolio
+tests/              Tax-engine regression tests
+index.html          Complete zero-dependency application
+manifest.webmanifest
+sw.js               Offline cache
 ```
 
 - **Zero Build Step**: No `npm install`, no Node.js runtime, no bundling tools.
@@ -162,4 +177,8 @@ open index.html # On macOS (or double-click the file on Windows/Linux)
 
 ## ⚖️ Legal Disclaimer
 
-Piggy is an open-source calculation helper, not tax-filing software or certified legal advice. It cannot determine whether a token is an electronic-money token, whether an asset belongs to business property, or whether an on-chain transaction has additional legs or fees. Review the imported ledger and final figures with a Czech tax adviser before filing.
+Piggy is a calculation helper, not tax-filing software or certified legal advice. It cannot determine whether a token is an electronic-money token, whether an asset belongs to business property, or whether an on-chain transaction has additional legs or fees. Review the imported ledger and final figures with a Czech tax adviser before filing with Finanční správa ČR.
+
+## License
+
+Piggy is source-available for personal, non-commercial use. Resale, paid hosting, commercial distribution, and inclusion in a paid product or service are prohibited without a separate written license. See [LICENSE](LICENSE).

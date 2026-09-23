@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffd95e">
-<meta name="description" content="Piggy – Private Czech § 10 calculation support for securities and cryptoassets with FIFO reconciliation, exemption tests, validation, and authority-facing exports.">
+<meta name="description" content="Piggy – Private Czech § 10 calculation support for securities and cryptoassets with FIFO reconciliation, exemption tests, validation, and supporting exports for Finanční správa ČR.">
 <title>Piggy – Czech Securities &amp; Crypto Tax Reports</title>
-<link rel="icon" href="images/favicon-32x32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="images/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="images/icon-192.png">
+<link rel="icon" href="assets/icons/favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <style>
   :root {
@@ -920,7 +920,7 @@
 <header>
   <div class="wrap">
     <div class="brand">
-      <div class="pig-logo"><img src="images/icon.svg" alt="Piggy Logo" width="44" height="44"></div>
+      <div class="pig-logo"><img src="assets/icons/icon.svg" alt="Piggy Logo" width="44" height="44"></div>
       <div>
         <h1>Piggy</h1>
         <p id="hdr-subtitle" data-i18n="subtitle">Czech § 10 reporting support • Securities, crypto &amp; EMT • FIFO reconciliation • Annex 2 summary</p>
@@ -1148,7 +1148,7 @@ function addMonthsCZ(d, months){
 }
 
 function normalizeAssetType(val){
-  if (!val) return 'security';
+  if (!val) return 'unknown';
   const v = String(val).trim().toLowerCase();
   if (/^(emt|electronic\s*money\s*token|e-?money\s*token|elektronick[yý]\s*pen[eě][zž]n[ií]\s*token|stablecoin\s*emt)$/i.test(v)){
     return 'emt';
@@ -1244,7 +1244,7 @@ function parseDateTime(s){
 function mapHeaders(headerCells){
   const map = {
     date: -1, dir: -1, symbol: -1, price: -1, qty: -1,
-    currency: -1, volume: -1, fee: -1, assetType: -1, cryptoEligible: -1,
+    currency: -1, volume: -1, fee: -1, assetType: -1, exemptionRestricted: -1, cryptoEligibleLegacy: -1,
     businessAsset: -1, transactionId: -1, source: -1, wallet: -1,
     counterAsset: -1, valuationSource: -1, note: -1
   };
@@ -1260,7 +1260,8 @@ function mapHeaders(headerCells){
     else if (map.volume === -1 && ['objem', 'celkem', 'volume', 'total', 'amount', 'hodnota', 'celková částka', 'celkova castka'].includes(h)) map.volume = idx;
     else if (map.fee === -1 && ['poplatky', 'poplatek', 'fees', 'fee', 'commission', 'provize', 'popl.'].includes(h)) map.fee = idx;
     else if (map.assetType === -1 && ['typ aktiva', 'druh aktiva', 'kategorie', 'typ nástroje', 'typ nastroje', 'asset type', 'category', 'instrument type', 'security type'].includes(h)) map.assetType = idx;
-    else if (map.cryptoEligible === -1 && ['krypto osvobození', 'krypto osvobozeni', 'krypto způsobilé', 'krypto zpusobile', 'crypto exemption eligible', 'crypto eligible'].includes(h)) map.cryptoEligible = idx;
+    else if (map.exemptionRestricted === -1 && ['vyloučení z osvobození', 'vylouceni z osvobozeni', 'exemption restriction', 'exemption excluded', 'exemption blocked'].includes(h)) map.exemptionRestricted = idx;
+    else if (map.cryptoEligibleLegacy === -1 && ['krypto osvobození', 'krypto osvobozeni', 'krypto způsobilé', 'krypto zpusobile', 'crypto exemption eligible', 'crypto eligible'].includes(h)) map.cryptoEligibleLegacy = idx;
     else if (map.businessAsset === -1 && ['obchodní majetek', 'obchodni majetek', 'business asset', 'business property'].includes(h)) map.businessAsset = idx;
     else if (map.transactionId === -1 && ['id transakce', 'id obchodu', 'transaction id', 'trade id', 'txid', 'tx hash', 'transaction hash'].includes(h)) map.transactionId = idx;
     else if (map.source === -1 && ['zdroj', 'broker', 'burza', 'exchange', 'source', 'platforma', 'platform'].includes(h)) map.source = idx;
@@ -1402,9 +1403,10 @@ function normalizeRows(csvResult){
 
     const assetTypeRaw = colMap.assetType >= 0 ? r[colMap.assetType] : null;
     const assetType = normalizeAssetType(assetTypeRaw);
-    const cryptoExemptionEligible = isCryptoType(assetType) && colMap.cryptoEligible >= 0
-      ? normalizeBool(r[colMap.cryptoEligible]) : false;
-    const cryptoEligibilityProvided = isCryptoType(assetType) && colMap.cryptoEligible >= 0 && String(r[colMap.cryptoEligible] || '').trim() !== '';
+    const cryptoExemptionEligible = !isCryptoType(assetType) ? true
+      : colMap.exemptionRestricted >= 0 ? !normalizeBool(r[colMap.exemptionRestricted])
+      : colMap.cryptoEligibleLegacy >= 0 ? normalizeBool(r[colMap.cryptoEligibleLegacy])
+      : true;
     const businessAsset = colMap.businessAsset >= 0 ? normalizeBool(r[colMap.businessAsset]) : false;
     if (assetType === 'unknown') issues.push({severity:'error', row:sourceRow, code:'UNKNOWN_ASSET_TYPE', symbol, value:String(assetTypeRaw || '')});
     if (price <= 0 || qty <= 0){
@@ -1418,7 +1420,6 @@ function normalizeRows(csvResult){
       tradeDate, settleDate, dir, symbol, price, qty, currency, fee, objem,
       assetType,
       cryptoExemptionEligible,
-      cryptoEligibilityProvided,
       businessAsset,
       transactionId: colMap.transactionId >= 0 ? String(r[colMap.transactionId] || '').trim() : '',
       source: colMap.source >= 0 ? String(r[colMap.source] || '').trim() : '',
@@ -1578,9 +1579,6 @@ function computeAll(trades){
   for (const g of groups){
     if (g.hasOpenShort){
       issues.push({severity:'error', row:g.trade.sourceRow, code:'MISSING_ACQUISITION', symbol:g.symbol, qty:g.openQty});
-    }
-    if (isCryptoType(g.trade.assetType) && !g.trade.cryptoEligibilityProvided){
-      issues.push({severity:'error', row:g.trade.sourceRow, code:'CRYPTO_ELIGIBILITY_UNCONFIRMED', symbol:g.symbol});
     }
     if (isCryptoType(g.trade.assetType) && !g.trade.transactionId){
       issues.push({severity:'warning', row:g.trade.sourceRow, code:'MISSING_TX_ID', symbol:g.symbol});
@@ -1849,7 +1847,7 @@ const I18N = {
     alert40M2025: "⚠️ V roce 2025 způsobilé osvobozené příjmy ({val}) přesáhly limit 40 000 000 Kč. Piggy poměrně převedl část nad limit do zdanitelných příjmů; výsledek ověřte s daňovým poradcem.",
     alert5M: "📢 V roce {year} bylo nalezeno {count} jednotlivých osvobozených příjmů nad 5 000 000 Kč. Ověřte povinnost samostatného oznámení podle § 38v ZDP.",
     warnUnsupportedCurrs: "Některé řádky byly přeskočeny kvůli nepodporované měně: {currs}. Piggy podporuje CZK, USD a EUR s oficiálními jednotnými kurzy GFŘ.",
-    warnCryptoEligibility: "U kryptoaktiv {symbols} se osvobození neuplatní automaticky. Samotné otevřené držení se nezdaňuje; jako zdanitelné jsou počítány až prodeje nebo swapy. Pro použití osvobození nastavte „Krypto osvobození“ na Ano pouze po ověření způsobilosti. DEX swap zadejte jako prodej odeslaného a nákup přijatého tokenu.",
+    warnCryptoEligibility: "U kryptoaktiv {symbols} Piggy automaticky vyhodnocuje použitelné časové a hodnotové testy. Pokud je osvobození z konkrétního právního důvodu nepoužitelné, nastavte volitelný sloupec „Vyloučení z osvobození“ na Ano. DEX swap zadejte jako prodej odeslaného a nákup přijatého tokenu.",
     warnProvisionalRate: "Pro rok {year} ještě GFŘ nevyhlásilo oficiální jednotné kurzy měn. Výpočty pro rok {year} jsou orientační s použitím kurzu roku 2025.",
     issueUnsupportedOperation: "Ve sloupci „Směr“ chybí podporovaná operace (Nákup nebo Prodej).",
     issueInvalidDate: "Ve sloupci „Datum obchodu“ chybí platné datum transakce.",
@@ -1858,7 +1856,6 @@ const I18N = {
     issueUnknownAssetType: "Ve sloupci „Typ aktiva“ je u {symbol} neznámá klasifikace: {value}.",
     issueInvalidAmount: "Hodnoty ve sloupcích „Cena“ a „Počet“ musí být u {symbol} kladné.",
     issueMissingAcquisition: "Prodej {symbol} nemá dostatečnou historii nákupu ({qty} jednotek). Zkontrolujte sloupce „Směr“, „Symbol“ a „Počet“ v dřívějších řádcích.",
-    issueCryptoEligibility: "U {symbol} chybí potvrzení regulatorní způsobilosti ve sloupci „Krypto osvobození“.",
     issueMissingTxId: "U prodeje/swapu {symbol} chybí hodnota ve sloupci „ID transakce“ (nebo tx hash).",
     issueMissingValuation: "U prodeje/swapu {symbol} chybí hodnota ve sloupci „Zdroj ocenění“.",
     taxBaseNote: "Základ daně = Daňové příjmy − Daňové výdaje. Upozornění: Ztrátu z prodeje cenných papírů nelze v ČR kompenzovat proti příjmům ze zaměstnání ani přenášet do dalších let.",
@@ -1872,11 +1869,11 @@ const I18N = {
     exportByYear: "PODLE ROKŮ",
     faqSectionTitle: "Daňový průvodce ČR & dokumentace k importu",
     faq1Summary: "🇨🇿 Základy daňového práva ČR & použití § 10 ZDP",
-    faq1Body: "<p>Piggy připravuje podpůrný výpočet pro soukromé investory podle § 10 ZDP.</p><ul><li><strong>FIFO</strong> je zvolená a ve výstupu zveřejněná metoda párování; uživatel odpovídá za její soulad se svou evidencí.</li><li><strong>Cenné papíry</strong> používají samostatný hodnotový test 100 000 Kč a časový test.</li><li><strong>Kryptoaktiva</strong> mají od 15. 2. 2025 vlastní hodnotový a časový test. EMT jsou z hodnotového testu vyloučeny; regulatorní způsobilost a obchodní majetek musí být potvrzeny.</li><li><strong>Limit 40 mil. Kč</strong> se vztahuje na vybraná osvobození z časového testu. Kandidáti jednotlivého osvobozeného příjmu nad 5 mil. Kč se označují k ověření podle § 38v.</li><li><strong>Příloha č. 2</strong> vykazuje jednotlivé druhy § 10 odděleně a výdaje nejvýše do výše příjmů daného druhu.</li></ul>",
+    faq1Body: "<p>Piggy připravuje podpůrný výpočet pro soukromé investory podle § 10 ZDP.</p><ul><li><strong>FIFO</strong> je zvolená a ve výstupu zveřejněná metoda párování; uživatel odpovídá za její soulad se svou evidencí.</li><li><strong>Cenné papíry</strong> používají samostatný hodnotový test 100 000 Kč a časový test.</li><li><strong>Kryptoaktiva</strong> mají od 15. 2. 2025 vlastní hodnotový a časový test. EMT jsou z hodnotového testu vyloučeny. Známé omezení osvobození a vazbu na obchodní majetek uveďte ve volitelných sloupcích.</li><li><strong>Limit 40 mil. Kč</strong> se vztahuje na vybraná osvobození z časového testu. Kandidáti jednotlivého osvobozeného příjmu nad 5 mil. Kč se označují k ověření podle § 38v.</li><li><strong>Příloha č. 2</strong> vykazuje jednotlivé druhy § 10 odděleně a výdaje nejvýše do výše příjmů daného druhu.</li></ul>",
     faq2Summary: "📂 Podporované formáty importu, oddělovače a brokeři",
     faq2Body: "<p>Piggy podporuje import přetažením souboru (drag &amp; drop), výběrem ze zařízení i přímým vložením ze schránky (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>Typy souborů</strong>: <code>.csv</code>, <code>.tsv</code> a <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Oddělovače</strong>: Automatická detekce středníku (<code>;</code>), čárky (<code>,</code>) i tabulátoru (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Dynamické mapování sloupců</strong>: Sloupce mohou být v libovolném pořadí — Piggy rozpozná záhlaví automaticky.</li><li style=\"margin-bottom:6px\"><strong>Číselné formáty</strong>: Podpora české desetinné čárky (<code>120,50</code>) i tečky (<code>120.50</code>), mezer mezi tisíci (<code>1 250,00</code>) a automatické odstraňování měnových symbolů (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Formáty data</strong>: Podpora <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code> a lomítkového zápisu <code>DD/MM/YYYY</code>.</li><li><strong>Podporovaní brokeři a zdroje</strong>: <strong>Fio banka e-Broker</strong> (přímý export CSV), <strong>Degiro</strong> (CSV transakcí), <strong>Interactive Brokers</strong> (přehled obchodů / Activity Flex Query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong> a <strong>Microsoft Excel</strong>.</li></ul>",
     faq3Summary: "📋 Požadované sloupce a názvy záhlaví (česky a anglicky)",
-    faq3Body: "<p>Piggy rozpoznává jak české standardní názvy sloupců (např. export z Fio e-Brokera), tak anglické alternativy v libovolném pořadí:</p><table class=\"faq-cols\"><thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Význam &amp; povolené hodnoty</th><th>Příklad</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Časové razítko provedení transakce</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B nebo Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Ticker akcie, ETF nebo tag aktiva</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Realizační cena za kus / podíl</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Počet kusů / množství</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Celkový objem obchodu před poplatky</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Poplatek brokerovi za provedení obchodu</td><td>10,00 $</td></tr><tr><td><code>Typ aktiva</code></td><td><code>Asset Type</code>, <code>Category</code></td><td>Nepovinné: Akcie / Cenný papír vs Kryptoaktivum / Virtuální aktivum / Kryptoměna (výchozí: Cenný papír)</td><td>Akcie</td></tr></tbody></table>"
+    faq3Body: "<p>Sloupce mohou být v libovolném pořadí, ale šablona uvádí nejprve povinné údaje a poté volitelné podklady.</p><h4>Povinné sloupce</h4><table class=\"faq-cols\"><thead><tr><th>České záhlaví</th><th>Anglická alternativa</th><th>Obsah</th><th>Příklad</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td>Date / Trade Date</td><td>Datum a čas provedení</td><td>15.03.2025 14:30</td></tr><tr><td><code>Směr</code></td><td>Direction / Type</td><td>Nákup nebo Prodej</td><td>Prodej</td></tr><tr><td><code>Symbol</code></td><td>Ticker / Asset</td><td>Ticker nebo označení aktiva</td><td>BTC</td></tr><tr><td><code>Cena</code></td><td>Price</td><td>Cena za jednotku</td><td>85 000</td></tr><tr><td><code>Počet</code></td><td>Quantity / Qty</td><td>Počet jednotek</td><td>0,01</td></tr><tr><td><code>Měna</code></td><td>Currency</td><td>CZK, USD nebo EUR</td><td>USD</td></tr><tr><td><code>Typ aktiva</code></td><td>Asset Type / Category</td><td>Akcie, ETF, Kryptoaktivum, EMT nebo ART</td><td>Kryptoaktivum</td></tr></tbody></table><h4>Volitelné sloupce</h4><p><strong>Důrazně doporučeno:</strong> vyplňte <code>Objem</code> a <code>Poplatky</code>, pokud je poskytuje výpis. U krypto prodejů a swapů vyplňte také <code>ID transakce</code>, <code>Zdroj</code>, <code>Peněženka</code>, <code>Protihodnota</code> a <code>Zdroj ocenění</code>; výrazně usnadní doložení výpočtu Finanční správě ČR. <code>Obchodní majetek</code> vyplňte vždy, pokud aktivum souviselo s podnikáním. <code>Vyloučení z osvobození</code> nastavte na Ano pouze tehdy, když víte o konkrétním právním důvodu, proč se osvobození nesmí použít.</p><table class=\"faq-cols\"><thead><tr><th>Sloupec</th><th>Kdy jej vyplnit</th></tr></thead><tbody><tr><td><code>Objem</code>, <code>Poplatky</code></td><td>Doporučeno pro přesné odsouhlasení s výpisem.</td></tr><tr><td><code>Vyloučení z osvobození</code></td><td>Jen při známém zákonném omezení; prázdná hodnota nechá Piggy vyhodnotit běžné testy.</td></tr><tr><td><code>Obchodní majetek</code></td><td>Důrazně doporučeno; Ano může změnit daňové posouzení.</td></tr><tr><td><code>ID transakce</code>, <code>Zdroj</code></td><td>Důrazně doporučeno u všech prodejů; u krypta a swapů prakticky nezbytné pro dohledatelnost.</td></tr><tr><td><code>Peněženka</code>, <code>Protihodnota</code>, <code>Zdroj ocenění</code></td><td>Důrazně doporučeno u on-chain transakcí a swapů.</td></tr><tr><td><code>Poznámka</code></td><td>Pro neobvyklé operace, vazby mezi řádky nebo vysvětlení ocenění.</td></tr></tbody></table>"
   },
   en: {
     pageTitle: "Piggy – Czech Securities & Crypto Tax Reports",
@@ -1985,7 +1982,7 @@ const I18N = {
     alert40M2025: "⚠️ In 2025, qualifying exempt proceeds ({val}) exceeded the 40,000,000 CZK ceiling. Piggy proportionally reclassified the excess as taxable income; verify the result with a tax adviser.",
     alert5M: "📢 {count} individual exempt incomes above CZK 5,000,000 were found in {year}. Verify the separate notification duty under § 38v ZDP.",
     warnUnsupportedCurrs: "Some rows were skipped due to unsupported currency: {currs}. Piggy supports CZK, USD, and EUR with official GFŘ uniform rates.",
-    warnCryptoEligibility: "Crypto exemptions are not applied automatically to {symbols}. An open holding is not taxed; only a later sale or swap is treated as taxable. Set “Crypto exemption eligible” to Yes only after confirming eligibility. Record a DEX swap as a sale of the outgoing token and a purchase of the incoming token.",
+    warnCryptoEligibility: "For crypto-assets {symbols}, Piggy automatically evaluates the applicable holding-period and proceeds tests. If a specific legal restriction prevents an exemption, set the optional Czech source column “Vyloučení z osvobození” to Yes. Record a DEX swap as a sale of the outgoing token and a purchase of the incoming token.",
     warnProvisionalRate: "Official GFŘ uniform rates for {year} have not yet been gazetted. Calculations for {year} are provisional estimates using 2025 rates.",
     issueUnsupportedOperation: "Enter Buy or Sell in the Czech source column “Směr”.",
     issueInvalidDate: "Enter a valid transaction date in the Czech source column “Datum obchodu”.",
@@ -1994,7 +1991,6 @@ const I18N = {
     issueUnknownAssetType: "The Czech source column “Typ aktiva” has an unknown classification for {symbol}: {value}.",
     issueInvalidAmount: "Values must be positive in the Czech source columns “Cena” (price) and “Počet” (quantity) for {symbol}.",
     issueMissingAcquisition: "The sale of {symbol} exceeds the available acquisition history by {qty} units. Check earlier rows, especially the Czech columns “Směr”, “Symbol”, and “Počet”.",
-    issueCryptoEligibility: "Confirm regulatory eligibility for {symbol} in the Czech source column “Krypto osvobození”.",
     issueMissingTxId: "The {symbol} sale/swap is missing the Czech source column “ID transakce” (transaction ID or tx hash).",
     issueMissingValuation: "The {symbol} sale/swap is missing the Czech source column “Zdroj ocenění” (valuation source).",
     taxBaseNote: "Tax Base (Základ daně) = Taxable Income − Taxable Expenses. Note that under Czech tax law, security trading losses cannot be offset against ordinary employment income or carried forward to future years.",
@@ -2008,11 +2004,11 @@ const I18N = {
     exportByYear: "BY YEAR (PODLE ROKŮ)",
     faqSectionTitle: "Czech Tax Guide & Import Documentation",
     faq1Summary: "🇨🇿 Czech Tax Law Foundations & § 10 ZDP Use Case",
-    faq1Body: "<p>Piggy prepares a supporting calculation for private investors under § 10 ZDP.</p><ul><li><strong>FIFO</strong> is the selected and disclosed matching method; the user remains responsible for consistency with source records.</li><li><strong>Securities</strong> use their own CZK 100,000 proceeds test and holding-period test.</li><li><strong>Crypto-assets</strong> have separate proceeds and holding-period tests from 15 February 2025. EMTs are excluded from the proceeds test; regulatory eligibility and business-property status must be confirmed.</li><li><strong>The CZK 40 million ceiling</strong> applies to specified holding-period exemptions. Individual exempt-income candidates above CZK 5 million are flagged for § 38v review.</li><li><strong>Annex 2</strong> reports each § 10 income kind separately and limits expenses to income within that kind.</li></ul>",
+    faq1Body: "<p>Piggy prepares a supporting calculation for private investors under § 10 ZDP.</p><ul><li><strong>FIFO</strong> is the selected and disclosed matching method; the user remains responsible for consistency with source records.</li><li><strong>Securities</strong> use their own CZK 100,000 proceeds test and holding-period test.</li><li><strong>Crypto-assets</strong> have separate proceeds and holding-period tests from 15 February 2025. EMTs are excluded from the proceeds test. Record any known exemption restriction and business-property connection in the optional columns.</li><li><strong>The CZK 40 million ceiling</strong> applies to specified holding-period exemptions. Individual exempt-income candidates above CZK 5 million are flagged for § 38v review.</li><li><strong>Annex 2</strong> reports each § 10 income kind separately and limits expenses to income within that kind.</li></ul>",
     faq2Summary: "📂 Supported Import Formats, Delimiters & Brokers",
     faq2Body: "<p>Piggy accepts files via drag &amp; drop, file selector, or direct clipboard paste (<code>Ctrl+V</code> / <code>Cmd+V</code>):</p><ul><li style=\"margin-bottom:6px\"><strong>File Types</strong>: <code>.csv</code>, <code>.tsv</code>, and <code>.txt</code>.</li><li style=\"margin-bottom:6px\"><strong>Delimiters</strong>: Automatically detects Semicolon (<code>;</code>), Comma (<code>,</code>), and Tab (<code>\\t</code>).</li><li style=\"margin-bottom:6px\"><strong>Dynamic Column Mapping</strong>: Columns can be in any arbitrary order — Piggy maps them automatically.</li><li style=\"margin-bottom:6px\"><strong>Number Formats</strong>: Automatically parses both European decimal commas (<code>120,50</code>) and standard decimal points (<code>120.50</code>), space-separated thousands (<code>1 250,00</code>), and strips currency symbols (<code>100$</code>, <code>25 €</code>, <code>850 Kč</code>).</li><li style=\"margin-bottom:6px\"><strong>Date Formats</strong>: Supports <code>DD.MM.YYYY HH:MM</code>, <code>DD.MM.YYYY</code>, <code>YYYY-MM-DD HH:MM</code>, <code>YYYY-MM-DD</code>, and slash notation <code>DD/MM/YYYY</code>.</li><li><strong>Supported Brokers</strong>: <strong>Fio banka e-Broker</strong> (direct CSV export), <strong>Degiro</strong> (Transactions CSV), <strong>Interactive Brokers</strong> (Trades report / custom flex query), <strong>Revolut</strong>, <strong>XTB</strong>, <strong>Trading 212</strong>, <strong>Google Sheets</strong>, and <strong>Microsoft Excel</strong>.</li></ul>",
     faq3Summary: "📋 Required Columns & Multilingual Headers (Czech & English)",
-    faq3Body: "<p>Piggy supports both standard Czech brokerage column headers (FIO e-Broker style) and English column headers in any column order:</p><table class=\"faq-cols\"><thead><tr><th>Czech Header</th><th>English Alternative</th><th>Meaning &amp; Accepted Values</th><th>Example</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td><code>Date</code>, <code>Trade Date</code></td><td>Transaction execution timestamp</td><td>15.03.2023 14:30</td></tr><tr><td><code>Směr</code></td><td><code>Direction</code>, <code>Type</code></td><td>Nákup / Buy / B or Prodej / Sell / S</td><td>Nákup</td></tr><tr><td><code>Symbol</code></td><td><code>Ticker</code>, <code>Asset</code></td><td>Security ticker symbol or crypto tag</td><td>FIFO</td></tr><tr><td><code>Cena</code></td><td><code>Price</code></td><td>Execution price per share</td><td>120,00 $</td></tr><tr><td><code>Počet</code></td><td><code>Quantity</code>, <code>Qty</code></td><td>Number of shares / units executed</td><td>25</td></tr><tr><td><code>Měna</code></td><td><code>Currency</code></td><td>CZK, USD, EUR (Kč, $, €)</td><td>USD</td></tr><tr><td><code>Objem</code></td><td><code>Volume</code>, <code>Total</code></td><td>Total transaction value before fees</td><td>-3 000,00 $</td></tr><tr><td><code>Poplatky</code></td><td><code>Fees</code>, <code>Fee</code></td><td>Broker commission / transaction fee</td><td>10,00 $</td></tr><tr><td><code>Typ aktiva</code></td><td><code>Asset Type</code>, <code>Category</code></td><td>Optional: Security / Stock vs Crypto-asset / Virtual Asset / Crypto (default: Security)</td><td>Akcie</td></tr></tbody></table>"
+    faq3Body: "<p>Columns may appear in any order, but the template places required inputs first and optional evidence fields afterwards.</p><h4>Required columns</h4><table class=\"faq-cols\"><thead><tr><th>Czech header</th><th>English alternative</th><th>Content</th><th>Example</th></tr></thead><tbody><tr><td><code>Datum obchodu</code></td><td>Date / Trade Date</td><td>Execution date and time</td><td>15.03.2025 14:30</td></tr><tr><td><code>Směr</code></td><td>Direction / Type</td><td>Buy or Sell</td><td>Sell</td></tr><tr><td><code>Symbol</code></td><td>Ticker / Asset</td><td>Ticker or asset identifier</td><td>BTC</td></tr><tr><td><code>Cena</code></td><td>Price</td><td>Price per unit</td><td>85,000</td></tr><tr><td><code>Počet</code></td><td>Quantity / Qty</td><td>Number of units</td><td>0.01</td></tr><tr><td><code>Měna</code></td><td>Currency</td><td>CZK, USD, or EUR</td><td>USD</td></tr><tr><td><code>Typ aktiva</code></td><td>Asset Type / Category</td><td>Security, ETF, Crypto-asset, EMT, or ART</td><td>Crypto-asset</td></tr></tbody></table><h4>Optional columns</h4><p><strong>Strongly recommended:</strong> populate <code>Objem</code> and <code>Poplatky</code> when the statement provides them. For crypto sales and swaps, also populate <code>ID transakce</code>, <code>Zdroj</code>, <code>Peněženka</code>, <code>Protihodnota</code>, and <code>Zdroj ocenění</code>; they make the calculation easier to substantiate to Finanční správa ČR. Always populate <code>Obchodní majetek</code> when an asset was connected with business activity. Set <code>Vyloučení z osvobození</code> to Yes only when a specific legal restriction prevents an exemption.</p><table class=\"faq-cols\"><thead><tr><th>Column</th><th>When to populate it</th></tr></thead><tbody><tr><td><code>Objem</code>, <code>Poplatky</code></td><td>Recommended for exact reconciliation to the source statement.</td></tr><tr><td><code>Vyloučení z osvobození</code></td><td>Only for a known legal restriction; blank lets Piggy evaluate the ordinary tests.</td></tr><tr><td><code>Obchodní majetek</code></td><td>Strongly recommended; Yes can change the tax treatment.</td></tr><tr><td><code>ID transakce</code>, <code>Zdroj</code></td><td>Strongly recommended for every disposal and effectively essential for crypto traceability.</td></tr><tr><td><code>Peněženka</code>, <code>Protihodnota</code>, <code>Zdroj ocenění</code></td><td>Strongly recommended for on-chain transactions and swaps.</td></tr><tr><td><code>Poznámka</code></td><td>Use for unusual operations, linked rows, or valuation explanations.</td></tr></tbody></table>"
   }
 };
 
@@ -2032,7 +2028,7 @@ function issueText(issue){
     UNSUPPORTED_OPERATION:'issueUnsupportedOperation', INVALID_DATE:'issueInvalidDate',
     MISSING_SYMBOL:'issueMissingSymbol', UNSUPPORTED_CURRENCY:'issueUnsupportedCurrency',
     UNKNOWN_ASSET_TYPE:'issueUnknownAssetType', INVALID_AMOUNT:'issueInvalidAmount',
-    MISSING_ACQUISITION:'issueMissingAcquisition', CRYPTO_ELIGIBILITY_UNCONFIRMED:'issueCryptoEligibility',
+    MISSING_ACQUISITION:'issueMissingAcquisition',
     MISSING_TX_ID:'issueMissingTxId', MISSING_VALUATION_SOURCE:'issueMissingValuation'
   };
   const key = keys[issue.code];
@@ -2083,32 +2079,32 @@ function applyI18n(){
 // Updated Demo Portfolio spanning 2022, 2023, 2024, and 2025 featuring HOLDING-3Y, FIFO, SHORT, and USDT
 const DEMOS = {
   demo:
-"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození\n" +
-"12.1.2022 10:15;Nákup;HOLDING-3Y;850;150;CZK;-127 540,00;40,00;Akcie\n" +
-"15.3.2022 14:30;Nákup;FIFO;90;25;USD;-2 260,00;10,00;Akcie\n" +
-"20.8.2022 11:00;Nákup;FIFO;110;20;USD;-2 212,00;12,00;Akcie\n" +
-"10.11.2022 15:45;Prodej;FIFO;130;15;USD;1 940,00;10,00;Akcie\n" +
-"14.2.2023 9:30;Prodej;SHORT;65;40;EUR;2 592,00;8,00;Akcie\n" +
-"18.5.2023 13:20;Nákup;FIFO;120;30;USD;-3 615,00;15,00;Akcie\n" +
-"22.9.2023 11:10;Nákup;SHORT;52;40;EUR;-2 088,00;8,00;Akcie\n" +
-"15.11.2023 16:00;Prodej;FIFO;145;20;USD;2 890,00;10,00;Akcie\n" +
-"20.1.2024 10:00;Prodej;SHORT;70;25;EUR;1 745,00;5,00;Akcie\n" +
-"10.4.2024 14:00;Nákup;FIFO;135;20;USD;-2 712,00;12,00;Akcie\n" +
-"15.6.2024 15:30;Prodej;FIFO;160;25;USD;3 988,00;12,00;Akcie\n" +
-"15.8.2024 11:00;Nákup;SHORT;58;25;EUR;-1 456,00;6,00;Akcie\n" +
-"20.10.2024 12:00;Nákup;USDT;1;2000;USD;-2 000,00;0,00;Kryptoaktivum;Ne\n" +
-"15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;134 940,00;60,00;Akcie\n" +
-"20.2.2025 14:20;Prodej;FIFO;170;15;USD;2 540,00;10,00;Akcie\n",
+"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Typ aktiva;Objem;Poplatky;Vyloučení z osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka\n" +
+"12.1.2022 10:15;Nákup;HOLDING-3Y;850;150;CZK;Akcie;-127 540,00;40,00;;Ne;DEMO-001;Demo broker;;;;\n" +
+"15.3.2022 14:30;Nákup;FIFO;90;25;USD;Akcie;-2 260,00;10,00;;Ne;DEMO-002;Demo broker;;;;\n" +
+"20.8.2022 11:00;Nákup;FIFO;110;20;USD;Akcie;-2 212,00;12,00;;Ne;DEMO-003;Demo broker;;;;\n" +
+"10.11.2022 15:45;Prodej;FIFO;130;15;USD;Akcie;1 940,00;10,00;;Ne;DEMO-004;Demo broker;;;;\n" +
+"14.2.2023 9:30;Prodej;SHORT;65;40;EUR;Akcie;2 592,00;8,00;;Ne;DEMO-005;Demo broker;;;;\n" +
+"18.5.2023 13:20;Nákup;FIFO;120;30;USD;Akcie;-3 615,00;15,00;;Ne;DEMO-006;Demo broker;;;;\n" +
+"22.9.2023 11:10;Nákup;SHORT;52;40;EUR;Akcie;-2 088,00;8,00;;Ne;DEMO-007;Demo broker;;;;\n" +
+"15.11.2023 16:00;Prodej;FIFO;145;20;USD;Akcie;2 890,00;10,00;;Ne;DEMO-008;Demo broker;;;;\n" +
+"20.1.2024 10:00;Prodej;SHORT;70;25;EUR;Akcie;1 745,00;5,00;;Ne;DEMO-009;Demo broker;;;;\n" +
+"10.4.2024 14:00;Nákup;FIFO;135;20;USD;Akcie;-2 712,00;12,00;;Ne;DEMO-010;Demo broker;;;;\n" +
+"15.6.2024 15:30;Prodej;FIFO;160;25;USD;Akcie;3 988,00;12,00;;Ne;DEMO-011;Demo broker;;;;\n" +
+"15.8.2024 11:00;Nákup;SHORT;58;25;EUR;Akcie;-1 456,00;6,00;;Ne;DEMO-012;Demo broker;;;;\n" +
+"20.10.2024 12:00;Nákup;USDT;1;2000;USD;EMT;-2 000,00;0,00;;Ne;DEMO-013;Demo exchange;Demo wallet;USD;Demo exchange;\n" +
+"15.1.2025 10:15;Prodej;HOLDING-3Y;1350;100;CZK;Akcie;134 940,00;60,00;;Ne;DEMO-014;Demo broker;;;;\n" +
+"20.2.2025 14:20;Prodej;FIFO;170;15;USD;Akcie;2 540,00;10,00;;Ne;DEMO-015;Demo broker;;;;\n",
   Template:
-"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka\n" +
-"10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;-1 300,00;2,00;Akcie;;Ne;BROKER-001;Interactive Brokers;;;;Nákup akcie\n" +
-"15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;-525,00;1,50;ETF;;Ne;BROKER-002;Degiro;;;;Nákup ETF\n" +
-"20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;760,00;2,00;Akcie;;Ne;BROKER-003;Interactive Brokers;;;;Částečný prodej akcie\n" +
-"16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;-950,00;3,00;Kryptoaktivum;Ano;Ne;0xbtc-buy;Kraken;Kraken custody;USD;Kraken spot;Nákup regulatorně způsobilého kryptoaktiva\n" +
-"1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;-1 000,00;1,00;EMT;Ano;Ne;0xusdt-buy;Kraken;0xwallet;USD;Kraken spot;Elektronický peněžní token – hodnotový test se nepoužije\n" +
-"10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;1 000,00;2,00;EMT;Ano;Ne;0xdex-swap;Uniswap;0xwallet;ETH;Uniswap execution;DEX swap USDT za ETH – odchozí část\n" +
-"10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;-1 000,00;0,00;Kryptoaktivum;Ano;Ne;0xdex-swap;Uniswap;0xwallet;USDT;Uniswap execution;DEX swap USDT za ETH – příchozí část\n" +
-"30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;300,00;1,50;Kryptoaktivum;Ano;Ne;0xeth-sell;Kraken;Kraken custody;USD;Kraken spot;Částečný prodej kryptoaktiva\n"
+"Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Typ aktiva;Objem;Poplatky;Vyloučení z osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka\n" +
+"10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;Akcie;-1 300,00;2,00;;Ne;BROKER-001;Interactive Brokers;;;;Nákup akcie\n" +
+"15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;ETF;-525,00;1,50;;Ne;BROKER-002;Degiro;;;;Nákup ETF\n" +
+"20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;Akcie;760,00;2,00;;Ne;BROKER-003;Interactive Brokers;;;;Částečný prodej akcie\n" +
+"16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;Kryptoaktivum;-950,00;3,00;;Ne;0xbtc-buy;Kraken;Kraken custody;USD;Kraken spot;Nákup kryptoaktiva\n" +
+"1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;EMT;-1 000,00;1,00;;Ne;0xusdt-buy;Kraken;0xwallet;USD;Kraken spot;Elektronický peněžní token – hodnotový test se nepoužije\n" +
+"10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;EMT;1 000,00;2,00;;Ne;0xdex-swap;Uniswap;0xwallet;ETH;Uniswap execution;DEX swap USDT za ETH – odchozí část\n" +
+"10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;Kryptoaktivum;-1 000,00;0,00;;Ne;0xdex-swap;Uniswap;0xwallet;USDT;Uniswap execution;DEX swap USDT za ETH – příchozí část\n" +
+"30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;Kryptoaktivum;300,00;1,50;;Ne;0xeth-sell;Kraken;Kraken custody;USD;Kraken spot;Částečný prodej kryptoaktiva\n"
 };
 
 // ---- Formatting with Direct Currency Symbols ------------------------------
@@ -2163,8 +2159,8 @@ function processText(text, sourceName){
   if (unsupportedCurrencies && unsupportedCurrencies.length){
     importWarnings.push({code:'UNSUPPORTED_CURRENCY', currs:unsupportedCurrencies.join(', '), source:sourceName || ''});
   }
-  const unverifiedCrypto = [...new Set(trades.filter(x => isCryptoType(x.assetType) && !x.cryptoExemptionEligible).map(x => x.symbol))];
-  if (unverifiedCrypto.length) importWarnings.push({code:'CRYPTO_ELIGIBILITY', symbols:unverifiedCrypto.join(', '), source:sourceName || ''});
+  const cryptoSymbols = [...new Set(trades.filter(x => isCryptoType(x.assetType)).map(x => x.symbol))];
+  if (cryptoSymbols.length) importWarnings.push({code:'CRYPTO_ELIGIBILITY', symbols:cryptoSymbols.join(', '), source:sourceName || ''});
   if (!trades.length){ showError('No valid trades found in "'+sourceName+'".'); return null; }
   return trades;
 }

@@ -33,8 +33,9 @@ function calculate(csvText) {
   );
 }
 
-const header = 'Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Objem;Poplatky;Typ aktiva;Krypto osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka';
-const row = values => values.join(';');
+const header = 'Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Typ aktiva;Objem;Poplatky;Vyloučení z osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka';
+// Test cases below retain the original fixture order; serialize them into the public required-first schema.
+const row = values => [values[0],values[1],values[2],values[3],values[4],values[5],values[8],values[6],values[7],values[9] === 'RESTRICT' ? 'Ano' : '',...values.slice(10)].join(';');
 const csv = rows => [header].concat(rows).join('\n');
 const close = (actual, expected, message) => {
   if (Math.abs(actual - expected) > 0.01) throw new Error(message + ': ' + actual + ' !== ' + expected);
@@ -113,9 +114,26 @@ test('CSV formula injection and delimiters are escaped', () => {
 });
 
 test('English validation guidance names the Czech source columns', () => {
-  for (const column of ['Směr', 'Datum obchodu', 'Symbol', 'Měna', 'Typ aktiva', 'Cena', 'Počet', 'Krypto osvobození', 'ID transakce', 'Zdroj ocenění']) {
+  for (const column of ['Směr', 'Datum obchodu', 'Symbol', 'Měna', 'Typ aktiva', 'Cena', 'Počet', 'ID transakce', 'Zdroj ocenění']) {
     ok(html.includes('Czech source column') && html.includes('“' + column + '”'), 'missing English guidance for Czech column: ' + column);
   }
+});
+
+test('crypto exemptions are evaluated without a redundant eligibility confirmation', () => {
+  const result = calculate(csv([
+    row(['1.1.2020','Nákup','BTC','100','1','CZK','-100','0','Kryptoaktivum','','Ne','B1','Exchange','W','CZK','Exchange','']),
+    row(['20.2.2025','Prodej','BTC','200','1','CZK','200','0','Kryptoaktivum','','Ne','S1','Exchange','W','CZK','Exchange',''])
+  ]));
+  ok(result.groups[0].timeTestExemptC === 200, 'time test should be evaluated by default');
+  ok(!result.issues.some(item => item.code === 'CRYPTO_ELIGIBILITY_UNCONFIRMED'), 'redundant eligibility error remains');
+});
+
+test('exemption restriction explicitly disables crypto exemptions', () => {
+  const result = calculate(csv([
+    row(['1.1.2020','Nákup','BTC','100','1','CZK','-100','0','Kryptoaktivum','RESTRICT','Ne','B1','Exchange','W','CZK','Exchange','']),
+    row(['20.2.2025','Prodej','BTC','200','1','CZK','200','0','Kryptoaktivum','RESTRICT','Ne','S1','Exchange','W','CZK','Exchange',''])
+  ]));
+  ok(result.groups[0].taxInc === 200, 'restricted disposal should remain taxable');
 });
 
 test('warnings and issue descriptions remain translatable after import', () => {

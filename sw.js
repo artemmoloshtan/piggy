@@ -1,12 +1,12 @@
 // Service Worker for Piggy offline capability
-const CACHE_NAME = 'piggy-v1.1.0';
+const CACHE_NAME = 'piggy-v1.2.0';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './images/icon.svg',
-  './demo and template/piggy-demo.csv',
-  './demo and template/piggy-template.csv'
+  './assets/icons/icon.svg',
+  './examples/piggy-demo.csv',
+  './examples/piggy-template.csv'
 ];
 
 self.addEventListener('install', event => {
