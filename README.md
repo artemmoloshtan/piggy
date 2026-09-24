@@ -124,11 +124,15 @@ For submissions or follow-up questions from Finanční správa ČR, the stronges
 
 The downloadable template includes:
 
-- stock and ETF purchases;
-- a partial stock sale;
-- an ordinary crypto purchase and disposal;
-- a stablecoin purchase;
+- multiple stock and ETF purchase lots across several years;
+- security disposals that demonstrate the three-year time test;
+- a mixed FIFO sale where one acquisition lot is exempt and another remains taxable;
+- partial sales that leave open positions;
+- an ordinary crypto acquisition and a disposal after more than three years;
+- an EMT stablecoin purchase and disposal;
 - a DEX swap represented by matching stablecoin-sale and crypto-purchase rows.
+
+All names, identifiers, wallet labels, prices, and quantities in the template are fictional examples. Replace every row with records from your own statements before relying on the result.
 
 Broker-specific exports may still require column mapping or cleanup. Unsupported operations such as staking rewards, mining, airdrops, gifts, lending, liquidity-pool transactions, derivatives, and transfers are not silently treated as ordinary buys or sells; they require separate classification. Always resolve every blocking validation item before using the PDF.
 

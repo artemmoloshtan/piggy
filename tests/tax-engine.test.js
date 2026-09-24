@@ -148,6 +148,16 @@ test('the app exposes one comprehensive example template', () => {
   ok(html.includes('Load Example Template'), 'combined example template button is missing');
 });
 
+test('example template is complete and demonstrates security time tests', () => {
+  const template = fs.readFileSync(path.join(__dirname, '..', 'examples', 'piggy-template.csv'), 'utf8');
+  const result = calculate(template);
+  ok(!result.issues.some(item => item.severity === 'error'), 'example template contains a blocking validation issue');
+  const securityTimeTests = result.groups.filter(item => item.trade.assetType === 'security' && item.timeTestExemptC > 0);
+  ok(securityTimeTests.length >= 3, 'template should demonstrate at least three security time-test disposals');
+  const mixedAapl = result.groups.find(item => item.symbol === 'AAPL' && item.timeTestExemptC > 0 && item.taxInc > 0);
+  ok(Boolean(mixedAapl), 'template should demonstrate a mixed exempt/taxable FIFO sale');
+});
+
 let passed = 0;
 for (const item of tests) {
   try {

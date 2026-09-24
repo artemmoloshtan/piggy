@@ -1,9 +1,17 @@
 Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Typ aktiva;Objem;Poplatky;Vyloučení z osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka
-10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;Akcie;-1 300,00;2,00;;Ne;BROKER-001;Interactive Brokers;;;;Nákup akcie
-15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;ETF;-525,00;1,50;;Ne;BROKER-002;Degiro;;;;Nákup ETF
-20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;Akcie;760,00;2,00;;Ne;BROKER-003;Interactive Brokers;;;;Částečný prodej akcie
-16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;Kryptoaktivum;-950,00;3,00;;Ne;0xbtc-buy;Kraken;Kraken custody;USD;Kraken spot;Nákup kryptoaktiva
-1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;EMT;-1 000,00;1,00;;Ne;0xusdt-buy;Kraken;0xwallet;USD;Kraken spot;Elektronický peněžní token – hodnotový test se nepoužije
-10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;EMT;1 000,00;2,00;;Ne;0xdex-swap;Uniswap;0xwallet;ETH;Uniswap execution;DEX swap USDT za ETH – odchozí část
-10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;Kryptoaktivum;-1 000,00;0,00;;Ne;0xdex-swap;Uniswap;0xwallet;USDT;Uniswap execution;DEX swap USDT za ETH – příchozí část
-30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;Kryptoaktivum;300,00;1,50;;Ne;0xeth-sell;Kraken;Kraken custody;USD;Kraken spot;Částečný prodej kryptoaktiva
+10.3.2020 15:30;Nákup;AAPL;100,00;20;USD;Akcie;-2 000,00;2,00;;Ne;IBKR-2020-001;Interactive Brokers;;;;Nákup lotu později splňujícího časový test
+15.6.2021 10:00;Nákup;VWCE;90,00;15;EUR;ETF;-1 350,00;1,50;;Ne;DEGIRO-2021-014;Degiro;;;;Dlouhodobá investice do ETF
+20.7.2021 18:15;Nákup;BTC;40000,00;0,02;USD;Kryptoaktivum;-800,00;4,00;;Ne;KRAKEN-2021-BTC-01;Kraken;Kraken custody;USD;Kraken spot;BTC lot později splňující časový test
+12.4.2022 11:20;Nákup;CEZ;800,00;50;CZK;Akcie;-40 000,00;40,00;;Ne;FIO-2022-088;Fio e-Broker;;;;Česká akcie držená déle než tři roky
+5.8.2024 15:45;Nákup;AAPL;180,00;10;USD;Akcie;-1 800,00;2,00;;Ne;IBKR-2024-117;Interactive Brokers;;;;Druhý AAPL lot bez splněného časového testu
+18.11.2024 16:10;Nákup;MSFT;400,00;8;USD;Akcie;-3 200,00;2,00;;Ne;IBKR-2024-204;Interactive Brokers;;;;Krátkodobější akciová pozice
+20.2.2025 13:30;Prodej;BTC;100000,00;0,01;USD;Kryptoaktivum;1 000,00;5,00;;Ne;KRAKEN-2025-BTC-07;Kraken;Kraken custody;USD;Kraken execution;Částečný prodej BTC po více než třech letech
+16.3.2025 12:00;Nákup;ETH;2500,00;0,50;USD;Kryptoaktivum;-1 250,00;3,00;;Ne;KRAKEN-2025-ETH-02;Kraken;Kraken custody;USD;Kraken spot;Běžný nákup kryptoaktiva
+20.3.2025 16:00;Prodej;AAPL;210,00;25;USD;Akcie;5 250,00;3,00;;Ne;IBKR-2025-031;Interactive Brokers;;;;FIFO prodej: 20 ks časový test, 5 ks zdanitelných
+10.4.2025 10:15;Prodej;VWCE;140,00;10;EUR;ETF;1 400,00;2,00;;Ne;DEGIRO-2025-041;Degiro;;;;Částečný prodej ETF po splnění časového testu
+30.4.2025 14:00;Prodej;CEZ;1100,00;20;CZK;Akcie;22 000,00;50,00;;Ne;FIO-2025-052;Fio e-Broker;;;;Částečný prodej české akcie po splnění časového testu
+15.5.2025 15:40;Prodej;MSFT;450,00;3;USD;Akcie;1 350,00;2,00;;Ne;IBKR-2025-076;Interactive Brokers;;;;Částečný prodej před splněním časového testu
+1.6.2025 09:00;Nákup;USDT;1,00;2000;USD;EMT;-2 000,00;1,00;;Ne;KRAKEN-2025-USDT-01;Kraken;0xExampleWallet;USD;Kraken spot;Nákup EMT pro pozdější DEX swap
+10.6.2025 14:30;Prodej;USDT;1,00;1000;USD;EMT;1 000,00;2,00;;Ne;0xExampleDexSwap01;Uniswap;0xExampleWallet;ETH;Uniswap execution;DEX swap USDT za ETH – odchozí část
+10.6.2025 14:30;Nákup;ETH;2500,00;0,40;USD;Kryptoaktivum;-1 000,00;0,00;;Ne;0xExampleDexSwap01;Uniswap;0xExampleWallet;USDT;Uniswap execution;DEX swap USDT za ETH – příchozí část
+30.9.2025 18:00;Prodej;ETH;3000,00;0,20;USD;Kryptoaktivum;600,00;1,50;;Ne;KRAKEN-2025-ETH-19;Kraken;Kraken custody;USD;Kraken execution;Částečný prodej kryptoaktiva
