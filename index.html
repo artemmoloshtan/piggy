@@ -2077,14 +2077,21 @@ function applyI18n(){
 const DEMOS = {
   Template:
 "Datum obchodu;Směr;Symbol;Cena;Počet;Měna;Typ aktiva;Objem;Poplatky;Vyloučení z osvobození;Obchodní majetek;ID transakce;Zdroj;Peněženka;Protihodnota;Zdroj ocenění;Poznámka\n" +
-"10.1.2023 15:30;Nákup;AAPL;130,00;10;USD;Akcie;-1 300,00;2,00;;Ne;BROKER-001;Interactive Brokers;;;;Nákup akcie\n" +
-"15.6.2024 10:00;Nákup;VWCE;105,00;5;EUR;ETF;-525,00;1,50;;Ne;BROKER-002;Degiro;;;;Nákup ETF\n" +
-"20.3.2025 16:00;Prodej;AAPL;190,00;4;USD;Akcie;760,00;2,00;;Ne;BROKER-003;Interactive Brokers;;;;Částečný prodej akcie\n" +
-"16.2.2025 12:00;Nákup;BTC;95000,00;0,01;USD;Kryptoaktivum;-950,00;3,00;;Ne;0xbtc-buy;Kraken;Kraken custody;USD;Kraken spot;Nákup kryptoaktiva\n" +
-"1.4.2025 09:00;Nákup;USDT;1,00;1000;USD;EMT;-1 000,00;1,00;;Ne;0xusdt-buy;Kraken;0xwallet;USD;Kraken spot;Elektronický peněžní token – hodnotový test se nepoužije\n" +
-"10.4.2025 14:30;Prodej;USDT;1,00;1000;USD;EMT;1 000,00;2,00;;Ne;0xdex-swap;Uniswap;0xwallet;ETH;Uniswap execution;DEX swap USDT za ETH – odchozí část\n" +
-"10.4.2025 14:30;Nákup;ETH;2500,00;0,40;USD;Kryptoaktivum;-1 000,00;0,00;;Ne;0xdex-swap;Uniswap;0xwallet;USDT;Uniswap execution;DEX swap USDT za ETH – příchozí část\n" +
-"30.9.2025 18:00;Prodej;ETH;3000,00;0,10;USD;Kryptoaktivum;300,00;1,50;;Ne;0xeth-sell;Kraken;Kraken custody;USD;Kraken spot;Částečný prodej kryptoaktiva\n"
+"15.02.2021 10:15;Nákup;VWCE;85,00;50;EUR;ETF;-4 250,00;2,00;;Ne;BROKER-001;Degiro;;;;Nákup akumulačního ETF\n" +
+"20.09.2022 14:00;Nákup;VWCE;95,00;30;EUR;ETF;-2 850,00;2,00;;Ne;BROKER-002;Degiro;;;;Pravidelný nákup ETF\n" +
+"18.03.2025 11:30;Prodej;VWCE;125,00;40;EUR;ETF;5 000,00;2,50;;Ne;BROKER-003;Degiro;;;;Prodej po více než 4 letech (splněn 3letý časový test -> osvobozeno dle § 4 ZDP)\n" +
+"12.04.2021 16:30;Nákup;AAPL;130,00;20;USD;Akcie;-2 600,00;1,50;;Ne;IB-001;Interactive Brokers;;;;Nákup 1. tranše AAPL\n" +
+"10.05.2024 15:45;Nákup;AAPL;180,00;30;USD;Akcie;-5 400,00;1,50;;Ne;IB-002;Interactive Brokers;;;;Nákup 2. tranše AAPL\n" +
+"25.08.2025 17:00;Prodej;AAPL;230,00;25;USD;Akcie;5 750,00;2,00;;Ne;IB-003;Interactive Brokers;;;;FIFO rozpad: 20 ks osvobozeno časovým testem, 5 ks zdanitelných\n" +
+"15.01.2024 09:30;Nákup;CEZ;870,00;150;CZK;Akcie;-130 500,00;150,00;;Ne;FIO-101;Fio banka;;;;Nákup dividendových akcií ČEZ\n" +
+"10.10.2025 11:00;Prodej;CEZ;940,00;150;CZK;Akcie;141 000,00;150,00;;Ne;FIO-102;Fio banka;;;;Prodej po 20 měsících (< 3 roky -> zdanitelný příjem § 10 ZDP)\n" +
+"10.10.2021 14:00;Nákup;BTC;55000,00;0,20;USD;Kryptoaktivum;-11 000,00;15,00;;Ne;KRAK-01;Kraken;Kraken cold storage;;Kraken spot;Nákup BTC pro dlouhodobé držení\n" +
+"20.04.2025 18:30;Prodej;BTC;85000,00;0,10;USD;Kryptoaktivum;8 500,00;10,00;;Ne;KRAK-02;Kraken;Kraken cold storage;;Kraken spot;Prodej po > 3 letech po 15.2.2025 (osvobozeno novou úpravou ZDP)\n" +
+"12.01.2025 13:00;Nákup;ETH;2600,00;1,50;USD;Kryptoaktivum;-3 900,00;5,00;;Ne;KRAK-03;Kraken;Kraken custody;;Kraken spot;Krátkodobý nákup ETH\n" +
+"14.05.2025 16:15;Prodej;ETH;3100,00;1,50;USD;Kryptoaktivum;4 650,00;5,00;;Ne;KRAK-04;Kraken;Kraken custody;;Kraken spot;Prodej se ziskem po 4 měsících (< 3 roky -> zdanitelný příjem § 10)\n" +
+"01.06.2025 09:00;Nákup;USDT;1,00;2000;USD;EMT;-2 000,00;2,00;;Ne;0xusdt-buy;Kraken;0xwallet;USD;Kraken spot;Nákup elektronického peněžního tokenu\n" +
+"15.06.2025 14:00;Prodej;USDT;1,00;2000;USD;EMT;2 000,00;3,00;;Ne;0xdex-swap;Uniswap;0xwallet;SOL;Uniswap;DEX swap USDT za SOL (EMT nepodléhá osvobození)\n" +
+"15.06.2025 14:00;Nákup;SOL;150,00;13,31;USD;Kryptoaktivum;-1 997,00;0,00;;Ne;0xdex-swap;Uniswap;0xwallet;USDT;Uniswap;DEX swap USDT za SOL – pořízení nového kryptoaktiva\n"
 };
 
 // ---- Formatting with Direct Currency Symbols ------------------------------
