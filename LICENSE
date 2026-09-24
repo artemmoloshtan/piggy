@@ -1,29 +1,21 @@
-Piggy Personal Use License 1.0
+MIT License
 
-Copyright (c) 2026 Artem Moloshtan. All rights reserved.
+Copyright (c) 2026 Artem Moloshtan
 
-Permission is granted, free of charge, to an individual obtaining a copy of
-this software and its source code to use, copy, and modify it solely for that
-individual's personal, non-commercial purposes.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-You may share an unmodified copy of the software free of charge, provided that
-this license and the copyright notice remain included.
-
-You may not:
-
-1. sell, rent, sublicense, or otherwise charge for the software or a modified
-   version of it;
-2. include the software or a modified version in a product or service offered
-   for payment or other commercial advantage;
-3. provide paid access to the software, including as a hosted service; or
-4. remove or alter the copyright notice or this license.
-
-Commercial use, commercial distribution, resale, sublicensing, and paid
-services require a separate written license from the copyright holder.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

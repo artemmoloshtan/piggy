@@ -142,6 +142,12 @@ test('warnings and issue descriptions remain translatable after import', () => {
   ok(html.includes('esc(issueText(x))'), 'validation table does not translate issue codes at render time');
 });
 
+test('the app exposes one comprehensive example template', () => {
+  ok(!html.includes('id="btnDemo"'), 'obsolete demo button remains');
+  ok(!html.includes('DEMOS.demo'), 'obsolete embedded demo remains');
+  ok(html.includes('Load Example Template'), 'combined example template button is missing');
+});
+
 let passed = 0;
 for (const item of tests) {
   try {

@@ -2,7 +2,7 @@
 
 A privacy-first, zero-dependency web application that turns securities and supported crypto transaction exports into reviewable Czech § 10 tax calculations. Piggy performs FIFO reconciliation, exemption tests, GFŘ currency conversion, validation, and supporting exports for **Finanční správa ČR**, entirely in the browser.
 
-[![License: Personal Use](https://img.shields.io/badge/License-Personal%20Use-f59e0b.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](#)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Client--Side-blue.svg)](#)
 [![Platform: Web & PWA](https://img.shields.io/badge/Platform-Web%20%26%20PWA-047857)](#)
@@ -139,7 +139,7 @@ Broker-specific exports may still require column mapping or cleanup. Unsupported
 ```
 assets/icons/       PWA and browser icons
 docs/sample-report/ Example output for Finanční správa ČR
-examples/           Import template and demo portfolio
+examples/           Comprehensive import example template
 tests/              Tax-engine regression tests
 index.html          Complete zero-dependency application
 manifest.webmanifest
@@ -181,4 +181,4 @@ Piggy is a calculation helper, not tax-filing software or certified legal advice
 
 ## License
 
-Piggy is source-available for personal, non-commercial use. Resale, paid hosting, commercial distribution, and inclusion in a paid product or service are prohibited without a separate written license. See [LICENSE](LICENSE).
+Piggy is available under the permissive [MIT License](LICENSE). You may use, modify, distribute, sublicense, and sell copies provided that the copyright and license notice remain included.
