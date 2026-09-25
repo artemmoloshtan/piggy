@@ -183,6 +183,16 @@ open index.html # On macOS (or double-click the file on Windows/Linux)
 
 Piggy is a calculation helper, not tax-filing software or certified legal advice. It cannot determine whether a token is an electronic-money token, whether an asset belongs to business property, or whether an on-chain transaction has additional legs or fees. Review the imported ledger and final figures with a Czech tax adviser before filing with Finanční správa ČR.
 
+## Calculation and import checks
+
+Missing optional fees default to zero; headers are mapped by name only. Invalid dates, numbers, and boolean fields require correction. Business-property records block final output for separate review, and exemption restrictions apply to both securities and crypto.
+
+The CZK 40 million holding-test ceiling combines qualifying proceeds in 2025. From 2026, securities are excluded and the crypto ceiling remains. See [Finanční správa's 2026 changes](https://financnisprava.gov.cz/cs/financni-sprava/media-a-verejnost/tiskove-zpravy-gfr/tiskove-zpravy-2026/danove-novinky-pro-rok-2026).
+
+The disposal ledger includes total, taxable and exempt quantities and signed gains/losses before the annual expense limit. Quantity splits for the ceiling are proceeds-proportional allocations. Apply the expense limit once per annual income category using the Annex 2 summary, not once per sale.
+
+Run both regression suites with `node tests/tax-engine.test.js` and `node tests/audit-regressions.test.js`.
+
 ## License
 
 Piggy is available under the permissive [MIT License](LICENSE). You may use, modify, distribute, sublicense, and sell copies provided that the copyright and license notice remain included.
