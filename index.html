@@ -383,6 +383,9 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.06);
   }
+  @media (hover: none) {
+    .btn:hover { transform: none; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+  }
   .btn:active {
     transform: scale(0.98);
   }
@@ -539,7 +542,18 @@
     margin-left: auto;
     padding-bottom: 2px;
   }
-  #report-status { overflow-x:auto; }
+  .table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(137, 113, 66, .55) rgba(137, 113, 66, .12);
+  }
+  .table-scroll.has-overflow { box-shadow: inset -16px 0 14px -16px rgba(64,49,24,.8); }
+  .table-scroll-hint { display:none; margin:4px 0 10px; color:var(--ink-sub); font-size:11px; line-height:1.4; text-align:right; }
+  .table-scroll-hint.visible { display:block; }
+  .table-scroll-hint::after { content:'  →'; color:#9a6b16; font-weight:800; }
   .report-status { margin: 14px 0; padding: 14px 16px; border-radius: 12px; border: 1px solid; }
   .report-status.ready { background:#ecfdf5; border-color:#86efac; color:#166534; }
   .report-status.blocked { background:#fff7ed; border-color:#fdba74; color:#9a3412; }
@@ -557,7 +571,7 @@
     border-radius: var(--radius-lg);
     padding: 24px;
     display: none;
-    overflow-x: auto;
+    overflow-x: visible;
     box-shadow: var(--glass-shadow);
     margin-top: 14px;
   }
@@ -861,8 +875,11 @@
     .paste-zone { padding: 12px 10px; }
     .paste-zone .big { font-size: 13.5px; }
     .paste-zone .small { font-size: 11.5px; }
-    .toolbar { gap: 6px; }
-    .btn { min-height: 38px; font-size: 12px; padding: 6px 12px; }
+    .toolbar { gap: 8px; }
+    .btn { min-height: 44px; font-size: 13px; padding: 9px 12px; }
+    .loaded-header { align-items:flex-start; gap:8px; }
+    .loaded-title { min-width:0; flex-wrap:wrap; }
+    .loaded-header .btn-clear { flex:0 0 auto; white-space:nowrap; padding:7px 10px !important; min-height:36px !important; font-size:11px !important; }
 
     .openpos-kpi-row { grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
     .openpos-kpi { padding: 10px 12px; }
@@ -897,7 +914,10 @@
   }
 
   @media (max-width: 480px) {
-    .toolbar .btn { flex: 1 1 calc(50% - 6px); justify-content: center; text-align: center; }
+    .toolbar { display:grid; grid-template-columns:1fr 1fr; align-items:stretch; }
+    .toolbar .btn { width:100%; min-width:0; min-height:48px; justify-content:center; text-align:center; line-height:1.25; padding:8px 10px; }
+    .file-chip { max-width:100%; padding:5px 9px; font-size:11px; }
+    .table-scroll-hint { font-size:10px; }
   }
 
   /* Print Stylesheet for Tax Filing */
@@ -908,7 +928,8 @@
     .glass-card, .toolbar, nav.tabs, .tabs-actions, .badge-github, .chart-card { display: none !important; }
     .panel, main > details, main > h2.section { display:none !important; }
     .print-only { display:block !important; }
-    #report-status { overflow:visible; }
+    .table-scroll { overflow:visible; }
+    .table-scroll-hint { display:none !important; }
     .report-status { break-inside:avoid; }
     body { background: #fff; color: #000; font-size: 11px; }
     table { min-width: 100%; font-size: 10px; page-break-inside: auto; background: #fff; }
@@ -1768,6 +1789,7 @@ const I18N = {
     pasteSmall: "Klikněte pro import zkopírovaných obchodů nebo použijte Ctrl+V / Cmd+V",
     loadedFiles: "📦 Načtené soubory a data",
     clearAll: "✕ Vymazat vše",
+    scrollTableHint: "Posuňte tabulku do strany pro další sloupce",
     btnTemplate: "📑 Načíst ukázkovou šablonu",
     btnDownloadTemplate: "⬇️ Stáhnout šablonu (.csv)",
     btnExport: "⬇️ Souhrn pro Přílohu č. 2",
@@ -1904,6 +1926,7 @@ const I18N = {
     pasteSmall: "Click to import copied trade cells, or use Ctrl+V / Cmd+V",
     loadedFiles: "📦 Loaded Files & Datasets",
     clearAll: "✕ Clear All",
+    scrollTableHint: "Scroll sideways to see more columns",
     btnTemplate: "📑 Load Example Template",
     btnDownloadTemplate: "⬇️ Download Template (.csv)",
     btnExport: "⬇️ Annex 2 Summary",
@@ -2098,6 +2121,35 @@ function applyI18n(){
   if (flagEl) flagEl.textContent = t('langFlag');
   const nameEl = $('langName');
   if (nameEl) nameEl.textContent = t('langName');
+  enhanceScrollableTables();
+}
+
+function enhanceScrollableTables(root=document){
+  root.querySelectorAll('table').forEach(table=>{
+    let scroller=table.parentElement;
+    if (!scroller.classList.contains('table-scroll')){
+      scroller=document.createElement('div');
+      scroller.className='table-scroll';
+      table.parentNode.insertBefore(scroller,table);
+      scroller.appendChild(table);
+      const hint=document.createElement('div');
+      hint.className='table-scroll-hint';
+      hint.setAttribute('aria-hidden','true');
+      scroller.insertAdjacentElement('afterend',hint);
+      scroller._scrollHint=hint;
+      scroller.addEventListener('scroll',()=>updateTableScrollHint(scroller),{passive:true});
+    }
+    requestAnimationFrame(()=>updateTableScrollHint(scroller));
+  });
+}
+
+function updateTableScrollHint(scroller){
+  const overflows=scroller.scrollWidth>scroller.clientWidth+2;
+  scroller.classList.toggle('has-overflow',overflows);
+  if (scroller._scrollHint){
+    scroller._scrollHint.textContent=t('scrollTableHint');
+    scroller._scrollHint.classList.toggle('visible',overflows && scroller.scrollLeft+scroller.clientWidth<scroller.scrollWidth-4);
+  }
 }
 
 // Comprehensive example template for the supported import workflow.
@@ -2270,6 +2322,7 @@ function renderAll(st){
   renderRoky(st);
   renderAkcie(st);
   renderPozice(st);
+  enhanceScrollableTables($('results'));
 }
 
 function renderReportStatus(st){
