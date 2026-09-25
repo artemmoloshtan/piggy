@@ -158,6 +158,16 @@ test('example template is complete and demonstrates security time tests', () => 
   ok(Boolean(mixedAapl), 'template should demonstrate a mixed exempt/taxable FIFO sale');
 });
 
+test('example chart includes five years with gains and an annual loss', () => {
+  const template = fs.readFileSync(path.join(__dirname, '..', 'examples', 'piggy-template.csv'), 'utf8');
+  const result = calculate(template);
+  const years = result.years.filter(y => y.totals.incC > 0 || y.totals.outC > 0).map(y => y.year);
+  ok(JSON.stringify(years) === JSON.stringify([2020,2021,2023,2024,2025]), 'expected five chronological chart years');
+  const loss = result.reportGroups.find(g => g.year === 2023 && g.kind === 'security');
+  ok(loss.expensesClaimed > loss.income && loss.taxBase === 0, 'loss year should show expenses above income and zero tax base');
+  for (const year of [2020,2021,2024]) ok(result.reportGroups.some(g => g.year === year && g.taxBase > 0), 'missing profitable year '+year);
+});
+
 let passed = 0;
 for (const item of tests) {
   try {

@@ -183,6 +183,10 @@ open index.html # On macOS (or double-click the file on Windows/Linux)
 
 Piggy is a calculation helper, not tax-filing software or certified legal advice. It cannot determine whether a token is an electronic-money token, whether an asset belongs to business property, or whether an on-chain transaction has additional legs or fees. Review the imported ledger and final figures with a Czech tax adviser before filing with Finanční správa ČR.
 
+## Example portfolio
+
+The downloadable and built-in templates contain the same 24 fictional transactions. Sales in 2020, 2021, 2023, 2024 and 2025 populate five yearly chart groups, including profitable years and a loss-making 2023. The example retains long-held securities, a mixed FIFO sale, crypto and a stablecoin DEX swap. Prices are illustrative, not historical market quotations. No 2026 trades are included, avoiding provisional exchange-rate warnings.
+
 ## Calculation and import checks
 
 Missing optional fees default to zero; headers are mapped by name only. Invalid dates, numbers, and boolean fields require correction. Business-property records block final output for separate review, and exemption restrictions apply to both securities and crypto.

@@ -40,7 +40,7 @@ const example=calc(fs.readFileSync(require('node:path').join(__dirname,'../examp
 c.g=example.groups.find(g=>g.symbol==='AAPL');
 assert.equal(vm.runInContext('disposalQuantities(g).taxable',c),5);
 assert.equal(vm.runInContext('disposalQuantities(g).exempt',c),20);
-assert.equal(example.reportGroups.find(g=>g.kind==='security').taxBase.toFixed(2),'3430.48');
+assert.equal(example.reportGroups.find(g=>g.year===2025 && g.kind==='security').taxBase.toFixed(2),'3430.48');
 // Exercise the actual import and export functions with rendering stubbed out.
 function install(name){const start=html.indexOf('function '+name+'(');const end=html.indexOf('\nfunction ',start+1);vm.runInContext(html.slice(start,end),c);}
 vm.runInContext('let importIssues=[],importWarnings=[],nextDatasetId=0,loadedFiles=[],state=null; const showError=msg=>{throw Error(msg)}; const renderLoaded=()=>{}; const runAll=()=>{};',c);
