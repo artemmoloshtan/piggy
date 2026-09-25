@@ -545,12 +545,13 @@
   .table-scroll {
     max-width: 100%;
     overflow-x: auto;
+    border-radius: 10px;
     overscroll-behavior-inline: contain;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: rgba(137, 113, 66, .55) rgba(137, 113, 66, .12);
   }
-  .table-scroll.has-overflow { box-shadow: inset -16px 0 14px -16px rgba(64,49,24,.8); }
+  .table-scroll.has-overflow { outline: 1px solid rgba(145,125,88,.12); outline-offset: -1px; }
   .table-scroll-hint { display:none; margin:4px 0 10px; color:var(--ink-sub); font-size:11px; line-height:1.4; text-align:right; }
   .table-scroll-hint.visible { display:block; }
   .table-scroll-hint::after { content:'  →'; color:#9a6b16; font-weight:800; }
