@@ -145,7 +145,28 @@ test('warnings and issue descriptions remain translatable after import', () => {
 test('the app exposes one comprehensive example template', () => {
   ok(!html.includes('id="btnDemo"'), 'obsolete demo button remains');
   ok(!html.includes('DEMOS.demo'), 'obsolete embedded demo remains');
-  ok(html.includes('Load Example Template'), 'combined example template button is missing');
+  ok(html.includes('id="btnTemplate"'), 'combined example template button is missing');
+});
+
+test('Piggy wallet rows keep supporting evidence and estimates out of filing totals', () => {
+  const sheetHeader = header + ';Druh záznamu;Klíč zdrojového záznamu;Soukromá poznámka';
+  const trade = (date, direction, price, id) =>
+    row([date,direction,'ETH',price,'1','CZK',price,'0','Kryptoaktivum','RESTRICT','Ne',id,'DEX','Wallet','CZK','DEX','']);
+  const buy = trade('1.1.2024','Nákup','2000','B1');
+  const sell = trade('1.2.2025','Prodej','3000','S1');
+  const result = calculate([
+    sheetHeader,
+    buy + ';Obchod;;private',
+    sell + ';Obchod;;private',
+    sell.replace('Prodej','Podklad obchodu') + ';token-transfers;chain:S1:token-transfers:0;private',
+    buy.replace('Nákup','Vlastní převod') + ';transactions;chain:T1:transactions:0;private',
+    sell + ';transactions;chain:S2:transactions:0;private'
+  ].join('\n'));
+  close(result.groups.length, 1, 'only the documented sale is included');
+  close(result.groups[0].taxInc, 3000, 'sale is counted once');
+  close(result.groups[0].taxOut, 2000, 'the opening cost is unchanged');
+  ok(result.issues.filter(issue => issue.code === 'WALLET_REVIEW').length === 1, 'unverified movement gets one review item');
+  ok(!JSON.stringify(result).includes('private'), 'private note column is never sent to the engine');
 });
 
 test('example template is complete and demonstrates security time tests', () => {
