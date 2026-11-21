@@ -4,8 +4,8 @@
   "description": "Kalkulačka daně z příjmů z obchodování s akciemi a cennými papíry (FIFO, časový test, GFŘ kurzy)",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f4f2ec",
-  "theme_color": "#ffd95e",
+  "background_color": "#f6f4ef",
+  "theme_color": "#f6f4ef",
   "orientation": "portrait-primary",
   "icons": [
     {

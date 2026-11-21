@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffd95e">
+<meta name="theme-color" content="#f6f4ef">
 <meta name="description" content="Piggy – Private Czech § 10 calculation support for securities and cryptoassets with FIFO reconciliation, exemption tests, validation, and supporting exports for Finanční správa ČR.">
 <title>Piggy – Czech Securities &amp; Crypto Tax Reports</title>
 <link rel="icon" href="assets/icons/favicon-32x32.png" sizes="32x32" type="image/png">
@@ -12,34 +12,37 @@
 <link rel="manifest" href="manifest.webmanifest">
 <style>
   :root {
-    --bg-mesh: radial-gradient(at 0% 0%, rgba(255, 237, 180, 0.45) 0px, transparent 55%),
-               radial-gradient(at 100% 0%, rgba(254, 215, 102, 0.35) 0px, transparent 55%),
-               radial-gradient(at 50% 100%, rgba(254, 240, 199, 0.5) 0px, transparent 60%),
-               #f8f7f2;
-    --glass-card: rgba(255, 255, 255, 0.74);
-    --glass-card-hover: rgba(255, 255, 255, 0.88);
-    --glass-border: rgba(255, 255, 255, 0.85);
-    --glass-border-subtle: rgba(220, 214, 200, 0.55);
-    --glass-shadow: 0 10px 30px -4px rgba(45, 38, 20, 0.05), 0 2px 8px -2px rgba(45, 38, 20, 0.03);
-    --glass-shadow-lg: 0 18px 40px -6px rgba(45, 38, 20, 0.09), 0 4px 14px -3px rgba(45, 38, 20, 0.05);
-
-    --ink: #1c1c1e;
-    --ink-sub: #635f54;
-    --gold: #f59e0b;
-    --gold-dark: #d97706;
-    --gold-surface: rgba(245, 158, 11, 0.12);
-    --green: #059669;
-    --green-bg: #ecfdf5;
-    --green-border: #a7f3d0;
-    --red: #dc2626;
+    --bg-canvas: #f6f4ef;
+    --bg-surface: #fff;
+    --bg-subtle: #efece6;
+    --border: #e2ddd5;
+    --ink: #181715;
+    --ink-sub: #57534e;
+    --muted: #6b645a;
+    --rose: #d4655f;
+    --focus: #a8403b;
+    --blue: #1d4ed8;
+    --blue-bg: #eaf1ff;
+    --green: #15803d;
+    --green-bg: #edf7f0;
+    --green-border: #b8d9bf;
+    --red: #b91c1c;
     --red-bg: #fef2f2;
-    --red-border: #fecaca;
-    --purple: #7c3aed;
-    --purple-bg: #faf5ff;
-    --blue: #2563eb;
-    --blue-bg: #eff6ff;
-    --teal: #0d9488;
+    --red-border: #edc4c4;
+    --gold: #92400e;
+    --gold-dark: #78350f;
+    --gold-surface: #fef3c7;
+    --purple: #6941a5;
+    --purple-bg: #f8f3fc;
+    --teal: #0f766e;
     --teal-bg: #f0fdfa;
+    --bg-mesh: var(--bg-canvas);
+    --glass-card: var(--bg-surface);
+    --glass-card-hover: var(--bg-surface);
+    --glass-border: var(--border);
+    --glass-border-subtle: var(--border);
+    --glass-shadow: 0 2px 4px rgb(24 23 21 / 3%);
+    --glass-shadow-lg: var(--glass-shadow);
 
     --radius-sm: 10px;
     --radius-md: 16px;
@@ -937,6 +940,136 @@
     tr { page-break-inside: avoid; page-break-after: auto; }
     th, td { border: 1px solid #999; padding: 4px 6px; }
   }
+  /* Warm Ledger */
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  a { color: var(--blue); text-underline-offset: 3px; }
+  header {
+    background: var(--bg-surface);
+    border-color: var(--border);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding-block: max(12px, env(safe-area-inset-top, 12px)) 12px;
+  }
+  header .wrap, main { max-width: 1120px; }
+  header h1 { font-size: 21px; color: var(--ink); }
+  header p { color: var(--ink-sub); }
+  .pig-logo { width: 39px; height: 39px; background: var(--rose); color: #fff; border-radius: 10px; filter: none; transition: none; }
+  .pig-logo:hover { transform: none; }
+  .badge-privacy, .badge-lang { background: #fff; color: var(--ink-sub); border-color: var(--border); box-shadow: none; }
+  .badge-privacy { cursor: default; }
+  .badge-lang:hover { border-color: #a99b8e; transform: none; }
+  .badge-github { background: #fff; color: var(--ink); border-color: var(--border); }
+  .badge-github:hover { background: var(--bg-subtle); color: var(--ink); }
+  .btn, .btn-demo { min-height: 40px; padding: 8px 13px; border-radius: 8px; font-weight: 650; }
+  .btn:not(.btn-primary):not(.btn-clear), .btn-demo { background: #fff; color: var(--ink); border: 1px solid #c7bfb3; box-shadow: none; }
+  .btn:not(.btn-primary):not(.btn-clear):hover { background: var(--bg-subtle); transform: none; }
+  .btn.btn-primary { background: #1c1917; color: #fff; border: 1px solid #1c1917; box-shadow: none; }
+  .btn.btn-primary:hover { background: #332e2b; transform: none; }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .meta, .import-help, .filing-header p { color: var(--muted); font-size: .875rem; }
+  .import-card, .filing-card, #year-comparison {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #fff;
+    padding: clamp(15px, 2.1vw, 25px);
+    box-shadow: var(--glass-shadow);
+    margin-bottom: 15px;
+    overflow: visible;
+  }
+  .import-card:hover { box-shadow: var(--glass-shadow); }
+  .import-card.drag { outline: 2px dashed var(--focus); outline-offset: -6px; background: #fdf1f0; }
+  .import-heading, .filing-header { display: flex; justify-content: space-between; align-items: center; gap: 12px 18px; flex-wrap: wrap; }
+  .import-heading h2, .filing-header h2, .filing-guide h2 { font-size: clamp(1.2rem, 2.1vw, 1.65rem); line-height: 1.22; letter-spacing: -.025em; margin: 0; }
+  .import-heading p, .filing-header p { margin: 4px 0 0; }
+  .import-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .import-options { margin: 12px 0 0; border: 0; padding: 0; background: transparent; border-radius: 0; box-shadow: none; }
+  .import-options > summary { color: var(--ink-sub); font-weight: 600; font-size: .875rem; padding: 0; }
+  .import-options .toolbar { justify-content: flex-start; display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 0 0; margin: 0; }
+  .import-options .toolbar .btn { width: auto; min-height: 40px; }
+  .loaded-files-box { margin: 9px 0 0; padding: 8px 0 0; background: transparent; border: 0; border-top: 1px solid var(--border); box-shadow: none; }
+  .loaded-header { margin: 0; padding: 0; border: 0; }
+  .loaded-title { color: var(--ink); font-size: .875rem; }
+  .loaded-header .btn-clear { min-height: 34px; padding: 4px 8px; }
+  .loaded-title .badge-count { background: var(--teal-bg); color: var(--teal); }
+  .dataset { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--border); padding: 7px 0; min-width: 0; }
+  .dataset strong { overflow-wrap: anywhere; font-size: .9rem; }
+  .dataset-remove.btn { flex: 0 0 auto; min-height: 33px; padding: 3px 9px; }
+  .has-imports .import-help { display: none; }
+  .has-imports .import-heading h2 { font-size: 1.1rem; }
+  .has-imports .import-options { display: none; }
+  .year-field { display: flex; align-items: center; font-size: .875rem; font-weight: 650; color: var(--ink-sub); gap: 8px; }
+  .year-field select { color: var(--ink); background: #fff; font: inherit; border: 1px solid #c7bfb3; border-radius: 8px; min-height: 40px; padding: 5px 11px; }
+  .report-status { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 11px; margin: 16px 0 12px; padding: 10px 12px; border-radius: 8px; font-size: .875rem; }
+  .report-status.ready { background: var(--green-bg); border-color: var(--green-border); color: #166534; }
+  .report-status.draft { background: #fef3c7; border-color: #e8ca71; color: #78350f; }
+  .report-status.blocked { background: var(--red-bg); border-color: var(--red-border); color: #991b1b; }
+  .report-status p { font-size: inherit; }
+  .filing-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .filing-metric { position: relative; padding: 14px 12px; border-radius: 10px; border: 1px solid var(--border); background: #fbfaf8; }
+  .filing-metric span { display: block; color: var(--ink-sub); font-weight: 650; font-size: .875rem; padding-right: 31px; }
+  .filing-metric strong { display: block; color: var(--ink); margin-top: 7px; font-size: clamp(1.15rem, 3vw, 1.85rem); font-variant-numeric: tabular-nums; letter-spacing: -.035em; overflow-wrap: anywhere; }
+  .filing-metric small { position: absolute; right: 11px; top: 14px; color: var(--muted); font-size: .75rem; font-weight: 650; }
+  .filing-base { border-color: #bdcff6; background: var(--blue-bg); }
+  .filing-base strong, .filing-base small { color: var(--blue); }
+  .filing-breakdown { margin-top: 12px; }
+  .filing-breakdown table { margin: 0; }
+  .filing-breakdown th[scope=row] { text-align: left; white-space: normal; }
+  .review-list, .review-group { margin: 12px 0 0; border: 1px solid var(--border); border-radius: 8px; background: #fff; box-shadow: none; padding: 8px 11px; }
+  .review-list summary, .review-group summary { color: var(--ink); padding: 0; }
+  .review-group td { white-space: normal; }
+  .report-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 0; }
+  .export-menu { position: relative; border: 0; background: none; padding: 0; margin: 0; box-shadow: none; }
+  .export-menu summary { list-style: none; }
+  .export-menu summary::before { content: none; }
+  .export-menu summary::after { content: '▾'; margin-left: 4px; }
+  .export-list { position: absolute; z-index: 20; left: 0; top: calc(100% + 5px); min-width: 195px; display: grid; gap: 3px; padding: 6px; border: 1px solid var(--border); border-radius: 9px; background: #fff; box-shadow: 0 6px 23px #1817151d; }
+  .export-list .btn { justify-content: flex-start; border-color: transparent !important; white-space: normal; }
+  .filing-guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .filing-guide h3 { font-size: .95rem; margin: 12px 0 4px; }
+  .filing-guide p { margin: 5px 0 10px; overflow-wrap: anywhere; }
+  .filing-guide dl { margin: 0 0 7px; }
+  .filing-guide dl > div { display: flex; gap: 4px 12px; justify-content: space-between; padding: 4px 0; flex-wrap: wrap; }
+  .filing-guide dt { color: var(--ink-sub); }
+  .filing-guide dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .filing-guide code { overflow-wrap: anywhere; }
+  .filing-guide details { margin: 8px 0; background: #fff; }
+  #year-comparison summary { color: var(--ink); padding: 0; }
+  .comparison-year { padding-top: 9px; }
+  .comparison-year h3 { margin: 0 0 3px; }
+  .comparison-measure { display: grid; grid-template-columns: 1fr auto; gap: 1px 12px; font-size: .875rem; margin-bottom: 5px; }
+  .comparison-measure strong { font-variant-numeric: tabular-nums; }
+  .bar-track { grid-column: span 2; height: 6px; border-radius: 5px; background: var(--bg-subtle); overflow: hidden; }
+  .bar-track span { display: block; height: 100%; border-radius: 5px; }
+  .bar-income { background: var(--green); }
+  .bar-expenses { background: var(--red); }
+  .bar-base { background: var(--blue); }
+  nav.tabs { position: static; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  nav.tabs button { min-height: 40px; border-radius: 8px; }
+  .warn { background: #fff7e4; color: #78350f; border-color: #edd6a1; }
+  table { font-variant-numeric: tabular-nums; }
+  @media (max-width: 640px) {
+    main { padding: 12px; }
+    header p { max-width: 23ch; }
+    .filing-metrics { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .filing-metric { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: baseline; gap: 7px; padding: 10px 11px; }
+    .filing-metric span { padding: 0; }
+    .filing-metric strong { margin: 0; font-size: 1.2rem; text-align: right; }
+    .filing-metric small { position: static; order: -1; line-height: 1; }
+    .filing-guide-grid { grid-template-columns: minmax(0,1fr); gap: 0; }
+    .filing-breakdown table { min-width: 0; }
+    .export-list { left: auto; right: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+  }
+  @media print {
+    header, main > :not(#print-report), footer { display: none !important; }
+    #print-report:empty { display: none !important; }
+    #print-report:not(:empty) { display: block !important; }
+    #print-report table { margin-top: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -944,7 +1077,12 @@
 <header>
   <div class="wrap">
     <div class="brand">
-      <div class="pig-logo"><img src="assets/icons/icon.svg" alt="Piggy Logo" width="44" height="44"></div>
+      <div class="pig-logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 13c2-3 6-5 11-4l5-3v5l2 3h3v7h-4l-2 3v3h-4v-3h-7v3H8v-4c-3-2-4-5-3-8-2 0-3-1-3-3"/>
+          <path d="M13 13h5"/><circle cx="23" cy="15" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
       <div>
         <h1>Piggy</h1>
         <p id="hdr-subtitle" data-i18n="subtitle">Czech § 10 reporting support • Securities, crypto &amp; EMT • FIFO reconciliation • Annex 2 summary</p>
@@ -967,82 +1105,76 @@
 </header>
 
 <main>
-  <!-- Input Section -->
-  <section class="glass-card" id="input">
-    <div class="input-grid">
-      <div class="dropzone" id="drop">
-        <div class="dropzone-icon">📁</div>
-        <div class="big" data-i18n="dropBig">Přetáhněte export z brokera (.CSV / .TSV)</div>
-        <div class="small" data-i18n="dropSmall">Nebo klikněte sem pro výběr souborů z vašeho zařízení</div>
-        <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
+  <section class="glass-card import-card" id="input" aria-labelledby="import-title">
+    <div class="import-heading">
+      <div>
+        <h2 id="import-title" data-i18n="importTitle">Import transakcí</h2>
+        <p class="import-help" data-i18n="importHelp">Přetáhněte soubor CSV nebo TSV, nebo vložte řádky z tabulky.</p>
       </div>
-
-      <div class="paste-zone" id="btnPasteClipboard">
-        <div class="paste-icon">📋</div>
-        <div class="big" data-i18n="pasteBig">Vložit ze schránky</div>
-        <div class="small" data-i18n="pasteSmall">Klikněte pro import zkopírovaných obchodů nebo použijte <kbd>Ctrl+V</kbd> / <kbd>Cmd+V</kbd></div>
+      <div class="import-actions" id="drop">
+        <button class="btn btn-primary" id="btnBrowse" data-i18n="importBrowse">Nahrát soubor</button>
+        <input type="file" id="file" accept=".csv,.tsv,.txt" multiple hidden>
+        <button class="btn" id="btnPasteClipboard" data-i18n="importPaste">Vložit z tabulky</button>
       </div>
     </div>
-
-    <!-- Defined Holding Area for Loaded Files -->
+    <details class="import-options">
+      <summary data-i18n="importTemplates">Šablona a ukázka</summary>
+      <div class="toolbar">
+        <button class="btn" id="btnTemplate" data-i18n="btnTemplate">Načíst ukázku</button>
+        <button class="btn" id="btnDownloadTemplate" data-i18n="btnDownloadTemplate">Stáhnout šablonu CSV</button>
+      </div>
+    </details>
     <div class="loaded-files-box" id="loaded-box" hidden>
       <div class="loaded-header">
         <div class="loaded-title">
-          <span data-i18n="loadedFiles">📦 Načtené soubory a data</span>
-          <span class="badge-count" id="loaded-count">0</span>
+          <span data-i18n="importSources">Načtené zdroje</span>
+          <span class="badge-count" id="loaded-count"></span>
         </div>
-        <button class="btn btn-clear" id="btnClear" style="padding:4px 12px;font-size:12px;min-height:auto;" data-i18n="clearAll">✕ Vymazat vše</button>
+        <button class="btn btn-clear" id="btnClear" data-i18n="clearAll">Vymazat vše</button>
       </div>
       <div id="loaded-chips"></div>
     </div>
-
-    <div class="toolbar">
-      <button class="btn btn-demo" id="btnTemplate" data-i18n="btnTemplate">📑 Načíst ukázkovou šablonu</button>
-      <button class="btn" id="btnDownloadTemplate" data-i18n="btnDownloadTemplate">⬇️ Stáhnout šablonu (.csv)</button>
-    </div>
-    <div id="messages"></div>
+    <div id="messages" aria-live="polite"></div>
   </section>
 
-  <!-- Results Section -->
   <section id="results" hidden>
-    <!-- Elevated Yearly Taxable Performance Chart (Front & Center) -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">
-          <span>📊</span>
-          <span data-i18n="chartTitle">Přehled daňových příjmů a výdajů v CZK</span>
+    <section class="filing-card" aria-labelledby="filing-title">
+      <div class="filing-header">
+        <div>
+          <h2 id="filing-title" data-i18n="filingTitle">Přehled pro daňové přiznání</h2>
+          <p data-i18n="filingSubtitle">Příloha č. 2 · § 10 · pouze načtené obchody</p>
         </div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot dot-inc"></div> <span data-i18n="legendInc">Daňové příjmy</span></div>
-          <div class="legend-item"><div class="legend-dot dot-out"></div> <span data-i18n="legendOut">Daňové výdaje</span></div>
-          <div class="legend-item"><div class="legend-dot dot-net"></div> <span data-i18n="legendNet">Základ daně</span></div>
-        </div>
+        <label class="year-field"><span data-i18n="colYear">Rok</span><select id="filing-year"></select></label>
       </div>
-      <div id="chart-container" style="width: 100%; height: 200px;"></div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <nav class="tabs" id="tabs">
-      <button data-tab="souhrn" class="active" data-i18n="tabSouhrn">Souhrn</button>
-      <button data-tab="roky" data-i18n="tabRoky">Podle roků</button>
-      <button data-tab="akcie" data-i18n="tabAkcie">Podle tickeru</button>
-      <button data-tab="pozice" data-i18n="tabPozice">Otevřené pozice</button>
-    </nav>
-
-    <div class="report-actions tabs-actions">
-      <button class="btn" id="btnExport" data-i18n="btnExport">⬇️ Exportovat souhrnný report</button>
-      <button class="btn" id="btnExportTaxable" data-i18n="btnExportTaxable">⬇️ Zdanitelné prodeje</button>
-      <button class="btn" id="btnExportExempt" data-i18n="btnExportExempt">⬇️ Osvobozené příjmy</button>
-      <button class="btn" id="btnExportFifo" data-i18n="btnExportFifo">⬇️ FIFO párování</button>
-      <button class="btn" id="btnExportIssues" data-i18n="btnExportIssues">⬇️ Kontroly</button>
-      <button class="btn btn-primary" id="btnPrint" data-i18n="btnPrint">🖨️ Uložit souhrn jako PDF</button>
-    </div>
-
+      <div id="report-status" aria-live="polite"></div>
+      <div class="report-actions tabs-actions">
+        <button class="btn btn-primary" id="btnPrint" data-i18n="btnPrint">Uložit český souhrn PDF</button>
+        <details class="export-menu">
+          <summary class="btn" data-i18n="exportMenu">Exporty</summary>
+          <div class="export-list">
+            <button class="btn" id="btnExport" data-i18n="btnExport">Souhrn pro Přílohu č. 2</button>
+            <button class="btn" id="btnExportTaxable" data-i18n="btnExportTaxable">Zdanitelné prodeje</button>
+            <button class="btn" id="btnExportExempt" data-i18n="btnExportExempt">Osvobozené příjmy</button>
+            <button class="btn" id="btnExportFifo" data-i18n="btnExportFifo">FIFO párování</button>
+            <button class="btn" id="btnExportIssues" data-i18n="btnExportIssues">Kontroly</button>
+          </div>
+        </details>
+        <span id="print-status" class="meta"></span>
+      </div>
+    </section>
+    <div id="filing-guide"></div>
     <div id="warnings"></div>
-    <div id="report-status"></div>
-    <div class="print-only info" data-i18n="printMethodology">
-      Podpůrný výpočet k § 10 ZDP, nikoli oficiální daňové přiznání. Párování FIFO; přepočet jednotnými kurzy GFŘ. Částky je nutné porovnat s původními výpisy a přenést do formuláře MOJE daně.
-    </div>
+    <details class="chart-card" id="year-comparison">
+      <summary data-i18n="comparisonTitle">Porovnání roků</summary>
+      <div id="chart-container"></div>
+    </details>
+
+    <nav class="tabs" id="tabs" data-i18n-aria="detailNav" aria-label="Podrobnosti výpočtu">
+      <button data-tab="souhrn" class="active" aria-pressed="true" data-i18n="tabSouhrn">Souhrn</button>
+      <button data-tab="roky" aria-pressed="false" data-i18n="tabRoky">Podle roků</button>
+      <button data-tab="akcie" aria-pressed="false" data-i18n="tabAkcie">Podle tickeru</button>
+      <button data-tab="pozice" aria-pressed="false" data-i18n="tabPozice">Otevřené pozice</button>
+    </nav>
 
     <div class="panel active" id="panel-souhrn">
       <h2 class="section" data-i18n="secSouhrn">Souhrn – Zdanitelné příjmy a výdaje podle roků</h2>
@@ -1061,6 +1193,7 @@
       <div id="out-pozice"></div>
     </div>
   </section>
+  <section class="print-only" id="print-report" lang="cs"></section>
 
   <!-- Technical Information & Exchange Rates -->
   <details id="info-rates">
@@ -1285,7 +1418,7 @@ function mapHeaders(headerCells){
     date: -1, dir: -1, symbol: -1, price: -1, qty: -1,
     currency: -1, volume: -1, fee: -1, assetType: -1, exemptionRestricted: -1, cryptoEligibleLegacy: -1,
     businessAsset: -1, transactionId: -1, source: -1, wallet: -1,
-    counterAsset: -1, valuationSource: -1, note: -1
+    counterAsset: -1, valuationSource: -1, note: -1, recordType: -1, rowKey: -1
   };
   const norm = s => String(s || '').trim().toLowerCase().replace(/^["']|["']$/g, '');
   headerCells.forEach((c, idx) => {
@@ -1307,6 +1440,8 @@ function mapHeaders(headerCells){
     else if (map.wallet === -1 && ['peněženka', 'penezenka', 'wallet', 'wallet address', 'adresa peněženky', 'adresa penezenky'].includes(h)) map.wallet = idx;
     else if (map.counterAsset === -1 && ['protihodnota', 'protiaktivum', 'counter asset', 'counterasset', 'pair', 'pár', 'par'].includes(h)) map.counterAsset = idx;
     else if (map.valuationSource === -1 && ['zdroj ocenění', 'zdroj oceneni', 'valuation source', 'price source', 'cenový zdroj', 'cenovy zdroj'].includes(h)) map.valuationSource = idx;
+    else if (map.recordType === -1 && ['druh záznamu', 'druh zaznamu', 'record type'].includes(h)) map.recordType = idx;
+    else if (map.rowKey === -1 && ['klíč zdrojového záznamu', 'klic zdrojoveho zaznamu', 'source row key'].includes(h)) map.rowKey = idx;
     else if (map.note === -1 && ['poznámka', 'poznamka', 'note', 'comment', 'memo'].includes(h)) map.note = idx;
   });
 
@@ -1391,6 +1526,8 @@ function normalizeCurrency(s){
 function normalizeRows(csvResult){
   const trades = [];
   let discarded = 0;
+  let evidenceCount = 0;
+  let provisionalCount = 0;
   const unsupportedCurrs = new Set();
   const issues = [];
   const colMap = mapHeaders(csvResult.header || []);
@@ -1403,6 +1540,21 @@ function normalizeRows(csvResult){
     const r = csvResult.rows[rowIndex];
     const sourceRow = rowIndex + 2;
     const dirRaw = String(r[colMap.dir]||'').trim().toLowerCase();
+    const recordType = String(r[colMap.recordType] || '').trim().toLowerCase();
+    const isWalletRecord = colMap.recordType >= 0 && colMap.rowKey >= 0
+      && recordType !== 'obchod' && recordType !== 'trade'
+      && Boolean(recordType || String(r[colMap.rowKey] || '').trim());
+    if (isWalletRecord) {
+      if (['vlastní převod', 'podklad obchodu', 'bez pohybu'].includes(dirRaw)) {
+        evidenceCount++;
+      } else {
+        provisionalCount++;
+        const year = parseDateTime(r[colMap.date])?.getFullYear();
+        issues.push({severity:'warning', row:sourceRow, code:'WALLET_REVIEW', year,
+          symbol:String(r[colMap.symbol] || '').trim()});
+      }
+      continue;
+    }
     const dir = (dirRaw === 'nákup' || dirRaw === 'nakup' || dirRaw === 'buy' || dirRaw === 'b') ? 'B'
               : (dirRaw === 'prodej' || dirRaw === 'sell' || dirRaw === 's') ? 'S' : null;
     if (!dir){ discarded++; issues.push({severity:'error', row:sourceRow, code:'UNSUPPORTED_OPERATION'}); continue; }
@@ -1468,7 +1620,7 @@ function normalizeRows(csvResult){
       related: new Set()
     });
   }
-  return { trades, discarded, unsupportedCurrencies: [...unsupportedCurrs], issues };
+  return { trades, discarded, evidenceCount, provisionalCount, unsupportedCurrencies: [...unsupportedCurrs], issues };
 }
 
 function computeAll(trades){
@@ -1782,12 +1934,13 @@ let highlight = { set: new Set() };
 let marketPrices = {};
 
 // Localization (Default: Czech, English includes key Czech terms)
+let selectedFilingYear = null;
 let currentLang = localStorage.getItem('piggy_lang') || ((navigator.language && (navigator.language.startsWith('cs') || navigator.language.startsWith('sk'))) ? 'cs' : 'en');
 
 const I18N = {
   cs: {
     pageTitle: "Piggy – České daňové podklady pro cenné papíry a krypto",
-    subtitle: "Podklady k § 10 ZDP • Cenné papíry, krypto a EMT • FIFO párování • Souhrn pro Přílohu č. 2",
+    subtitle: "Podklady pro české daňové přiznání · § 10",
     privacyBadge: "100% soukromí v prohlížeči",
     langName: "Čeština",
     langFlag: "🇨🇿",
@@ -1798,14 +1951,52 @@ const I18N = {
     loadedFiles: "📦 Načtené soubory a data",
     clearAll: "✕ Vymazat vše",
     scrollTableHint: "Posuňte tabulku do strany pro další sloupce",
-    btnTemplate: "📑 Načíst ukázkovou šablonu",
-    btnDownloadTemplate: "⬇️ Stáhnout šablonu (.csv)",
-    btnExport: "⬇️ Souhrn pro Přílohu č. 2",
-    btnExportTaxable: "⬇️ Zdanitelné prodeje",
-    btnExportExempt: "⬇️ Osvobozené příjmy",
-    btnExportFifo: "⬇️ FIFO párování",
-    btnExportIssues: "⬇️ Kontroly",
-    btnPrint: "🖨️ Uložit souhrn jako PDF",
+    btnTemplate: "Načíst ukázku",
+    btnDownloadTemplate: "Stáhnout šablonu CSV",
+    btnExport: "Souhrn pro Přílohu č. 2",
+    btnExportTaxable: "Zdanitelné prodeje",
+    btnExportExempt: "Osvobozené příjmy",
+    btnExportFifo: "FIFO párování",
+    btnExportIssues: "Kontroly",
+    btnPrint: "Uložit český souhrn PDF",
+    severityWarning: "Upozornění",
+    severityError: "Chyba",
+    demoNotice: "Ukázková data. Import vlastních záznamů ukázku nahradí.",
+    importTitle: "Import transakcí",
+    importHelp: "Přetáhněte CSV nebo TSV, nebo vložte řádky z tabulky.",
+    importBrowse: "Nahrát soubor",
+    importPaste: "Vložit z tabulky",
+    importTemplates: "Šablona a ukázka",
+    importSources: "Načtené zdroje",
+    importCounts: "Obchody: {accepted} · Podklady: {evidence} · K ověření: {pending} · Vyřazeno: {discarded}",
+    removeDataset: "Odebrat zdroj",
+    filingTitle: "Přehled pro daňové přiznání",
+    filingSubtitle: "Příloha č. 2 · § 10 · pouze načtené obchody",
+    exportMenu: "Exporty",
+    comparisonTitle: "Porovnání roků",
+    detailNav: "Podrobnosti výpočtu",
+    reviewBlocked: "Výpočet je blokován",
+    reviewDraft: "Předběžný výpočet",
+    reviewReady: "Připraveno ke kontrole",
+    reviewBlockedHint: "Nejdříve vyřešte blokující kontroly níže.",
+    reviewDraftHint: "Zkontrolujte odhady nebo neúplné podklady. Ovlivňují použitelnost částek pro přiznání.",
+    reviewReadyHint: "Porovnejte výsledky s původními výpisy před vyplněním přiznání.",
+    reviewInput: "Import a údaje o obchodech",
+    reviewActivity: "Pohyby peněženky",
+    reviewRates: "Kurzy a ocenění",
+    reviewFifo: "Pořizovací náklady a FIFO",
+    reviewOther: "Ostatní kontroly",
+    sourceCheck: "Zkontrolujte zdrojový řádek a importujte opravený soubor.",
+    walletCheck: "Ověřte pohyb ve výpisu. Skutečný obchod s doloženou cenou v tabulce označte jako Obchod a importujte jej znovu.",
+    rateCheck: "Doplňte spolehlivé ocenění nebo po zveřejnění aktualizujte jednotný kurz.",
+    fifoCheck: "Doplňte chybějící nákupy či pořizovací výpisy a zkontrolujte opakované záznamy.",
+    otherCheck: "Porovnejte označené položky s původní dokumentací.",
+    printNeedsReview: "PDF je dostupné po vyřešení blokujících a předběžných položek.",
+    noFilingData: "Pro tento rok zatím nejsou žádné vypočtené prodeje.",
+    filingBase: "Dílčí základ daně",
+    filingIncome: "Zdanitelné příjmy",
+    filingExpenses: "Uplatnitelné výdaje",
+    filingNotices: "Samostatné oznámení § 38v",
     chartTitle: "Přehled daňových příjmů a výdajů v CZK",
     legendInc: "Daňové příjmy",
     legendOut: "Daňové výdaje",
@@ -1924,7 +2115,7 @@ const I18N = {
   },
   en: {
     pageTitle: "Piggy – Czech Securities & Crypto Tax Reports",
-    subtitle: "Czech § 10 reporting support • Securities, crypto & EMT • FIFO reconciliation • Annex 2 summary",
+    subtitle: "Czech investment tax reporting · § 10",
     privacyBadge: "100% Client-Side Privacy",
     langName: "English",
     langFlag: "🇬🇧",
@@ -1935,22 +2126,60 @@ const I18N = {
     loadedFiles: "📦 Loaded Files & Datasets",
     clearAll: "✕ Clear All",
     scrollTableHint: "Scroll sideways to see more columns",
-    btnTemplate: "📑 Load Example Template",
-    btnDownloadTemplate: "⬇️ Download Template (.csv)",
-    btnExport: "⬇️ Annex 2 Summary",
-    btnExportTaxable: "⬇️ Taxable disposals",
-    btnExportExempt: "⬇️ Exempt income",
-    btnExportFifo: "⬇️ FIFO matching",
-    btnExportIssues: "⬇️ Validation",
-    btnPrint: "🖨️ Save summary as PDF",
+    btnTemplate: "Load example",
+    btnDownloadTemplate: "Download CSV template",
+    btnExport: "Annex 2 summary",
+    btnExportTaxable: "Taxable disposals",
+    btnExportExempt: "Exempt income",
+    btnExportFifo: "FIFO matching",
+    btnExportIssues: "Validation",
+    btnPrint: "Save Czech summary PDF",
+    severityWarning: "Warning",
+    severityError: "Error",
+    demoNotice: "Example data. Importing your own records replaces the example.",
+    importTitle: "Import transactions",
+    importHelp: "Drop a CSV or TSV file here, or paste rows from a spreadsheet.",
+    importBrowse: "Upload file",
+    importPaste: "Paste from Sheets",
+    importTemplates: "Template and example",
+    importSources: "Imported sources",
+    importCounts: "Trades: {accepted} · Evidence: {evidence} · To review: {pending} · Rejected: {discarded}",
+    removeDataset: "Remove dataset",
+    filingTitle: "Tax filing overview",
+    filingSubtitle: "Annex 2 · § 10 · imported trades only",
+    exportMenu: "Exports",
+    comparisonTitle: "Compare tax years",
+    detailNav: "Calculation details",
+    reviewBlocked: "Calculation blocked",
+    reviewDraft: "Provisional calculation",
+    reviewReady: "Ready for review",
+    reviewBlockedHint: "Resolve the blocking checks below.",
+    reviewDraftHint: "Review estimates and incomplete records before using these figures in a return.",
+    reviewReadyHint: "Reconcile these figures to your original statements before completing your return.",
+    reviewInput: "Import and trade details",
+    reviewActivity: "Wallet activity",
+    reviewRates: "Exchange rates and valuation",
+    reviewFifo: "Acquisition costs and FIFO",
+    reviewOther: "Other checks",
+    sourceCheck: "Review the source row and reimport the corrected file.",
+    walletCheck: "Reconcile the movement to your statement. For a documented trade, mark the row Obchod in your sheet and reimport it.",
+    rateCheck: "Verify the valuation or update the annual exchange rate when it is published.",
+    fifoCheck: "Supply missing purchases or acquisition records and check for repeated entries.",
+    otherCheck: "Reconcile the flagged items to your original records.",
+    printNeedsReview: "PDF becomes available once blockers and provisional items are resolved.",
+    noFilingData: "There are no calculated disposals for this year yet.",
+    filingBase: "§ 10 tax base",
+    filingIncome: "Taxable proceeds",
+    filingExpenses: "Allowable expenses",
+    filingNotices: "Separate § 38v notice",
     chartTitle: "Yearly Taxable Performance (Přehled daňových příjmů a výdajů v CZK)",
     legendInc: "Taxable Income (Příjmy)",
     legendOut: "Taxable Expenses (Výdaje)",
     legendNet: "Net Tax Base (Základ daně)",
-    tabSouhrn: "Summary (Souhrn)",
-    tabRoky: "By Year (Podle roků)",
-    tabAkcie: "By Symbol (Podle tickeru)",
-    tabPozice: "Open Positions (Otevřené pozice)",
+    tabSouhrn: "Summary",
+    tabRoky: "By year",
+    tabAkcie: "By symbol",
+    tabPozice: "Open positions",
     secSouhrn: "Summary – Taxable Income and Expenses by Year",
     secRoky: "Yearly Trade Ledger (Deník obchodů podle roků)",
     secAkcie: "Breakdown by Security Symbol (Podle tickeru)",
@@ -2079,6 +2308,8 @@ function issueText(issue){
     DUPLICATE_LEG: ['{symbol}: stejná část transakce byla vložena vícekrát. Ověřte zdrojové soubory.','{symbol}: the same transaction leg appears more than once. Check the source files.'],
     MISSING_COLUMN: ['Chybí povinný sloupec „{value}“.','Missing required Czech source column “{value}”.'],
     INVALID_FIELD: ['Neplatná hodnota ve sloupci „{value}“.','Invalid value in Czech source column “{value}”.'],
+    WALLET_REVIEW: ['{symbol}: pohyb peněženky čeká na ověření a zatím není ve výpočtu. Ověřte druh obchodu, cenu a zdroj.', '{symbol}: wallet activity is pending review and excluded from the calculation. Verify the trade type, price and source.'],
+    MARKET_ESTIMATE: ['{symbol}: použitá cena je tržní odhad. Ověřte skutečnou protihodnotu.', '{symbol}: the price is a market estimate. Verify the actual consideration.'],
     BUSINESS_REVIEW: ['{symbol}: obchodní majetek vyžaduje samostatné posouzení. Osvobození nebylo použito.','{symbol}: “Obchodní majetek” requires separate tax review. No exemption was applied.']
   };
   if (extra[issue.code]) return extra[issue.code][currentLang==='en'?1:0].replace('{value}',issue.value||'').replace('{symbol}',issue.symbol||'');
@@ -2116,6 +2347,8 @@ function setLanguage(lang){
 
 function applyI18n(){
   document.title = t('pageTitle');
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (key){
@@ -2240,10 +2473,17 @@ function typeLabel(tObj, groups){
 function processText(text, sourceName){
   const csv = parseCsv(text);
   if (csv.error){ showError(csv.error + (sourceName ? ' ('+sourceName+')' : '')); return null; }
-  const { trades, discarded, unsupportedCurrencies, issues } = normalizeRows(csv);
+  const { trades, discarded, evidenceCount = 0, provisionalCount = 0, unsupportedCurrencies, issues } = normalizeRows(csv);
   const datasetId = ++nextDatasetId;
   trades.datasetId = datasetId;
-  for (const trade of trades) { trade.datasetId = datasetId; trade.importSource = sourceName; }
+  trades.importCounts = {discarded, evidenceCount, provisionalCount};
+  for (const trade of trades) {
+    trade.datasetId = datasetId;
+    trade.importSource = sourceName;
+    if (/tržní odhad|market estimate/i.test(trade.valuationSource)) {
+      issues.push({severity:'warning', row:trade.sourceRow, code:'MARKET_ESTIMATE', symbol:trade.symbol, year:trade.year});
+    }
+  }
   if (issues && issues.length) importIssues.push(...issues.map(x=>({...x, datasetId, source:sourceName || ''})));
   if (unsupportedCurrencies && unsupportedCurrencies.length){
     importWarnings.push({code:'UNSUPPORTED_CURRENCY', currs:unsupportedCurrencies.join(', '), datasetId, source:sourceName || ''});
@@ -2253,15 +2493,23 @@ function processText(text, sourceName){
   return trades;
 }
 
-function addTrades(trades, sourceName){
-  loadedFiles.push({ trades, name: sourceName, datasetId:trades.datasetId });
+function addTrades(trades, sourceName, example = false){
+  if (!example) {
+    const previousExample = loadedFiles.find(file => file.example);
+    if (previousExample) {
+      loadedFiles = loadedFiles.filter(file => !file.example);
+      importIssues = importIssues.filter(issue => issue.datasetId !== previousExample.datasetId);
+      importWarnings = importWarnings.filter(warning => warning.datasetId !== previousExample.datasetId);
+    }
+  }
+  loadedFiles.push({ trades, name: sourceName, datasetId:trades.datasetId, example });
   renderLoaded();
   runAll();
 }
 
-function loadText(text, sourceName){
+function loadText(text, sourceName, example = false){
   const trades = processText(text, sourceName);
-  if (trades) addTrades(trades, sourceName);
+  if (trades) addTrades(trades, sourceName, example);
 }
 
 function readFile(file){
@@ -2281,6 +2529,8 @@ function readFile(file){
 function renderLoaded(){
   const box = $('loaded-box');
   const countEl = $('loaded-count');
+  $('input').classList.toggle('has-imports', loadedFiles.length > 0);
+  $('btnTemplate').disabled = loadedFiles.length > 0;
   const chipsEl = $('loaded-chips');
   if (!loadedFiles.length){
     if (box) box.hidden = true;
@@ -2290,9 +2540,12 @@ function renderLoaded(){
   if (box) box.hidden = false;
   if (countEl) countEl.textContent = loadedFiles.length === 1 ? t('itemCount') : t('itemsCount', { n: loadedFiles.length });
   if (chipsEl){
-    chipsEl.innerHTML = loadedFiles.map((f,i)=>
-      '<span class="file-chip"><span>📄 '+esc(f.name)+' ('+f.trades.length+' trades)</span><button data-rm="'+i+'" title="Remove file">✕</button></span>'
-    ).join('');
+    chipsEl.innerHTML = loadedFiles.map((f,i)=>{
+      const {discarded, evidenceCount, provisionalCount} = f.trades.importCounts;
+      const counts = t('importCounts', {accepted:f.trades.length, evidence:evidenceCount, pending:provisionalCount, discarded});
+      return '<div class="dataset"><div><strong>'+esc(f.name)+'</strong><div class="meta">'+esc(counts)+'</div></div>'+
+        '<button class="btn dataset-remove" data-rm="'+i+'" aria-label="'+esc(t('removeDataset'))+'">×</button></div>';
+    }).join('');
   }
 }
 
@@ -2303,6 +2556,8 @@ function clearAll(){
   state = null;
   marketPrices = {};
   $('results').hidden = true;
+  $('print-report').innerHTML = '';
+  selectedFilingYear = null;
   $('messages').innerHTML = '';
   renderLoaded();
 }
@@ -2314,10 +2569,17 @@ function showError(msg){
 function runAll(){
   const all = [];
   for (const f of loadedFiles) all.push(...f.trades);
-  if (!loadedFiles.length){ state = null; $('results').hidden = true; return; }
+  if (!loadedFiles.length){
+    state = null;
+    selectedFilingYear = null;
+    $('results').hidden = true;
+    $('print-report').innerHTML = '';
+    return;
+  }
   state = computeAll(all);
   state.issues.unshift(...importIssues);
-  state.isFinalizable = !state.issues.some(x=>x.severity === 'error');
+  state.isFinalizable = reportReadiness(state.issues) === 'ready';
+  $('print-report').innerHTML = '';
   state.warnings.unshift(...importWarnings);
   $('results').hidden = false;
   $('messages').innerHTML = '';
@@ -2328,7 +2590,7 @@ function runAll(){
 function renderAll(st){
   renderChart(st);
   renderWarnings(st.warnings);
-  renderReportStatus(st);
+  renderFiling(st);
   renderSouhrn(st);
   renderRoky(st);
   renderAkcie(st);
@@ -2336,28 +2598,86 @@ function renderAll(st){
   enhanceScrollableTables($('results'));
 }
 
-function renderReportStatus(st){
-  const el = $('report-status');
-  if (!el) return;
-  const errors = st.issues.filter(x=>x.severity==='error');
-  const notes = st.issues.filter(x=>x.severity!=='error');
-  const rows = st.reportGroups.map(g=>
-    '<tr><td>'+g.year+'</td><td>'+esc(g.kind==='security' ? t('p2Securities') : t('p2Crypto'))+'</td>'+
-    '<td class="num">'+fmtMoney(g.income,'CZK')+'</td><td class="num">'+fmtMoney(g.allowableExpenses,'CZK')+'</td>'+
-    '<td class="num"><strong>'+fmtMoney(g.taxBase,'CZK')+'</strong></td></tr>'
+function isBlockingIssue(issue){
+  return issue.severity === 'error' && issue.code !== 'UNPUBLISHED_RATE';
+}
+
+function reportReadiness(issues){
+  if (issues.some(isBlockingIssue)) return 'blocked';
+  if (issues.some(issue => ['WALLET_REVIEW','MARKET_ESTIMATE','UNPUBLISHED_RATE','BUSINESS_REVIEW'].includes(issue.code))) return 'draft';
+  return 'ready';
+}
+
+function filingYearIssues(st, year){
+  return st.issues.filter(issue => issue.code === 'UNPUBLISHED_RATE'
+    ? Number(issue.value) <= year
+    : issue.year == null || issue.year <= year);
+}
+
+function renderFiling(st){
+  const select = $('filing-year');
+  const years = [...new Set([...st.byYear.map(y => y.year),
+    ...loadedFiles.flatMap(file => file.trades.map(trade => trade.year))])].sort((a,b) => b-a);
+  if (!years.includes(selectedFilingYear)) selectedFilingYear = years[0] ?? null;
+  select.innerHTML = years.map(year => '<option'+(year === selectedFilingYear ? ' selected' : '')+'>'+year+'</option>').join('');
+  select.disabled = !years.length;
+  renderReportStatus(st, selectedFilingYear);
+  $('filing-guide').innerHTML = renderFilingGuide(st, selectedFilingYear);
+}
+
+function renderReportStatus(st, year){
+  const issues = filingYearIssues(st, year ?? Infinity);
+  const readiness = reportReadiness(issues);
+  const statusKey = {blocked:'reviewBlocked',draft:'reviewDraft',ready:'reviewReady'}[readiness];
+  const groups = st.reportGroups.filter(g => g.year === year);
+  const amounts = filingAmounts(st, year);
+  const metrics = [
+    ['207','filingIncome',amounts.income], ['208','filingExpenses',amounts.expenses], ['209','filingBase',amounts.base]
+  ];
+  const metricHtml = metrics.map(([line,label,value]) =>
+    '<div class="filing-metric'+(line === '209' ? ' filing-base' : '')+'"><span>'+t(label)+'</span>'+
+    '<strong>'+(groups.length ? fmtMoney(value,'CZK') : '—')+'</strong><small>'+line+'</small></div>'
   ).join('');
-  let h = '<div class="report-status '+(errors.length?'blocked':'ready')+'"><h3>'+
-    (errors.length ? t('reportBlockedTitle',{n:errors.length}) : t('reportReadyTitle'))+'</h3><p>'+
-    (errors.length ? t('reportBlockedText') : t('reportReadyText',{n:notes.length}))+'</p></div>';
-  if (rows){
-    h += '<h3 class="group">'+t('p2Heading')+'</h3><table><thead><tr><th>'+t('colYear')+'</th><th>'+t('p2IncomeType')+'</th><th class="num">'+t('colTaxIncCZK')+'</th><th class="num">'+t('colTaxOutCZK')+'</th><th class="num">'+t('colTaxBaseCZK')+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
-    h += renderFilingGuide(st);
+  const rows = groups.map(g =>
+    '<tr><th scope="row">'+t(g.kind === 'security' ? 'p2Securities' : 'p2Crypto')+'</th>'+
+    '<td class="num">'+fmtMoney(g.income,'CZK')+'</td><td class="num">'+fmtMoney(g.allowableExpenses,'CZK')+'</td>'+
+    '<td class="num">'+fmtMoney(g.taxBase,'CZK')+'</td></tr>'
+  ).join('');
+  const demo = loadedFiles.some(file => file.example);
+  const hint = demo ? t('demoNotice') : (groups.length || issues.length ? t(statusKey+'Hint') : t('noFilingData'));
+  const label = !demo && (groups.length || issues.length) ? '<strong>'+t(statusKey)+'</strong>' : '';
+  $('report-status').innerHTML =
+    '<div class="report-status '+readiness+'">'+label+'<p>'+hint+'</p></div>'+
+    '<div class="filing-metrics">'+metricHtml+'</div>'+
+    (rows ? '<div class="filing-breakdown"><table><thead><tr><th>'+t('p2IncomeType')+'</th><th class="num">207</th><th class="num">208</th><th class="num">209</th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '')+
+    renderReview(issues, readiness);
+  $('btnPrint').disabled = demo || !groups.length || readiness !== 'ready';
+  $('print-status').textContent = groups.length && readiness !== 'ready' ? t('printNeedsReview') : '';
+}
+
+function renderReview(issues, readiness){
+  const groups = [
+    ['reviewActivity','walletCheck',['WALLET_REVIEW']],
+    ['reviewRates','rateCheck',['UNPUBLISHED_RATE','MARKET_ESTIMATE','MISSING_VALUATION_SOURCE']],
+    ['reviewFifo','fifoCheck',['MISSING_ACQUISITION','DUPLICATE_LEG']],
+    ['reviewInput','sourceCheck',['MISSING_COLUMN','INVALID_FIELD','UNSUPPORTED_OPERATION','INVALID_DATE','MISSING_SYMBOL','UNSUPPORTED_CURRENCY','INVALID_AMOUNT','UNKNOWN_ASSET_TYPE']],
+    ['reviewOther','otherCheck',[]]
+  ];
+  const sections = new Map(groups.map(([key]) => [key,[]]));
+  for (const issue of issues) {
+    const group = groups.find(([, , codes]) => codes.includes(issue.code)) ?? groups[4];
+    sections.get(group[0]).push(issue);
   }
-  if (st.issues.length){
-    h += '<details '+(errors.length?'open':'')+'><summary>'+t('validationDetails')+' ('+st.issues.length+')</summary><table><thead><tr><th>'+t('severity')+'</th><th>'+t('sourceRow')+'</th><th>'+t('issue')+'</th></tr></thead><tbody>'+
-      st.issues.map(x=>'<tr><td>'+(x.severity==='error'?'⛔':'⚠️')+'</td><td>'+esc((x.source?x.source+' / ':'')+(x.row||'—'))+'</td><td>'+esc(issueText(x))+'</td></tr>').join('')+'</tbody></table></details>';
-  }
-  el.innerHTML = h;
+  const content = groups.map(([key, action])=>{
+    const list = sections.get(key);
+    if (!list.length) return '';
+    const rows = list.map(x=>'<tr><td>'+t(isBlockingIssue(x) ? 'severityError' : 'severityWarning')+
+      '</td><td>'+esc(x.row ? [x.source,x.row].filter(Boolean).join(' / ') : (x.source || '—'))+'</td><td>'+esc(issueText(x))+'</td></tr>').join('');
+    return '<details class="review-group"'+(list.some(isBlockingIssue) ? ' open' : '')+
+      '><summary>'+t(key)+' ('+list.length+')</summary><p class="meta">'+t(action)+'</p><table><thead><tr>'+
+      '<th>'+t('severity')+'</th><th>'+t('sourceRow')+'</th><th>'+t('issue')+'</th></tr></thead><tbody>'+rows+'</tbody></table></details>';
+  }).join('');
+  return content ? '<details class="review-list"'+(readiness !== 'ready' ? ' open' : '')+'><summary>'+t('validationDetails')+' ('+issues.length+')</summary>'+content+'</details>' : '';
 }
 
 function filingAmounts(st, year){
@@ -2382,92 +2702,67 @@ function exemptNoticeCandidates(groups){
   return [...receipts.values()].filter(g=>g.exemptC>5000000);
 }
 
-function renderFilingGuide(st){
-  const en = currentLang === 'en';
-  const label = (cz,eng)=>en ? eng : cz;
-  const dates = {
-    2025:['1. 4. 2026','4. 5. 2026','1. 7. 2026'],
-    2026:['1. 4. 2027','3. 5. 2027','1. 7. 2027']
-  };
-  const yearRows = st.byYear.map(({year})=>{
-    const a = filingAmounts(st,year);
-    const deadline = dates[year]?.join(' / ') || label('Ověřte kalendář Finanční správy','Check the Financial Administration calendar');
-    return '<tr><td>'+year+'</td><td class="num">'+fmtMoney(a.income,'CZK')+'</td><td class="num">'+
-      fmtMoney(a.expenses,'CZK')+'</td><td class="num">'+fmtMoney(a.base,'CZK')+'</td><td>'+deadline+'</td></tr>';
-  }).join('');
-  const notices = exemptNoticeCandidates(st.groups);
-  const noticeRows = notices.map(g=>{
-    const basis = g.trade.assetType==='security'
-      ? (g.year>=2025 ? '§ 4 odst. 1 písm. u)' : label('§ 4 ZDP – ověřte znění pro daný rok','§ 4 – verify the version applicable to the year'))
-      : '§ 4 odst. 1 písm. zk)';
-    const description = label('Úplatný převod ','Disposal of ')+g.symbol+
-      (g.trade.counterAsset ? ' → '+g.trade.counterAsset : '');
-    return '<tr><td>'+esc(fmtDate(g.trade.settleDate))+'</td><td class="num">'+fmtMoney(g.exemptC,'CZK')+
-      '</td><td>'+basis+'</td><td>'+esc(description)+'</td><td>'+esc(g.trade.transactionId||'—')+'</td></tr>';
-  }).join('');
-  return '<h3 class="group">'+label('Kdy, kam a co podat','When, where and what to file')+'</h3><p>'+
-    label('Daňové přiznání a případné samostatné oznámení podejte místně příslušnému finančnímu úřadu, např. přes',
-      'Send the return and any separate notice to your locally competent Financial Office, for example through')+
-    ' <a href="https://www.mojedane.cz/">MOJE daně</a>.</p><p>'+
-    label('Povinnost podat přiznání se posuzuje podle celkových příjmů a dalších okolností. Obecný limit ročních zdanitelných příjmů je nad 50 000 Kč. U zaměstnance splňujícího podmínky výjimky sledujte ostatní příjmy podle § 7 až § 10 nad 20 000 Kč.',
-      'Filing depends on your total income and circumstances. The general taxable-income threshold is over CZK 50,000. If you qualify for the employee exception, check whether other income under §§ 7–10 exceeds CZK 20,000.')+
-    '</p><table><thead><tr><th>'+t('colYear')+'</th><th>207</th><th>208</th><th>209</th><th>'+
-    label('Lhůty: základní / elektronická / poradce či audit','Deadlines: standard / electronic / adviser or audit')+
-    '</th></tr></thead><tbody>'+yearRows+'</tbody></table><p>'+
-    label('Řádky 207–209 zahrnují pouze zde evidované příjmy a výdaje. Delší lhůty platí jen při splnění podmínek. Při samostatném oznámení bez povinnosti podat přiznání platí základní lhůta.',
-      'Lines 207–209 cover the records imported here. Extended deadlines are conditional. If only the exempt-income notice is required, the standard deadline applies.')+
-    ' <a href="https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/obecne-informace">'+label('Lhůty a podmínky','Deadlines and conditions')+'</a></p><p>'+
-    label('Oznámení § 38v: posuďte každý jednotlivý osvobozený příjem nad 5 mil. Kč. Uveďte částku, datum příjmu, ustanovení a okolnosti nabytí. Ověřte související části téhož příjmu a případné zákonné výjimky.',
-      'Section 38v: review each individual exempt receipt over CZK 5 million. Report its amount, receipt date, exemption provision and circumstances. Review linked parts of the same receipt and any statutory exceptions.')+
-    ' <a href="https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/oznameni-o-osvobozenych-prijmech">'+label('Pokyny k oznámení','Notice instructions')+'</a></p>'+
-    (noticeRows ? '<table><thead><tr><th>'+t('colDateTime')+'</th><th>CZK</th><th>'+label('Ustanovení','Provision')+
-      '</th><th>'+label('Okolnosti k ověření','Circumstances to verify')+'</th><th>'+label('ID transakce','Transaction ID')+
-      '</th></tr></thead><tbody>'+noticeRows+'</tbody></table>' : '');
+const FILING_DATES = {
+  2025:['1. 4. 2026','4. 5. 2026','1. 7. 2026'],
+  2026:['1. 4. 2027','3. 5. 2027','1. 7. 2027']
+};
+const FILING_CALENDAR = 'https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/obecne-informace';
+const NOTICE_GUIDE = 'https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/oznameni-o-osvobozenych-prijmech';
+
+function renderFilingGuide(st, year){
+  if (year == null) return '';
+  const label = (cz,en)=>currentLang === 'en' ? en : cz;
+  const dates = FILING_DATES[year];
+  const deadlines = [
+    label('Základní lhůta','Standard'),
+    label('Elektronické podání po základní lhůtě','Electronic after standard deadline'),
+    label('Podání poradcem nebo povinný audit','Adviser filing or mandatory audit')
+  ];
+  const notices = exemptNoticeCandidates(st.groups.filter(g => g.year === year));
+  const noticeRows = notices.map(g=>'<li>'+esc(g.symbol)+' · '+esc(fmtDate(g.trade.settleDate))+' · '+
+    fmtMoney(g.exemptC,'CZK')+(g.trade.transactionId ? ' · <code>'+esc(g.trade.transactionId)+'</code>' : '')+'</li>').join('');
+  return '<section class="filing-card filing-guide"><h2>'+label('Kdy, kam a co podat','When, where and what to file')+'</h2>'+
+    '<div class="filing-guide-grid"><div><h3>'+label('Kam a co','Where and what')+'</h3><p>'+
+    label('Místně příslušný finanční úřad přes', 'File with your local Financial Office through')+
+    ' <a href="https://www.mojedane.cz/">MOJE daně</a>. '+
+    label('V Příloze č. 2 vyplňte druhy příjmů a řádky 207–209. Řádek 209 přeneste na řádek 40 hlavního formuláře.',
+      'In Annex 2, enter the income breakdown and lines 207–209. Carry line 209 to line 40 of the main return.')+
+    '</p></div><div><h3>'+label('Lhůty','Deadlines')+'</h3>'+
+    (dates ? '<dl>'+dates.map((date,i)=>'<div><dt>'+deadlines[i]+'</dt><dd>'+date+'</dd></div>').join('')+'</dl>' : '')+
+    '<a href="'+FILING_CALENDAR+'">'+label('Lhůty a podmínky Finanční správy','Financial Administration deadlines and conditions')+'</a></div></div>'+
+    '<details'+(notices.length ? ' open' : '')+'><summary>'+t('filingNotices')+(notices.length ? ' ('+notices.length+')' : '')+'</summary><p>'+
+    label('Posuďte jednotlivé osvobozené příjmy nad 5 mil. Kč. Uveďte částku, datum, ustanovení a okolnosti nabytí.',
+      'Review each individual exempt receipt above CZK 5 million. Give the amount, date, exemption provision and circumstances.')+
+    ' <a href="'+NOTICE_GUIDE+'">'+label('Pokyny','Official instructions')+'</a></p>'+
+    (noticeRows ? '<ul>'+noticeRows+'</ul>' : '')+'</details>'+
+    '<p class="meta">'+label('Povinnost podat přiznání závisí na všech příjmech a okolnostech, včetně příjmů mimo Piggy.',
+      'Your filing obligation depends on your full income and circumstances, including income outside Piggy.')+'</p></section>';
 }
 
-// Elevated native pure SVG bar chart with direct currency formatting
 function renderChart(st){
-  const el = $('chart-container');
-  const years = st.byYear.filter(y=>y.totals.incC > 0 || y.totals.outC > 0);
-  if (!years.length){
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-sub);font-size:13.5px;font-weight:500">' + t('noRealizedSales') + '</div>';
-    return;
-  }
+  const years = st.byYear.filter(y => st.reportGroups.some(g => g.year === y.year));
+  const entries = years.map(y=>({year:y.year,...filingAmounts(st,y.year)}));
+  const max = Math.max(1,...entries.flatMap(y=>[y.income,y.expenses,y.base]));
+  const parts = [['income','filingIncome'],['expenses','filingExpenses'],['base','filingBase']];
+  $('year-comparison').hidden = entries.length < 2;
+  $('chart-container').innerHTML = entries.map(y=>'<div class="comparison-year"><h3>'+y.year+'</h3>'+
+    parts.map(([key,label])=>'<div class="comparison-measure"><span>'+t(label)+'</span><strong>'+
+      fmtMoney(y[key],'CZK')+'</strong><div class="bar-track" aria-hidden="true"><span class="bar-'+key+
+      '" style="width:'+Math.max(0,100*y[key]/max)+'%"></span></div></div>').join('')+'</div>').join('');
+}
 
-  const reportBaseFor = year => st.reportGroups.filter(g=>g.year===year).reduce((sum,g)=>sum+g.taxBase,0);
-  const maxVal = Math.max(...years.map(y=>Math.max(y.totals.incC, y.totals.outC, reportBaseFor(y.year))), 1000);
-  const w = el.clientWidth || 920;
-  const h = 190;
-  const padBottom = 28;
-  const padTop = 14;
-  const chartH = h - padBottom - padTop;
-  const barGroupWidth = w / years.length;
-  const barWidth = Math.max(10, Math.min(26, barGroupWidth / 4.2));
-
-  let svg = '<svg width="100%" height="'+h+'" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">';
-  svg += '<line x1="0" y1="'+(h-padBottom)+'" x2="'+w+'" y2="'+(h-padBottom)+'" stroke="rgba(210, 204, 190, 0.7)" stroke-width="1.5" />';
-
-  years.forEach((yr, idx) => {
-    const cx = (idx + 0.5) * barGroupWidth;
-    const incH = Math.max(3, (yr.totals.incC / maxVal) * chartH);
-    const outH = Math.max(3, (yr.totals.outC / maxVal) * chartH);
-    const net = reportBaseFor(yr.year);
-    const netH = Math.max(3, (Math.abs(net) / maxVal) * chartH);
-    const netColor = net >= 0 ? '#f59e0b' : '#ef4444';
-
-    // Income bar (green)
-    svg += '<rect x="'+(cx - barWidth*1.65)+'" y="'+(h - padBottom - incH)+'" width="'+barWidth+'" height="'+incH+'" rx="4" fill="#10b981"><title>'+t('legendInc')+': '+fmtMoney(yr.totals.incC, 'CZK')+'</title></rect>';
-    // Expense bar (red)
-    svg += '<rect x="'+(cx - barWidth*0.5)+'" y="'+(h - padBottom - outH)+'" width="'+barWidth+'" height="'+outH+'" rx="4" fill="#ef4444"><title>'+t('legendOut')+': '+fmtMoney(yr.totals.outC, 'CZK')+'</title></rect>';
-    // Net Base bar (amber or red if negative)
-    svg += '<rect x="'+(cx + barWidth*0.65)+'" y="'+(h - padBottom - netH)+'" width="'+barWidth+'" height="'+netH+'" rx="4" fill="'+netColor+'"><title>'+t('legendNet')+': '+fmtMoney(net, 'CZK')+'</title></rect>';
-
-    // Year label
-    svg += '<text x="'+cx+'" y="'+(h - 8)+'" font-size="12.5" font-weight="700" fill="var(--ink)" text-anchor="middle">'+yr.year+'</text>';
-  });
-
-  svg += '</svg>';
-  el.innerHTML = svg;
+function renderPrintReport(st, year){
+  const a = filingAmounts(st,year);
+  const rows = st.reportGroups.filter(g=>g.year === year).map(g=>'<tr><td>'+
+    (g.kind === 'security' ? 'D – Prodej cenných papírů' : 'Převod kryptoaktiv')+
+    '</td><td>'+fmtMoney(g.income,'CZK')+'</td><td>'+fmtMoney(g.allowableExpenses,'CZK')+'</td><td>'+fmtMoney(g.taxBase,'CZK')+'</td></tr>').join('');
+  $('print-report').innerHTML = '<h1>Podklad pro Přílohu č. 2 · '+year+'</h1>'+
+    '<p>Ostatní příjmy podle § 10 ZDP. Pouze načtené obchody. Párování FIFO a přepočet jednotnými kurzy GFŘ podle příslušného roku.</p>'+
+    '<table><thead><tr><th>Druh příjmu</th><th>207 · Příjmy</th><th>208 · Výdaje</th><th>209 · Dílčí základ daně</th></tr></thead><tbody>'+
+    rows+'<tr><th>Celkem</th><td>'+fmtMoney(a.income,'CZK')+'</td><td>'+fmtMoney(a.expenses,'CZK')+'</td><td>'+fmtMoney(a.base,'CZK')+'</td></tr></tbody></table>'+
+    '<p>Řádek 209 přeneste na řádek 40 hlavního formuláře. Podklad porovnejte s původními výpisy.</p>'+
+    (exemptNoticeCandidates(st.groups.filter(g => g.year === year)).length ?
+      '<p>Zkontrolujte také samostatné oznámení osvobozených příjmů podle § 38v.</p>' : '');
 }
 
 function renderWarnings(w){
@@ -2958,7 +3253,9 @@ function renderDonutSvg(slices, total){
 // Navigation & Tab Switching
 function tab(name){
   document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab === name);
+    const active = b.dataset.tab === name;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-pressed', String(active));
   });
   document.querySelectorAll('.panel').forEach(p=>{
     p.classList.toggle('active', p.id === 'panel-' + name);
@@ -2988,7 +3285,11 @@ function applyRowHl(){
 document.addEventListener('click', e=>{
   const target = e.target;
   if (target.closest('#btnLang')){ setLanguage(currentLang === 'cs' ? 'en' : 'cs'); return; }
-  if (target.closest('#btnTemplate')){ loadText(DEMOS.Template, 'Example template'); return; }
+  if (target.closest('#btnTemplate')){
+    if (!loadedFiles.length) loadText(DEMOS.Template, currentLang === 'en' ? 'Example template' : 'Ukázková šablona', true);
+    return;
+  }
+  if (target.closest('#btnBrowse')){ $('file').click(); return; }
   if (target.closest('#btnPasteClipboard')){
     if (navigator.clipboard && navigator.clipboard.readText){
       navigator.clipboard.readText().then(text => {
@@ -3007,16 +3308,17 @@ document.addEventListener('click', e=>{
   }
   if (target.closest('#btnDownloadTemplate')){ download('piggy-template.csv', DEMOS.Template); return; }
   if (target.closest('#btnClear')){ clearAll(); return; }
+  if (target.closest('.export-list button')) $('results').querySelector('.export-menu').open = false;
   if (target.closest('#btnExport')){ exportReport(); return; }
   if (target.closest('#btnExportTaxable')){ exportTaxable(); return; }
   if (target.closest('#btnExportExempt')){ exportExempt(); return; }
   if (target.closest('#btnExportFifo')){ exportFifo(); return; }
   if (target.closest('#btnExportIssues')){ exportIssues(); return; }
   if (target.closest('#btnPrint')){
-    if (state && !state.isFinalizable){ showError(t('cannotPrintDraft')); return; }
+    if (!state || $('btnPrint').disabled) return;
+    renderPrintReport(state, selectedFilingYear);
     window.print(); return;
   }
-  if (target.closest('#drop') && !target.closest('.toolbar, button, input')){ $('file').click(); return; }
   if (target.dataset.rm != null){
     const removed = loadedFiles[+target.dataset.rm];
     loadedFiles.splice(+target.dataset.rm, 1);
@@ -3074,7 +3376,13 @@ document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
 });
 
 // Drag and drop & Paste
-const drop = $('drop');
+$('filing-year').addEventListener('change', event=>{
+  selectedFilingYear = Number(event.target.value);
+  renderFiling(state);
+  enhanceScrollableTables($('results'));
+  $('print-report').innerHTML = '';
+});
+const drop = $('input');
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,k=>{ k.preventDefault(); drop.classList.add('drag'); }));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,k=>{ k.preventDefault(); drop.classList.remove('drag'); }));
 drop.addEventListener('drop', k=>{
@@ -3110,7 +3418,8 @@ function exportReport(){
   if (!state) return;
   const L = [];
   L.push(csvRow(['PIGGY – PODKLAD PRO DAŇOVÉ PŘIZNÁNÍ (§ 10 ZDP)']));
-  L.push(csvRow(['Stav', state.isFinalizable ? 'PŘIPRAVENO KE KONTROLE' : 'NÁVRH – BLOKUJÍCÍ CHYBY']));
+  const reportStatus = {ready:'PŘIPRAVENO KE KONTROLE',draft:'NÁVRH – PŘEDBĚŽNÉ ÚDAJE',blocked:'NÁVRH – BLOKUJÍCÍ CHYBY'};
+  L.push(csvRow(['Stav', loadedFiles.some(file => file.example) ? 'UKÁZKOVÁ DATA' : reportStatus[reportReadiness(state.issues)]]));
   L.push(csvRow(['Metoda párování','FIFO']));
   L.push(csvRow(['Měnový přepočet','Jednotné kurzy GFŘ podle roku příjmu/výdaje']));
   L.push(csvRow(['Vytvořeno',new Date().toISOString()]));
@@ -3175,7 +3484,7 @@ function exportFifo(){
 function exportIssues(){
   if (!state) return;
   const L=[csvRow(['Závažnost','Zdroj','Řádek','Kód','Popis'])];
-  for (const x of state.issues) L.push(csvRow([x.severity==='error'?'CHYBA':'UPOZORNĚNÍ',x.source||'',x.row||'',x.code,issueText(x)]));
+  for (const x of state.issues) L.push(csvRow([isBlockingIssue(x)?'CHYBA':'UPOZORNĚNÍ',x.source||'',x.row||'',x.code,issueText(x)]));
   download('05_kontroly_a_nejasnosti.csv',L.join('\n'));
 }
 
