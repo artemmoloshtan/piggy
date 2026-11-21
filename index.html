@@ -1223,7 +1223,7 @@ function disposalQuantities(g){
 }
 
 function pairTaxTreatment(sell, buy){
-  if (buy.tradeDate > sell.tradeDate) return 'taxable'; // short cover is always taxable
+  if (buy.tradeDate > sell.tradeDate) return 'taxable';
   if (sell.businessAsset || buy.businessAsset || !sell.cryptoExemptionEligible || !buy.cryptoExemptionEligible) return 'taxable';
   if (isCryptoType(sell.assetType) || isCryptoType(buy.assetType)){
     // The crypto exemptions took effect on 15 February 2025.
@@ -1483,12 +1483,32 @@ function computeAll(trades){
   const flow = [];
   const warnings = [];
   const issues = [];
+  const seenTransactionLegs = new Set();
+  for (const tr of trades) {
+    if (!tr.transactionId) continue;
+    const key = JSON.stringify([tr.transactionId,tr.tradeDate.getTime(),tr.dir,tr.assetType,tr.symbol,tr.currency,tr.qty,tr.price,tr.fee,tr.wallet]);
+    if (seenTransactionLegs.has(key)) {
+      issues.push({severity:'error', row:tr.sourceRow, code:'DUPLICATE_LEG', symbol:tr.symbol});
+    }
+    seenTransactionLegs.add(key);
+  }
 
   for (const sym of symbols){
     const ts = bySymbol.get(sym).slice()
       .map((t,i)=>({t, i}))
       .sort((a,b)=> a.t.tradeDate-b.t.tradeDate || a.i-b.i)
       .map(x=>x.t);
+    const types = new Set(ts.map(t=>t.assetType));
+    if (types.size > 1) {
+      issues.push({severity:'error', code:'MIXED_ASSET_TYPES', symbol:sym});
+      for (const type of types) {
+        const res = processSymbol(sym, ts.filter(t=>t.assetType===type));
+        groups.push(...res.groups);
+        openPos.push(...res.openPos);
+        flow.push(...res.flow);
+      }
+      continue;
+    }
     const res = processSymbol(sym, ts);
     groups.push(...res.groups);
     openPos.push(...res.openPos);
@@ -1614,6 +1634,11 @@ function computeAll(trades){
   });
 
   for (const g of groups){
+    for (const trade of [g.trade, ...g.pairs.map(p=>p.buy)]) {
+      if (trade.currency !== 'CZK' && !RATES[trade.year] && !issues.some(i=>i.code==='UNPUBLISHED_RATE' && i.value===trade.year)) {
+        issues.push({severity:'error', code:'UNPUBLISHED_RATE', value:trade.year});
+      }
+    }
     if (g.hasOpenShort){
       issues.push({severity:'error', row:g.trade.sourceRow, code:'MISSING_ACQUISITION', symbol:g.symbol, qty:g.openQty});
     }
@@ -1665,25 +1690,7 @@ function processSymbol(sym, ts){
 
   for (const t of ts){
     if (t.dir === 'B'){
-      let rem = t.qty;
-      while (rem > 1e-9 && shorts.length){
-        const s = shorts[0];
-        const m = Math.min(rem, s.qtyRem);
-        const g = mkGroup(s.sell);
-        g.qty += m;
-        const buyCost = t.price*m + t.fee*(m/t.qty);
-        g.costs += buyCost;
-        const sellFeeShare = s.sell.fee*(m/s.sell.qty);
-        g.pairs.push({qty:m, sell:s.sell, buy:t, treatment:'taxable',
-          incomeCZK:s.sell.price*m*rateFor(s.sell.currency, s.sell.year),
-          expenseCZK:buyCost*rateFor(t.currency, t.year) + sellFeeShare*rateFor(s.sell.currency, s.sell.year)});
-        g.incNative += s.sell.price*m;
-        g.outNative += buyCost + sellFeeShare;
-        g.taxInc += s.sell.price*m*rateFor(s.sell.currency, s.sell.year);
-        g.taxOut += buyCost*rateFor(t.currency, t.year) + sellFeeShare*rateFor(s.sell.currency, s.sell.year);
-        s.qtyRem -= m; rem -= m;
-        if (s.qtyRem <= 1e-9) shorts.shift();
-      }
+      const rem = t.qty;
       if (rem > 1e-9) lots.push({trade:t, qtyRem:rem, qtyTotal:t.qty});
       net += t.qty;
     } else {
@@ -1694,15 +1701,16 @@ function processSymbol(sym, ts){
         const m = Math.min(rem, lot.qtyRem);
         g.qty += m;
         const buyCost = lot.trade.price*m + lot.trade.fee*(m/lot.qtyTotal);
-        g.costs += buyCost;
         const sellFeeShare = t.fee*(m/t.qty);
         const treatment = pairTaxTreatment(t, lot.trade);
         const incomeCZK = t.price*m*rateFor(t.currency, t.year);
         const expenseCZK = buyCost*rateFor(lot.trade.currency, lot.trade.year) + sellFeeShare*rateFor(t.currency, t.year);
+        const expenseInSaleCurrency = expenseCZK / rateFor(t.currency, t.year);
+        g.costs += expenseInSaleCurrency;
         g.pairs.push({qty:m, sell:t, buy:lot.trade, treatment, incomeCZK, expenseCZK});
         if (treatment === 'taxable'){
           g.incNative += t.price*m;
-          g.outNative += buyCost + sellFeeShare;
+          g.outNative += expenseInSaleCurrency;
           g.taxInc += incomeCZK;
           g.taxOut += expenseCZK;
         } else {
@@ -1723,8 +1731,7 @@ function processSymbol(sym, ts){
   for (const g of groupsOut){
     const covered = g.qty;
     const proceeds = g.trade.price*covered;
-    const feeShare = g.trade.fee*(covered/g.trade.qty);
-    const totalCosts = g.costs + feeShare;
+    const totalCosts = g.costs;
     g.profit = proceeds - totalCosts;
     g.rel = totalCosts > 1e-9 ? g.profit/totalCosts*100 : null;
     const openQty = g.trade.qty - g.qty;
@@ -2067,6 +2074,9 @@ function t(key, params){
 
 function issueText(issue){
   const extra = {
+    MIXED_ASSET_TYPES: ['{symbol}: stejný symbol označuje různé druhy aktiv. Ověřte klasifikaci a použijte odlišné identifikátory.','{symbol}: the same symbol has different asset types. Verify the classifications and use distinct identifiers.'],
+    UNPUBLISHED_RATE: ['Pro rok {value} chybí oficiální jednotný kurz GFŘ. Částky jsou předběžné.','An official GFŘ annual rate for {value} is missing. The displayed amounts are provisional.'],
+    DUPLICATE_LEG: ['{symbol}: stejná část transakce byla vložena vícekrát. Ověřte zdrojové soubory.','{symbol}: the same transaction leg appears more than once. Check the source files.'],
     MISSING_COLUMN: ['Chybí povinný sloupec „{value}“.','Missing required Czech source column “{value}”.'],
     INVALID_FIELD: ['Neplatná hodnota ve sloupci „{value}“.','Invalid value in Czech source column “{value}”.'],
     BUSINESS_REVIEW: ['{symbol}: obchodní majetek vyžaduje samostatné posouzení. Osvobození nebylo použito.','{symbol}: “Obchodní majetek” requires separate tax review. No exemption was applied.']
@@ -2341,12 +2351,78 @@ function renderReportStatus(st){
     (errors.length ? t('reportBlockedText') : t('reportReadyText',{n:notes.length}))+'</p></div>';
   if (rows){
     h += '<h3 class="group">'+t('p2Heading')+'</h3><table><thead><tr><th>'+t('colYear')+'</th><th>'+t('p2IncomeType')+'</th><th class="num">'+t('colTaxIncCZK')+'</th><th class="num">'+t('colTaxOutCZK')+'</th><th class="num">'+t('colTaxBaseCZK')+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    h += renderFilingGuide(st);
   }
   if (st.issues.length){
     h += '<details '+(errors.length?'open':'')+'><summary>'+t('validationDetails')+' ('+st.issues.length+')</summary><table><thead><tr><th>'+t('severity')+'</th><th>'+t('sourceRow')+'</th><th>'+t('issue')+'</th></tr></thead><tbody>'+
       st.issues.map(x=>'<tr><td>'+(x.severity==='error'?'⛔':'⚠️')+'</td><td>'+esc((x.source?x.source+' / ':'')+(x.row||'—'))+'</td><td>'+esc(issueText(x))+'</td></tr>').join('')+'</tbody></table></details>';
   }
   el.innerHTML = h;
+}
+
+function filingAmounts(st, year){
+  return st.reportGroups.filter(g=>g.year===year).reduce((total,g)=>({
+    income:total.income+g.income,
+    expenses:total.expenses+g.allowableExpenses,
+    base:total.base+g.taxBase
+  }),{income:0,expenses:0,base:0});
+}
+
+function exemptNoticeCandidates(groups){
+  const receipts = new Map();
+  for (const g of groups) {
+    if (g.exemptC <= 0) continue;
+    const tr = g.trade;
+    const key = tr.transactionId && tr.source
+      ? JSON.stringify([tr.source,tr.transactionId,tr.symbol,tr.assetType,tr.tradeDate.getTime()])
+      : tr.id;
+    if (!receipts.has(key)) receipts.set(key,{...g,exemptC:0});
+    receipts.get(key).exemptC += g.exemptC;
+  }
+  return [...receipts.values()].filter(g=>g.exemptC>5000000);
+}
+
+function renderFilingGuide(st){
+  const en = currentLang === 'en';
+  const label = (cz,eng)=>en ? eng : cz;
+  const dates = {
+    2025:['1. 4. 2026','4. 5. 2026','1. 7. 2026'],
+    2026:['1. 4. 2027','3. 5. 2027','1. 7. 2027']
+  };
+  const yearRows = st.byYear.map(({year})=>{
+    const a = filingAmounts(st,year);
+    const deadline = dates[year]?.join(' / ') || label('Ověřte kalendář Finanční správy','Check the Financial Administration calendar');
+    return '<tr><td>'+year+'</td><td class="num">'+fmtMoney(a.income,'CZK')+'</td><td class="num">'+
+      fmtMoney(a.expenses,'CZK')+'</td><td class="num">'+fmtMoney(a.base,'CZK')+'</td><td>'+deadline+'</td></tr>';
+  }).join('');
+  const notices = exemptNoticeCandidates(st.groups);
+  const noticeRows = notices.map(g=>{
+    const basis = g.trade.assetType==='security'
+      ? (g.year>=2025 ? '§ 4 odst. 1 písm. u)' : label('§ 4 ZDP – ověřte znění pro daný rok','§ 4 – verify the version applicable to the year'))
+      : '§ 4 odst. 1 písm. zk)';
+    const description = label('Úplatný převod ','Disposal of ')+g.symbol+
+      (g.trade.counterAsset ? ' → '+g.trade.counterAsset : '');
+    return '<tr><td>'+esc(fmtDate(g.trade.settleDate))+'</td><td class="num">'+fmtMoney(g.exemptC,'CZK')+
+      '</td><td>'+basis+'</td><td>'+esc(description)+'</td><td>'+esc(g.trade.transactionId||'—')+'</td></tr>';
+  }).join('');
+  return '<h3 class="group">'+label('Kdy, kam a co podat','When, where and what to file')+'</h3><p>'+
+    label('Daňové přiznání a případné samostatné oznámení podejte místně příslušnému finančnímu úřadu, např. přes',
+      'Send the return and any separate notice to your locally competent Financial Office, for example through')+
+    ' <a href="https://www.mojedane.cz/">MOJE daně</a>.</p><p>'+
+    label('Povinnost podat přiznání se posuzuje podle celkových příjmů a dalších okolností. Obecný limit ročních zdanitelných příjmů je nad 50 000 Kč. U zaměstnance splňujícího podmínky výjimky sledujte ostatní příjmy podle § 7 až § 10 nad 20 000 Kč.',
+      'Filing depends on your total income and circumstances. The general taxable-income threshold is over CZK 50,000. If you qualify for the employee exception, check whether other income under §§ 7–10 exceeds CZK 20,000.')+
+    '</p><table><thead><tr><th>'+t('colYear')+'</th><th>207</th><th>208</th><th>209</th><th>'+
+    label('Lhůty: základní / elektronická / poradce či audit','Deadlines: standard / electronic / adviser or audit')+
+    '</th></tr></thead><tbody>'+yearRows+'</tbody></table><p>'+
+    label('Řádky 207–209 zahrnují pouze zde evidované příjmy a výdaje. Delší lhůty platí jen při splnění podmínek. Při samostatném oznámení bez povinnosti podat přiznání platí základní lhůta.',
+      'Lines 207–209 cover the records imported here. Extended deadlines are conditional. If only the exempt-income notice is required, the standard deadline applies.')+
+    ' <a href="https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/obecne-informace">'+label('Lhůty a podmínky','Deadlines and conditions')+'</a></p><p>'+
+    label('Oznámení § 38v: posuďte každý jednotlivý osvobozený příjem nad 5 mil. Kč. Uveďte částku, datum příjmu, ustanovení a okolnosti nabytí. Ověřte související části téhož příjmu a případné zákonné výjimky.',
+      'Section 38v: review each individual exempt receipt over CZK 5 million. Report its amount, receipt date, exemption provision and circumstances. Review linked parts of the same receipt and any statutory exceptions.')+
+    ' <a href="https://financnisprava.gov.cz/cs/dane/dane/dan-z-prijmu/fyzicke-osoby/oznameni-o-osvobozenych-prijmech">'+label('Pokyny k oznámení','Notice instructions')+'</a></p>'+
+    (noticeRows ? '<table><thead><tr><th>'+t('colDateTime')+'</th><th>CZK</th><th>'+label('Ustanovení','Provision')+
+      '</th><th>'+label('Okolnosti k ověření','Circumstances to verify')+'</th><th>'+label('ID transakce','Transaction ID')+
+      '</th></tr></thead><tbody>'+noticeRows+'</tbody></table>' : '');
 }
 
 // Elevated native pure SVG bar chart with direct currency formatting
@@ -2451,7 +2527,7 @@ function renderSouhrn(st){
     }
 
     // § 38v is assessed for an individual exempt income, not merely the annual sum.
-    const noticeCandidates = yr.rows.flatMap(r=>r.list).filter(g=>g.exemptC > 5000000);
+    const noticeCandidates = exemptNoticeCandidates(yr.rows.flatMap(r=>r.list));
     if (noticeCandidates.length){
       h += '<tr class="dim" style="background:#eff6ff;color:#1e40af;font-weight:600"><td colspan="9">' +
         t('alert5M', { year: yr.year, count: noticeCandidates.length }) +
@@ -3045,10 +3121,16 @@ function exportReport(){
     L.push(csvRow([g.year, g.kind==='security'?'D – Prodej cenných papírů':'Převod kryptoaktiv', numCZK(g.income), numCZK(g.allowableExpenses), numCZK(g.nonDeductibleExpenses), numCZK(g.taxBase)]));
   }
   L.push('');
+  L.push(csvRow(['Rok','Ř. 207 – příjmy CZK','Ř. 208 – výdaje CZK','Ř. 209 – dílčí základ CZK']));
+  for (const {year} of state.byYear) {
+    const a = filingAmounts(state,year);
+    L.push(csvRow([year,numCZK(a.income),numCZK(a.expenses),numCZK(a.base)]));
+  }
+  L.push('');
   L.push(csvRow(['OSVOBOZENÉ PŘÍJMY PODLE ROKU']));
   L.push(csvRow(['Rok','Cenné papíry CZK','Kryptoaktiva CZK','Celkem CZK','Kandidáti oznámení § 38v']));
   for (const y of state.byYear){
-    const candidates = y.rows.flatMap(r=>r.list).filter(g=>g.exemptC>5000000).length;
+    const candidates = exemptNoticeCandidates(y.rows.flatMap(r=>r.list)).length;
     L.push(csvRow([y.year,numCZK(y.totals.exemptSecuritiesCZK),numCZK(y.totals.exemptCryptoCZK),numCZK(y.totals.exemptC),candidates]));
   }
   download('01_souhrn_pro_danove_priznani.csv', L.join('\n'));
